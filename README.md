@@ -4,7 +4,13 @@
 
 [下载整个仓库 ZIP](https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip)
 
-## 开始运行
+## 第二篇：微生物数据的Python与MATLAB入门
+
+新增 [lesson02_microbes](lesson02_microbes/)：人工构造的微生物OD600数据、Python和MATLAB中文注释脚本，以及R对照脚本、基础语法练习和实际结果图。
+
+请先进入该文件夹，再按其README运行。它与下方首课的专业汇总、抛硬币模拟是不同的教学案例。
+
+## 首课：开始运行
 
 1. 安装 [R](https://cran.r-project.org/) 和 [RStudio Desktop](https://posit.co/download/rstudio-desktop/)。
 2. 双击根目录的 `医学统计学.Rproj`。

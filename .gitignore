@@ -6,3 +6,7 @@
 Rplots.pdf
 *.xlsx
 *.pptx
+
+# Locally generated data-object caches
+lesson02_microbes/output/**/*.rds
+lesson02_microbes/output/**/*.mat
