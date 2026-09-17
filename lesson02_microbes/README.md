@@ -67,3 +67,63 @@ SD使用n−1分母。四分位数用位置1+(n−1)p的线性插值，三种语
 - R：https://cran.r-project.org/
 
 验证：三种语言的微生物统计表已核对，全部数值列误差小于1e-10；输出图已检查。测试环境为macOS，未逐一测试Windows软件安装。
+
+## 项目与工作目录设置
+
+### 先设置项目和工作目录，再读数据
+
+“工作目录”就是程序解析 `data/文件名.csv` 这类相对路径时的起点。**打开了脚本，不一定就已经切换到脚本所在文件夹。** 本篇请把起点设为同时包含脚本和 `data` 的 `lesson02_microbes` 文件夹，不是其中的 `data` 子文件夹。
+
+在 Spyder 中按下面的顺序操作：
+
+1. 完整解压 GitHub 下载包，找到 `statistics-classroom-main/lesson02_microbes`。
+2. 选择菜单 **项目（Projects）→ 新建项目（New Project）**。
+3. 在创建窗口左侧选择 **现有文件夹（Existing directory）**，选中刚才的 `lesson02_microbes`，然后创建项目。已有数据和脚本时不用选“新建文件夹”，也不用再套一层空目录。
+4. 在项目文件树中打开 `02_python_quickstart.py`。以后通过“打开项目”或“最近的项目”返回这里。
+
+Spyder 会使用项目根文件夹设置工作目录；运行配置也可能影响执行时的位置，所以最后在 **IPython 控制台**核对一次。[Spyder 官方项目说明](https://docs.spyder-ide.org/current/panes/projects.html)
+
+```python
+from pathlib import Path
+print(Path.cwd())
+print([p.name for p in Path.cwd().iterdir()])
+print((Path.cwd() / "data" / "microbes_od600_demo.csv").is_file())
+```
+
+应能看到 `data` 和 `02_python_quickstart.py`，最后返回 `True`。不创建项目也能使用 Spyder：在顶部工作目录栏旁的文件夹按钮中选择同一文件夹，再用上述命令确认。
+
+如果需要用代码切换，可以在控制台输入下面两行，运行时粘贴**自己电脑上该文件夹的完整路径，不加外层引号**：
+
+```python
+import os
+os.chdir(input("请粘贴 lesson02_microbes 文件夹的完整路径：").strip())
+```
+
+本篇完整脚本通过 `__file__` 定位数据；控制台里逐句试验时则使用已经核对的 `Path.cwd()`。这两个起点可能不同，要知道自己正在用哪一个。
+
+### MATLAB：先切换“当前文件夹”，再理解“设置路径”
+
+顶部 **设置路径（Set Path）** 按钮打开的是函数搜索路径列表。把文件夹加进这个列表，并不等于把它设为当前工作目录；也不会替你把 `data/...` 的相对路径起点改到那里。本篇无需在该窗口添加文件夹或保存路径。
+
+实际操作只要两步：
+
+1. 在工具栏下方的**当前文件夹地址栏**输入或浏览到 `lesson02_microbes`。左侧 Files / Current Folder 中应该同时看到 `data` 和 `matlab_quickstart.m`。
+2. 打开 `matlab_quickstart.m`，点击 Run；若提示文件不在当前文件夹，并提供 **Change Folder（更改文件夹）**，本练习选择更改到脚本所在文件夹。
+
+也可以在命令窗口用文件夹选择框完成切换，无需手写长路径：
+
+```matlab
+folder = uigetdir(pwd, '选择含data和脚本的lesson02_microbes文件夹');
+if ~isequal(folder, 0) % 点击取消时返回0，不执行切换
+    cd(folder);
+end
+pwd
+dir
+isfile(fullfile(pwd, 'data', 'microbes_od600_demo.csv'))
+```
+
+最后一行应返回逻辑值 `1`（true）。`pwd` 查看当前位置，`cd` 改变当前位置，`dir` 列出其中的文件。[MATLAB 官方 cd 说明](https://www.mathworks.com/help/matlab/ref/cd.html)
+
+**当前文件夹、脚本所在文件夹、搜索路径，是三个不同概念。** 本篇完整 `.m` 脚本根据自身位置寻找数据；上面的目录设置则方便在命令窗口逐句练习与检查文件。只有以后需要调用其他目录里的公共函数时，才进一步讨论 `addpath` 与持久保存搜索路径。
+
+本地单独练习ZIP解压后的文件夹可能叫 `microbes_demo`；选择同时含脚本和 `data` 的那一层即可，文件夹名称本身不影响运行。
