@@ -17,19 +17,33 @@
 
 ## 运行方法
 
-**R**：双击本文件夹的 `医学统计学.Rproj`，再打开 `R/` 下脚本 Source（可逐段运行）。首次运行会提示安装缺失的包（需联网）。
+**Python（推荐用 Spyder，与统计课堂 03 篇一致）**：Spyder 是免费开源的科学计算开发环境，官方独立安装包自带 Python 环境与 NumPy、pandas、matplotlib，做本练习通常不需要另外装一套 Python。[Spyder 官方下载页](https://www.spyder-ide.org/download)
 
-**Python**：
+在 Spyder 中按顺序操作：
+
+1. 完整解压下载包，找到 `stats_classroom/article06_cv_geometric_mean`（同时含脚本与 `data` 的那一层）。
+2. 菜单 **项目（Projects）→ 新建项目（New Project）**，左侧选 **现有文件夹（Existing directory）**，选中该文件夹并创建项目。
+3. 在文件区打开 `2-9-几何均数.py` 或 `2-10-变异系数.py`，点击运行（F5）。计算与中文注释集中在共用模块 `Python/medstats_examples.py`，入口文件只负责调用对应例题。
+4. 在 **IPython 控制台**核对工作目录：
+
+```python
+from pathlib import Path
+print(Path.cwd())
+print((Path.cwd() / "data" / "05.txt").is_file())
+```
+
+最后一行应返回 `True`；返回 `False` 就先切到该文件夹，再运行脚本。不建项目也能用：在顶部工作目录栏旁的文件夹按钮中选择同一个文件夹，再用上面两行确认。
+
+命令行方式同样可以：
 
 ```bash
 python -m pip install -r requirements.txt
 python 2-9-几何均数.py
-python 2-10-变异系数.py
 ```
 
-计算与中文注释集中在共用模块 `Python/medstats_examples.py`，两个入口文件只负责调用对应例题。
+**MATLAB**：需要 Statistics and Machine Learning Toolbox。先把**当前文件夹**切到本文件夹（工具栏地址栏输入或浏览；左侧 Files 中应同时看到 `data` 与脚本），再打开 `MATLAB/2-9-几何均数.m` 运行；中文文件名可用 `run('2-9-几何均数.m')`。注意"当前文件夹""脚本所在文件夹""搜索路径"是三个不同概念——把文件夹加进搜索路径，并不会改变 `data/…` 这类相对路径的起点。共用实现为 `MATLAB/medstats_examples.m`。
 
-**MATLAB**：需要 Statistics and Machine Learning Toolbox；在本文件夹下打开 `MATLAB/` 中的同名 `.m` 运行（中文文件名可用 `run('2-9-几何均数.m')`）。共用实现为 `MATLAB/medstats_examples.m`。
+**R**：双击本文件夹的 `医学统计学.Rproj`，再打开 `R/` 下脚本 Source（可逐段运行）。首次运行会提示安装缺失的包（需联网）。
 
 **结果保存**：默认就会写文件——R 存到 `output/R/`（图、表格与 docx 等；只想到控制台看时先运行 `options(medstats.export = FALSE)`），Python 存到 `output/Python/`，MATLAB 存到 `output/MATLAB/`。图中中文依赖本机中文字体，见下方排查说明。
 
