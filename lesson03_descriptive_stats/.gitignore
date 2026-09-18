@@ -1,0 +1,7 @@
+output/
+Rplots.pdf
+.Rhistory
+.RData
+.Rproj.user/
+__pycache__/
+.DS_Store
