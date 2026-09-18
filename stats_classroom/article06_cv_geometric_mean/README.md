@@ -4,7 +4,7 @@
 
 三套语言**主文件名一致**（`2-9-几何均数`、`2-10-变异系数`），扩展名分别是 `.R`、`.py`、`.m`；同一道例题在三套语言里用同一份数据、同一统计口径实现。
 
-在仓库首页点击 **Code → Download ZIP**，完整解压后进入 `article06_cv_geometric_mean`，不要只下载单个脚本。
+在仓库首页点击 **Code → Download ZIP**，完整解压后进入 `stats_classroom/article06_cv_geometric_mean`，不要只下载单个脚本。
 
 ## 数据是什么
 
