@@ -10,6 +10,10 @@
 
 请先进入该文件夹，再按其README运行。它与下方首课的专业汇总、抛硬币模拟是不同的教学案例。
 
+## 统计课堂 06：变异系数与几何均数
+
+新增 [article06_cv_geometric_mean](article06_cv_geometric_mean/)：课堂上没来得及展开的两节——变异系数（CV）与几何均数／几何标准差（GM／GSD）。含 R、Python、MATLAB 三套同名脚本、精简共用模块，以及两组数据（10 名患者来源分离株的环丙沙星 MIC、10 名新生儿身高体重）。请先进入该文件夹，再按其 README 运行。
+
 ## 首课：开始运行
 
 1. 安装 [R](https://cran.r-project.org/) 和 [RStudio Desktop](https://posit.co/download/rstudio-desktop/)。
