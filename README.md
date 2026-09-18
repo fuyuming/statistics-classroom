@@ -16,7 +16,7 @@
 
 | 公众号 | 主题 | 代码 |
 |---|---|---|
-| 06 | 变异系数（CV）与几何均数／几何标准差（GM／GSD）——课堂上没展开的两节 | [stats_classroom/article06_cv_geometric_mean](stats_classroom/article06_cv_geometric_mean/) |
+| 04 | 变异系数（CV）与几何均数／几何标准差（GM／GSD）——课堂上没展开的两节（先发） | [stats_classroom/article04_cv_geometric_mean](stats_classroom/article04_cv_geometric_mean/) |
 
 请进入对应文件夹，再按该文件夹的 README 运行。
 

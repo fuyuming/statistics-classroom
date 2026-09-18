@@ -4,7 +4,7 @@
 
 三套语言**主文件名一致**（`2-9-几何均数`、`2-10-变异系数`），扩展名分别是 `.R`、`.py`、`.m`；同一道例题在三套语言里用同一份数据、同一统计口径实现。
 
-在仓库首页点击 **Code → Download ZIP**，完整解压后进入 `stats_classroom/article06_cv_geometric_mean`，不要只下载单个脚本。
+在仓库首页点击 **Code → Download ZIP**，完整解压后进入 `stats_classroom/article04_cv_geometric_mean`，不要只下载单个脚本。
 
 ## 数据是什么
 
@@ -21,7 +21,7 @@
 
 在 Spyder 中按顺序操作：
 
-1. 完整解压下载包，找到 `stats_classroom/article06_cv_geometric_mean`（同时含脚本与 `data` 的那一层）。
+1. 完整解压下载包，找到 `stats_classroom/article04_cv_geometric_mean`（同时含脚本与 `data` 的那一层）。
 2. 菜单 **项目（Projects）→ 新建项目（New Project）**，左侧选 **现有文件夹（Existing directory）**，选中该文件夹并创建项目。
 3. 在文件区打开 `2-9-几何均数.py` 或 `2-10-变异系数.py`，点击运行（F5）。计算与中文注释集中在共用模块 `Python/medstats_examples.py`，入口文件只负责调用对应例题。
 4. 在 **IPython 控制台**核对工作目录：
