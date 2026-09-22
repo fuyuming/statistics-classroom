@@ -1,0 +1,257 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>等待越久，就越容易等到吗？｜统计课堂06</title><style>*{box-sizing:border-box}body{margin:0;background:#f3f5f2;color:#28363a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:780px;margin:28px auto;background:#fff;padding:44px 40px;font-size:17px;line-height:1.95}h1{font-size:30px;line-height:1.5;color:#153f42;margin:0 0 24px}h2{font-size:22px;line-height:1.6;color:#146c68;margin-top:42px;border-bottom:1px solid #dce7e2;padding-bottom:10px}p{margin:20px 0}blockquote{margin:24px 0;padding:12px 20px;background:#f1f6f3;border-left:4px solid #258880}blockquote p{margin:8px 0}a{color:#177f7a;text-decoration:none;border-bottom:1px solid #b9d6cc}img{display:block;width:100%;height:auto;margin:24px auto 10px}em{font-style:normal;font-size:14px;color:#677271}strong{color:#175954}pre{background:#f5f6f6;padding:18px;overflow:auto;line-height:1.65;font-size:13px;border-radius:5px}code{font-family:Menlo,Consolas,monospace;font-size:.9em}p code,li code{background:#f0f4f2;padding:2px 4px}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.7;min-width:420px}td,th{border:1px solid #dce5df;padding:11px;text-align:left}th{background:#edf5f0;color:#225953}.table-wrap{overflow-x:auto;margin:24px 0}li{margin:12px 0}hr{border:0;border-top:1px solid #dbe4df;margin:36px 0}sup{line-height:0}@media(max-width:620px){main{margin:0;padding:26px 20px;font-size:16px}h1{font-size:26px}h2{font-size:20px}blockquote{padding:10px 14px}pre{font-size:12px}}</style></head><body><main><h1>等待越久，就越容易等到吗？从指数分布讲到威布尔分布</h1>
+<blockquote>
+<p>明哥的微生物世界 · 统计课堂 06</p>
+<p>摘要：从“还要等多久”出发，理解指数分布、条件概率与无记忆性，再看威布尔分布怎样描述随时间变化的风险。</p>
+</blockquote>
+<p>大家好，我是明哥。</p>
+<p>上课讲到指数分布时，有几个地方值得再慢一点：为什么它能和泊松分布联系起来？已经等了很久，为什么还说“无记忆”？如果研究对象会衰老，这个模型还合适吗？</p>
+<p>今天把这条线重新串起来，也往前走一步，聊聊<strong>威布尔分布（Weibull distribution）</strong>。</p>
+<h2>一、同一件事，可以数次数，也可以量时间</h2>
+<p>假设某条电话线路的来电符合一个理想模型：来电彼此不影响，发生率保持稳定，平均每小时0.5通。更准确地说，我们假设它是一个<strong>齐次泊松过程</strong>。</p>
+<p>我们可以提出两种问题：</p>
+<ul>
+<li>未来4小时，会来几通电话？这是<strong>次数</strong>。</li>
+<li>从现在开始，到下一通电话要等多久？这是<strong>时间</strong>。</li>
+</ul>
+<p>令 N(t) 表示 t 小时内的来电数，T 表示到下一通来电的等待时间。把下面两句话放在一起读：</p>
+<blockquote>
+<p><strong>等待超过 t 小时，恰好就是这 t 小时里一通电话都没来。</strong></p>
+<p>P(T &gt; t) = P[N(t) = 0] = exp(−λt)</p>
+</blockquote>
+<p>这里的 λ 是每小时发生率，exp(x) 就是 e 的 x 次方。</p>
+<p>当 λ = 0.5/小时，未来4小时的期望来电数是 0.5 × 4 = 2 通。于是：</p>
+<blockquote>
+<p>P(T &gt; 4) = P[N(4) = 0] = exp(−2) ≈ <strong>13.53%</strong>。</p>
+</blockquote>
+<p>这样，泊松分布与指数分布就连起来了：在这个过程模型下，一个描述固定时间里的次数，另一个描述相邻事件之间的等待时间。</p>
+<p>要留意：泊松计数的参数是 <strong>λt</strong>，等待时间的指数分布参数是 <strong>λ</strong>。时间窗口变长，期望次数会变；每小时的发生率并不会因此变大。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/01_%E6%AC%A1%E6%95%B0%E4%B8%8E%E7%AD%89%E5%BE%85.png" alt="同一个来电过程中的次数与等待时间" /></p>
+<p><em>图1｜超过4小时的等待，对应密度曲线右侧的面积。平均每小时0.5通，不等于固定每2小时来一通。所有配图均为设定参数下的模型曲线。</em></p>
+<p>这一步使用了完整的齐次泊松过程假设。仅凭“某一段时间的计数像泊松分布”，还不足以推出所有等待间隔都服从指数分布。<a href="https://www.itl.nist.gov/div898/handbook/apr/section1/apr161.htm">模型关系参考：NIST</a></p>
+<h2>二、指数分布的核心，不只是那条下降的曲线</h2>
+<p>描述等待时间时，先分清三个量：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>量</th>
+<th>回答什么问题</th>
+<th>指数分布中的表达式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>生存函数 S(t)</td>
+<td>到 t 时，事件还没发生的概率是多少？</td>
+<td>exp(−λt)</td>
+</tr>
+<tr>
+<td>分布函数 F(t)</td>
+<td>到 t 时，事件已经发生的概率是多少？</td>
+<td>1 − exp(−λt)</td>
+</tr>
+<tr>
+<td>概率密度 f(t)</td>
+<td>事件时间在 t 附近有多集中？</td>
+<td>λ exp(−λt)</td>
+</tr>
+</tbody>
+</table></div>
+<p>这里的“生存”是数学用语：可以指人或动物仍然存活，也可以指仪器还没故障、下一通电话还没到来。</p>
+<p><strong>密度曲线的高度不是概率，某个时间区间下的面积才是概率。</strong> 对连续时间模型，“恰好在某一个精确时刻发生”的概率为0；我们通常关心一段时间内是否发生。</p>
+<p>接下来，才是理解指数分布最关键的量：<strong>风险率 h(t)</strong>。</p>
+<p>它问的是：</p>
+<blockquote>
+<p><strong>在已经持续到 t、事件仍未发生的条件下，接下来一小段时间内，事件发生得有多快？</strong></p>
+</blockquote>
+<p>在很短的时间 Δt 内，条件事件概率近似为 h(t) × Δt。风险率的单位是“每小时”或“每年”，本身不是一个概率。</p>
+<p>它与密度的关系是：</p>
+<blockquote>
+<p>h(t) = f(t) / S(t)</p>
+<p>指数分布中：h(t) = λ。</p>
+</blockquote>
+<p>为什么密度明明下降，风险率却不变？因为<strong>越往后，还没有发生事件的对象也越少</strong>。密度以最初全部对象为基准；风险率则以持续到当前仍未发生事件的对象为基准。指数模型中，两者分子分母按相同比例下降，比值便保持不变。</p>
+<p>这也解释了一个容易混淆的数字：若 λ = 0.1/年，未来一年内发生事件的条件概率是：</p>
+<blockquote>
+<p>1 − exp(−0.1 × 1) ≈ <strong>9.52%</strong>，并不是直接拿0.1当作10%。</p>
+</blockquote>
+<p>指数分布的平均等待时间为 1/λ。因此，λ = 0.5/小时对应平均等待2小时。这个平均值描述许多次等待的整体水平，不是下一次来电的时间表。</p>
+<h2>三、“无记忆”，究竟忘掉了什么？</h2>
+<p>还是这条电话线路。</p>
+<p>刚开始等的时候，超过1小时仍没有来电的概率是：</p>
+<blockquote>
+<p>P(T &gt; 1) = exp(−0.5) ≈ <strong>60.65%</strong>。</p>
+</blockquote>
+<p>现在已经等了2小时，电话仍没有来。接下来再等1小时，仍等不到的概率是多少？</p>
+<p>首先把问题写对：总等待需要超过3小时，但我们已经知道它超过了2小时。</p>
+<blockquote>
+<p>P(T &gt; 3 | T &gt; 2)</p>
+<p>= P(T &gt; 3) / P(T &gt; 2)</p>
+<p>= 0.22313 / 0.36788</p>
+<p>≈ <strong>60.65%</strong>。</p>
+</blockquote>
+<p>这个结果和刚开始等1小时完全一样。</p>
+<p>分母不能省略。22.31%是从起点看，所有等待中超过3小时的比例；60.65%是在那些已经等过2小时的等待中，最终还会超过3小时的比例。</p>
+<p>更一般地：</p>
+<blockquote>
+<p><strong>P(T &gt; s + u | T &gt; s) = exp(−λu) = P(T &gt; u)。</strong></p>
+</blockquote>
+<p>这就是无记忆性：已知事件尚未发生，<strong>剩余等待时间的分布不随已经等待的时长改变</strong>。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/02_%E6%97%A0%E8%AE%B0%E5%BF%86%E6%80%A7.png" alt="指数模型的无记忆性" /></p>
+<p><em>图2｜横轴从“此刻”重新计算剩余等待。实线与虚线重合，表示整个剩余等待分布相同。</em></p>
+<p>已经过去的2小时当然真实存在。无记忆性说的是未来等待的概率分布；它既不保证马上来电，也不要求必须再等2小时。</p>
+<p>如果公交车严格按固定间隔到站，或者电话高峰即将到来，等待时间就不能照搬这个结论。<strong>先判断过程是否近似符合假设，再使用无记忆性。</strong></p>
+<h2>四、回到课堂：已经活了10年，再活8年怎么算？</h2>
+<p>课堂里有一道猫寿命的例题。这里按《生物统计学》第6版第76页例3-19的指数模型设定改编，并把第二问明确写成条件概率：</p>
+<blockquote>
+<p>假设总寿命 X 从出生开始计算，服从 λ = 0.1/年的指数分布。</p>
+<p>① 活过15年的概率是多少？</p>
+<p>② 已经活过10年，再活过8年的概率是多少？</p>
+</blockquote>
+<p>第一问直接算右尾概率：</p>
+<blockquote>
+<p>P(X &gt; 15) = exp(−0.1 × 15) ≈ <strong>22.31%</strong>。</p>
+</blockquote>
+<p>第二问中，“再活8年”意味着总寿命超过18年；“已经活过10年”是已知条件：</p>
+<blockquote>
+<p>P(X &gt; 18 | X &gt; 10)</p>
+<p>= S(18) / S(10)</p>
+<p>= exp(−1.8) / exp(−1)</p>
+<p>= exp(−0.8) ≈ <strong>44.93%</strong>。</p>
+</blockquote>
+<p>这里为什么是相除？可以把它想成：先找到所有活过10年的对象，再看其中多少还活过18年。<strong>条件概率改变了计算比例时的分母。</strong></p>
+<p>若计算 S(10) − S(18)，得到约20.26%，回答的是“从出生算，在10到18年之间死亡”的概率，是另一个问题。</p>
+<p>还要分清：λ = 0.1 是题目给定的模型参数；10岁是第二问的年龄条件。不能因为“已经10岁”，就用1/10来估计 λ。即使知道平均寿命是10年，也不能单凭这一点确定寿命服从指数分布。</p>
+<p>算到这里，恰好可以追问一句：<strong>真实生命会衰老，为什么模型却说已活10年后的剩余寿命，与刚出生时的寿命分布相同？</strong></p>
+<p>因为题目预先采用了恒定风险率的指数模型。这是模型的结果，不是“猫不会衰老”的生物学结论。</p>
+<h2>五、如果风险会变化，就走到威布尔分布</h2>
+<p>仪器可能越用越容易故障；有些对象的早期故障风险较高，持续运行一段时间后，观察到的风险反而下降。</p>
+<p>我们需要一个允许风险率随时间变化的模型。常用的选择之一是<strong>两参数威布尔分布</strong>。</p>
+<p>用 k 表示形状参数，用 η（eta）表示尺度参数：</p>
+<blockquote>
+<p><strong>S(t) = exp[−(t/η)<sup>k</sup>]</strong></p>
+<p>h(t) = (k/η) × (t/η)<sup>k−1</sup>，t &gt; 0。</p>
+</blockquote>
+<p>先看公式里决定风险变化的幂次 k − 1：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>形状参数</th>
+<th>随时间变化的风险率</th>
+<th>可以帮助描述的情境</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>k &lt; 1</td>
+<td>下降</td>
+<td>早期故障较多，后续条件风险降低</td>
+</tr>
+<tr>
+<td>k = 1</td>
+<td>恒定</td>
+<td>指数模型描述的恒定风险阶段</td>
+</tr>
+<tr>
+<td>k &gt; 1</td>
+<td>上升</td>
+<td>随使用时间增加的磨损风险</td>
+</tr>
+</tbody>
+</table></div>
+<p>这些情境帮助理解模型，不是仅凭拟合出一个 k 就证明了相应机制。<a href="https://www.itl.nist.gov/div898/handbook/apr/section1/apr162.htm">威布尔模型定义与应用：NIST</a></p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/03_%E5%A8%81%E5%B8%83%E5%B0%94%E9%A3%8E%E9%99%A9%E7%8E%87%E4%B8%8E%E7%94%9F%E5%AD%98.png" alt="威布尔分布的风险率与生存概率" /></p>
+<p><em>图3｜上图比较风险率，下图比较生存概率。三条生存曲线都下降，但对应的风险率可以下降、恒定或上升。固定尺度η = 10年，三个模型的均值并不相同。</em></p>
+<p>当 k = 1 时：</p>
+<blockquote>
+<p>S(t) = exp(−t/η)。</p>
+</blockquote>
+<p>令 λ = 1/η，就回到了指数分布。因此，<strong>指数分布是威布尔分布在形状参数等于1时的特例</strong>。</p>
+<p>尺度 η 的含义也值得单独记一下：无论 k 是多少，在 t = η 时，都有 S(η) = exp(−1) ≈ 36.79%。也就是说，到这个时间点，约63.21%的对象已发生事件。</p>
+<p>η 的单位是时间，k 没有单位。<strong>η 一般不是平均寿命</strong>；仅在 k = 1 时，两者相等。不同资料可能用其他符号，使用软件时要核对 <code>shape</code> 与 <code>scale</code> 的定义。<a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Weibull.html">R的威布尔分布说明</a></p>
+<h2>六、换成威布尔，“已经用了多久”就可能重要了</h2>
+<p>沿用“已经持续10年，再持续8年”的问题。这次把对象想成一件尚未故障的仪器，事件定义为首次故障。</p>
+<p>条件概率的基本规则仍然是：</p>
+<blockquote>
+<p><strong>P(T &gt; s + u | T &gt; s) = S(s + u) / S(s)。</strong></p>
+</blockquote>
+<p>这个规则并不专属于指数分布。把威布尔生存函数代进去：</p>
+<blockquote>
+<p>exp{−[((s + u)/η)<sup>k</sup> − (s/η)<sup>k</sup>]}。</p>
+</blockquote>
+<p>只有 k = 1 时，式子里的 s 才会消掉。其余情况下，已经使用的时长通常会影响未来的条件概率。</p>
+<p>固定尺度η = 10年，得到下面这组教学计算：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>形状 k</th>
+<th>从起点算，保持超过8年无故障</th>
+<th>已用10年，再保持超过8年无故障</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.5</td>
+<td>40.88%</td>
+<td>71.06%</td>
+</tr>
+<tr>
+<td>1</td>
+<td>44.93%</td>
+<td>44.93%</td>
+</tr>
+<tr>
+<td>2</td>
+<td>52.73%</td>
+<td>10.65%</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>重点是横着比较同一行。</strong> 风险递减时，已经持续到10年的对象，后续8年的无事件概率更高；风险递增时则相反。指数模型恰好处在中间：前后相等。</p>
+<p>不同模型固定的是尺度，不是平均寿命，所以不能据此宣称某个模型代表的仪器“总体更耐用”。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/04_%E5%89%A9%E4%BD%99%E6%97%B6%E9%97%B4%E7%9A%84%E5%8F%98%E5%8C%96.png" alt="已使用时间与剩余无故障概率" /></p>
+<p><em>图4｜横轴是已经使用且尚未故障的时间，纵轴是再保持超过8年无故障的条件概率。只有k = 1的曲线是水平线。</em></p>
+<p>普通的两参数威布尔模型也有边界：它的风险率只能单调变化或保持恒定，不能用一条这样的曲线完整描述“先下降、再平稳、最后上升”的浴盆形风险。</p>
+<h2>七、放到自己的研究里，先定义“什么事件、从何时开始”</h2>
+<p>这套方法可以用来思考仪器首次故障，也可以用来研究微生物相关的时间问题。</p>
+<p>例如：以样本开始观察为时间零点，以<strong>首次检出某种微生物</strong>为事件，记录每份样本等待了多久。这个变量具有时间属性，但不能因此直接宣布它服从指数或威布尔分布。</p>
+<p>“首次检出”还受到检测限与观察间隔影响。若每天检查一次，昨天阴性、今天阳性，只能知道事件发生在两次检查之间；这个检出时间也不等于微生物真正出现的精确时刻。</p>
+<p>做实际分析时，先问清三件事：</p>
+<ol>
+<li><strong>起点和事件是否一致？</strong> 不同样本的时间应有可比较的定义。</li>
+<li><strong>观察结束还没发生事件的对象怎样记录？</strong> 不能删掉，也不能把最后观察时间当作事件时间。</li>
+<li><strong>恒定、递增或递减的风险假设，是否得到数据支持？</strong> 图像、拟合诊断和研究背景需要共同判断。</li>
+</ol>
+<p>这些问题通向生存分析。今天先把模型含义弄清楚；如何处理不完整观察、估计参数和检查拟合，可以另开一篇。</p>
+<h2>八、用R核对：先写事件，再调用函数</h2>
+<p>下面这几行可直接运行。<code>lower.tail = FALSE</code> 表示计算右尾概率，也就是“超过这个时间”的概率。</p>
+<pre><code class="language-r"># 1. 等超过4小时：rate的单位是每小时
+p_wait &lt;- pexp(4, rate = 0.5, lower.tail = FALSE)
+cat(sprintf(&quot;等待超过4小时的概率：%.2f%%\n&quot;, 100 * p_wait))
+
+# 2. 已活过10年，再活过8年：分子是18，不是8
+p_cat &lt;- pexp(18, rate = 0.1, lower.tail = FALSE) /
+         pexp(10, rate = 0.1, lower.tail = FALSE)
+cat(sprintf(&quot;已活过10年，再活过8年：%.2f%%\n&quot;, 100 * p_cat))
+
+# 3. 威布尔模型：shape无单位，scale的单位是年
+p_device &lt;- pweibull(18, shape = 2, scale = 10,
+                    lower.tail = FALSE) /
+            pweibull(10, shape = 2, scale = 10,
+                    lower.tail = FALSE)
+cat(sprintf(&quot;已用10年，再保持超过8年无故障：%.2f%%\n&quot;, 100 * p_device))
+</code></pre>
+<p>依次得到 <strong>13.53%、44.93%、10.65%</strong>。</p>
+<p>完整配套脚本包含逐题说明、计算结果、四张图的生成代码和课后小练习。计算部分只需基础R；绘图部分另需 <code>ggplot2</code>、<code>showtext</code> 和中文字体。脚本用UTF-8保存，并分别说明文字编码与绘图字体问题。</p>
+<p><a href="https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article06_exponential_weibull">下载配套脚本与结果</a>（进入仓库首页，选择 <strong>Code → Download ZIP</strong> 后解压）。本篇没有真实观测数据，配套CSV是模型计算结果，不是实验数据。</p>
+<p>最后留一道小题：事件发生率为每小时2次。如果已经等了1小时，接下来再等超过半小时的概率是多少？先写出条件概率，再用R核对。答案和解释都在脚本里。</p>
+<p>我们学会一个分布，不只是记住它的曲线和公式，还要能说清：<strong>它在描述什么，采用了什么假设，以及换一个条件，答案为什么会变。</strong></p>
+<p>这里是“明哥的微生物世界”。下一次遇到“还要等多久”的问题，希望大家能先把时间起点、事件和条件写下来。</p>
+<hr />
+<p><strong>课堂与阅读来源</strong></p>
+<ul>
+<li>课堂猫寿命模型改编自李春喜《生物统计学》第6版，第76页例3-19；第二问在本文中明确按条件概率表述。来电桥接、仪器比较与配图为教学补充。</li>
+<li><a href="https://www.itl.nist.gov/div898/handbook/apr/section1/apr161.htm">NIST：指数分布</a>；<a href="https://www.itl.nist.gov/div898/handbook/apr/section1/apr162.htm">NIST：威布尔分布</a>。</li>
+<li><a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Exponential.html">R官方文档：指数分布</a>；<a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Weibull.html">R官方文档：威布尔分布</a>。</li>
+</ul>
+<p><em>本文配图由配套代码生成；全部数值例子用于解释模型，未拟合真实寿命或微生物检出数据。</em></p>
+</main></body></html>
