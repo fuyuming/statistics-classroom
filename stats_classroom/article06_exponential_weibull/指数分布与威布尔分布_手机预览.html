@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>等待越久，就越容易等到吗？｜统计课堂06</title><style>*{box-sizing:border-box}body{margin:0;background:#f3f5f2;color:#28363a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:780px;margin:28px auto;background:#fff;padding:44px 40px;font-size:17px;line-height:1.95}h1{font-size:30px;line-height:1.5;color:#153f42;margin:0 0 24px}h2{font-size:22px;line-height:1.6;color:#146c68;margin-top:42px;border-bottom:1px solid #dce7e2;padding-bottom:10px}p{margin:20px 0}blockquote{margin:24px 0;padding:12px 20px;background:#f1f6f3;border-left:4px solid #258880}blockquote p{margin:8px 0}a{color:#177f7a;text-decoration:none;border-bottom:1px solid #b9d6cc}img{display:block;width:100%;height:auto;margin:24px auto 10px}em{font-style:normal;font-size:14px;color:#677271}strong{color:#175954}pre{background:#f5f6f6;padding:18px;overflow:auto;line-height:1.65;font-size:13px;border-radius:5px}code{font-family:Menlo,Consolas,monospace;font-size:.9em}p code,li code{background:#f0f4f2;padding:2px 4px}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.7;min-width:420px}td,th{border:1px solid #dce5df;padding:11px;text-align:left}th{background:#edf5f0;color:#225953}.table-wrap{overflow-x:auto;margin:24px 0}li{margin:12px 0}hr{border:0;border-top:1px solid #dbe4df;margin:36px 0}sup{line-height:0}@media(max-width:620px){main{margin:0;padding:26px 20px;font-size:16px}h1{font-size:26px}h2{font-size:20px}blockquote{padding:10px 14px}pre{font-size:12px}}</style></head><body><main><h1>等待越久，就越容易等到吗？从指数分布讲到威布尔分布</h1>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>等待越久，就越容易等到吗？｜统计课堂06</title><style>*{box-sizing:border-box}body{margin:0;background:#f3f5f2;color:#28363a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:780px;margin:28px auto;background:#fff;padding:44px 40px;font-size:17px;line-height:1.95}h1{font-size:30px;line-height:1.5;color:#153f42;margin:0 0 24px}h2{font-size:22px;line-height:1.6;color:#146c68;margin-top:42px;border-bottom:1px solid #dce7e2;padding-bottom:10px}p{margin:20px 0}blockquote{margin:24px 0;padding:12px 20px;background:#f1f6f3;border-left:4px solid #258880}blockquote p{margin:8px 0}a{color:#177f7a;text-decoration:none;border-bottom:1px solid #b9d6cc}img{display:block;width:100%;height:auto;margin:24px auto 10px}em{font-style:normal;font-size:14px;color:#677271}strong{color:#175954}pre{background:#f5f6f6;padding:18px;overflow:auto;line-height:1.65;font-size:13px;border-radius:5px}code{font-family:Menlo,Consolas,monospace;font-size:.9em}p code,li code{background:#f0f4f2;padding:2px 4px}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.7;min-width:420px}td,th{border:1px solid #dce5df;padding:11px;text-align:left}th{background:#edf5f0;color:#225953}.table-wrap{overflow-x:auto;margin:24px 0}li{margin:12px 0}hr{border:0;border-top:1px solid #dbe4df;margin:36px 0}sup{line-height:0}@media(max-width:620px){main{margin:0;padding:26px 20px;font-size:16px}h1{font-size:26px}h2{font-size:20px}blockquote{padding:10px 14px}pre{font-size:12px}}main{overflow-wrap:anywhere}</style></head><body><main><h1>等待越久，就越容易等到吗？从指数分布讲到威布尔分布</h1>
 <blockquote>
 <p>明哥的微生物世界 · 统计课堂 06</p>
 <p>摘要：从“还要等多久”出发，理解指数分布、条件概率与无记忆性，再看威布尔分布怎样描述随时间变化的风险。</p>
@@ -28,7 +28,7 @@
 <p>要留意：泊松计数的参数是 <strong>λt</strong>，等待时间的指数分布参数是 <strong>λ</strong>。时间窗口变长，期望次数会变；每小时的发生率并不会因此变大。</p>
 <p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/01_%E6%AC%A1%E6%95%B0%E4%B8%8E%E7%AD%89%E5%BE%85.png" alt="同一个来电过程中的次数与等待时间" /></p>
 <p><em>图1｜超过4小时的等待，对应密度曲线右侧的面积。平均每两个小时一通，不等于固定每2小时来一通。所有配图均为设定参数下的模型曲线。</em></p>
-<p>这一步使用了完整的齐次泊松过程假设。仅凭“某一段时间的计数像泊松分布”，还不足以推出所有等待间隔都服从指数分布。<a href="https://www.itl.nist.gov/div898/handbook/apr/section1/apr161.htm">模型关系参考：NIST</a></p>
+<p>这一步使用了完整的齐次泊松过程假设。仅凭“某一段时间的计数像泊松分布”，还不足以推出所有等待间隔都服从指数分布。模型关系参考：NIST：https://www.itl.nist.gov/div898/handbook/apr/section1/apr161.htm</p>
 <h2>二、指数分布的核心，不只是那条下降的曲线</h2>
 <p>描述等待时间时，先分清三个量：</p>
 <div class="table-wrap"><table>
@@ -113,7 +113,7 @@
 <p>S(t) = exp[−H(t)]；</p>
 <p>未来 Δ 年的条件事件概率 = 1 − exp{−[H(t + Δ) − H(t)]}。</p>
 </blockquote>
-<p>H(t) 虽然没有单位，也不是概率。<strong>风险率通过一段时间的累积，才能转换成这段时间的事件概率。</strong> 指数模型因为风险率恒定，才简化成 1 − exp(−λΔ)。<a href="https://www.itl.nist.gov/div898/handbook/apr/section1/apr123.htm">风险率定义：NIST</a></p>
+<p>H(t) 虽然没有单位，也不是概率。<strong>风险率通过一段时间的累积，才能转换成这段时间的事件概率。</strong> 指数模型因为风险率恒定，才简化成 1 − exp(−λΔ)。风险率定义：NIST：https://www.itl.nist.gov/div898/handbook/apr/section1/apr123.htm</p>
 <p>指数分布的平均等待时间为 1/λ。因此，λ = 0.5/小时对应平均等待2小时。这个平均值描述许多次等待的整体水平，不是下一次来电的时间表。</p>
 <h2>三、“无记忆”，究竟忘掉了什么？</h2>
 <p>还是这条电话线路。</p>
@@ -198,7 +198,7 @@
 </tr>
 </tbody>
 </table></div>
-<p>这些情境帮助理解模型，不是仅凭拟合出一个 k 就证明了相应机制。<a href="https://www.itl.nist.gov/div898/handbook/apr/section1/apr162.htm">威布尔模型定义与应用：NIST</a></p>
+<p>这些情境帮助理解模型，不是仅凭拟合出一个 k 就证明了相应机制。威布尔模型定义与应用：NIST：https://www.itl.nist.gov/div898/handbook/apr/section1/apr162.htm</p>
 <p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/03_%E5%A8%81%E5%B8%83%E5%B0%94%E9%A3%8E%E9%99%A9%E7%8E%87%E4%B8%8E%E7%94%9F%E5%AD%98.png" alt="威布尔分布的风险率与生存概率" /></p>
 <p><em>图3｜上图比较风险率，下图比较生存概率。三条生存曲线都下降，但对应的风险率可以下降、恒定或上升。固定尺度η = 10年，三个模型的均值并不相同。</em></p>
 <p>当 k = 1 时：</p>
@@ -207,7 +207,7 @@
 </blockquote>
 <p>令 λ = 1/η，就回到了指数分布。因此，<strong>指数分布是威布尔分布在形状参数等于1时的特例</strong>。</p>
 <p>尺度 η 的含义也值得单独记一下：无论 k 是多少，在 t = η 时，都有 S(η) = exp(−1) ≈ 36.79%。也就是说，到这个时间点，约63.21%的对象已发生事件。</p>
-<p>η 的单位是时间，k 没有单位。<strong>η 一般不是平均寿命</strong>；仅在 k = 1 时，两者相等。不同资料可能用其他符号，使用软件时要核对 <code>shape</code> 与 <code>scale</code> 的定义。<a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Weibull.html">R的威布尔分布说明</a></p>
+<p>η 的单位是时间，k 没有单位。<strong>η 一般不是平均寿命</strong>；仅在 k = 1 时，两者相等。不同资料可能用其他符号，使用软件时要核对 <code>shape</code> 与 <code>scale</code> 的定义。R的威布尔分布说明：https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Weibull.html</p>
 <h2>六、换成威布尔，“已经用了多久”就可能重要了</h2>
 <p>沿用“已经持续10年，再持续8年”的问题。这次把对象想成一件尚未故障的仪器，事件定义为首次故障。</p>
 <p>条件概率的基本规则仍然是：</p>
@@ -269,7 +269,7 @@
 <blockquote>
 <p>log E(T | x) = β₀ + β₁x。</p>
 </blockquote>
-<p>这表示解释变量影响的是<strong>条件平均时间</strong>。在其他变量不变时，x增加1单位，平均时间乘以 exp(β₁)；这个倍数不是风险比。通常的Gamma GLM还假设条件方差与条件均值的平方成比例。<a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/family.html">R的Gamma模型与连接函数</a></p>
+<p>这表示解释变量影响的是<strong>条件平均时间</strong>。在其他变量不变时，x增加1单位，平均时间乘以 exp(β₁)；这个倍数不是风险比。通常的Gamma GLM还假设条件方差与条件均值的平方成比例。R的Gamma模型与连接函数：https://stat.ethz.ch/R-manual/R-devel/library/stats/html/family.html</p>
 <p>指数分布确实是Gamma分布在形状参数等于1时的特例。但普通Gamma回归不会自动把形状固定为1，因此通常不具有指数模型的恒定风险率与无记忆性。威布尔分布与Gamma分布则是两个不同的分布家族，不能把威布尔回归统称为Gamma回归。</p>
 <p>若问题是“某因素如何影响首次检出的时间，以及持续到某时刻后的风险”，尤其观察结束时还有样本尚未检出，就更自然地进入<strong>生存回归模型</strong>：</p>
 <div class="table-wrap"><table>
@@ -299,7 +299,7 @@
 </tbody>
 </table></div>
 <p>例如观察到第30天仍未检出，我们只知道时间超过30天。这条记录对模型有信息，不能当成“第30天发生”，也不能简单删除。普通 <code>glm(..., family = Gamma(...))</code> 不会自动处理这样的删失记录；需要相应的生存似然或支持删失的模型。</p>
-<p>R的 <code>survival::survreg()</code> 可以拟合指数与威布尔生存回归，其常见表达是加速失效时间模型，系数解释为时间尺度的变化。<a href="https://stat.ethz.ch/R-manual/R-devel/library/survival/html/survreg.html">R生存回归说明</a></p>
+<p>R的 <code>survival::survreg()</code> 可以拟合指数与威布尔生存回归，其常见表达是加速失效时间模型，系数解释为时间尺度的变化。R生存回归说明：https://stat.ethz.ch/R-manual/R-devel/library/survival/html/survreg.html</p>
 <p>因此，本篇沿着“恒定风险—变化风险—事件时间”的主线，后续最顺的延伸是指数与威布尔生存回归；Gamma回归可以在比较正值连续响应模型时单独展开。具体选择仍取决于研究问题、观测方式和拟合诊断。</p>
 <h2>九、用R核对：先写事件，再调用函数</h2>
 <p>下面这几行可直接运行。<code>lower.tail = FALSE</code> 表示计算右尾概率，也就是“超过这个时间”的概率。</p>
@@ -321,7 +321,7 @@ cat(sprintf(&quot;已用10年，再保持超过8年无故障：%.2f%%\n&quot;, 1
 </code></pre>
 <p>依次得到 <strong>13.53%、44.93%、10.65%</strong>。</p>
 <p>完整配套脚本包含逐题说明、计算结果、四张图的生成代码和课后小练习。计算部分只需基础R；绘图部分另需 <code>ggplot2</code>、<code>showtext</code> 和中文字体。脚本用UTF-8保存，并分别说明文字编码与绘图字体问题。</p>
-<p><a href="https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article06_exponential_weibull">下载配套脚本与结果</a>（进入仓库首页，选择 <strong>Code → Download ZIP</strong> 后解压）。本篇没有真实观测数据，配套CSV是模型计算结果，不是实验数据。</p>
+<p>下载配套脚本与结果：https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article06_exponential_weibull（进入仓库首页，选择 <strong>Code → Download ZIP</strong> 后解压）。本篇没有真实观测数据，配套CSV是模型计算结果，不是实验数据。</p>
 <p>最后留一道小题：事件发生率为每小时2次。如果已经等了1小时，接下来再等超过半小时的概率是多少？先写出条件概率，再用R核对。答案和解释都在脚本里。</p>
 <p>我们学会一个分布，不只是记住它的曲线和公式，还要能说清：<strong>它在描述什么，采用了什么假设，以及换一个条件，答案为什么会变。</strong></p>
 <p>这里是“明哥的微生物世界”。下一次遇到“还要等多久”的问题，希望大家能先把时间起点、事件和条件写下来。</p>
@@ -329,8 +329,8 @@ cat(sprintf(&quot;已用10年，再保持超过8年无故障：%.2f%%\n&quot;, 1
 <p><strong>课堂与阅读来源</strong></p>
 <ul>
 <li>课堂猫寿命模型改编自李春喜《生物统计学》第6版，第76页例3-19；第二问在本文中明确按条件概率表述。来电桥接、仪器比较与配图为教学补充。</li>
-<li><a href="https://www.itl.nist.gov/div898/handbook/apr/section1/apr161.htm">NIST：指数分布</a>；<a href="https://www.itl.nist.gov/div898/handbook/apr/section1/apr162.htm">NIST：威布尔分布</a>。</li>
-<li><a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Exponential.html">R官方文档：指数分布</a>；<a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Weibull.html">R官方文档：威布尔分布</a>。</li>
+<li>NIST：指数分布：https://www.itl.nist.gov/div898/handbook/apr/section1/apr161.htm；NIST：威布尔分布：https://www.itl.nist.gov/div898/handbook/apr/section1/apr162.htm。</li>
+<li>R官方文档：指数分布：https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Exponential.html；R官方文档：威布尔分布：https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Weibull.html。</li>
 </ul>
 <p><em>本文配图由配套代码生成；全部数值例子用于解释模型，未拟合真实寿命或微生物检出数据。</em></p>
 </main></body></html>
