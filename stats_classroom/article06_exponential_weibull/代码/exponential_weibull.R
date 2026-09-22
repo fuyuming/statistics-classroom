@@ -29,9 +29,9 @@ section <- function(title) cat("\n", strrep("=", 48), "\n", title, "\n", sep = "
 answer <- function(label, value) cat(sprintf("%s：%.6f（%.2f%%）\n", label, value, 100 * value))
 
 section("1. 泊松数次数，指数量等待：同一个事件")
-lambda <- 0.5  # 每小时平均 0.5 通；这是率，单位为 1/小时。
+lambda <- 0.5  # 平均每两个小时一通；这是率，单位为 1/小时。
 t <- 4
-cat("设定：来电服从齐次泊松过程，恒定发生率 0.5/小时。\n")
+cat("设定：来电服从齐次泊松过程，平均每两个小时一通，恒定发生率为 0.5/小时。\n")
 cat(sprintf("4 小时内来电数的期望 = 0.5 × 4 = %.1f 通。\n", lambda*t))
 p_zero <- dpois(0, lambda = lambda*t)
 # lower.tail=FALSE 直接算右尾 P(T>t)；默认 TRUE 算 P(T<=t)。
@@ -137,7 +137,7 @@ if (!requireNamespace("ggplot2",quietly=TRUE) || !requireNamespace("showtext",qu
       geom_line(colour="#187F7B",linewidth=1.2) +
       geom_vline(xintercept=4,linetype="dashed",colour="#C8793A") +
       annotate("text",x=6.8,y=.29,label="等超过 4 小时\n= 前 4 小时零来电\n= exp(−0.5 × 4) ≈ 13.53%",family="chinese",size=5,colour="#263B44")+
-      labs(title="数次数与量等待，怎样连起来？",subtitle="齐次泊松过程：每小时平均 0.5 通来电",x="从开始等待算起的时间（小时）",y="概率密度（1/小时）",
+      labs(title="数次数与量等待，怎样连起来？",subtitle="齐次泊松过程：平均每两个小时一通电话",x="从开始等待算起的时间（小时）",y="概率密度（1/小时）",
            caption="橙色是右尾面积（右侧延伸至无穷），不是曲线高度。图中仅显示到第 10 小时。\n参数为教学设定；明哥的微生物世界 · 统计课堂 06")
     save_plot("01_次数与等待.png",p1)
     d2 <- rbind(data.frame(t=tt,p=exp(-.5*tt),curve="刚开始：P(T > u)"),
