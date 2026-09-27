@@ -347,17 +347,31 @@ qf(0.95, df1 = 1, df2 = 10)
 
 把自由度从 10 改成 5、30、100，再看一看。t 与 F 的对应关系仍然成立，而错用 1.96 得到的错误率会逐渐接近 5%。严格说，1.96 本身还是标准正态临界值的四舍五入值。
 
-### 下载完整脚本、教学数据与运行结果
+### 选一种语言，自己跑一遍
+
+前面几行 R 代码，可以先核对两个数字。如果想把三种分布的曲线画出来，再看看 t²＝F 怎样出现在均数比较和回归分析中，就可以打开这篇的完整练习。
+
+和前面的统计课堂一样，这次也准备了 **R、Python 和 MATLAB 三套脚本**。主文件名都是 `normal_chisq_t_f`，扩展名分别是 `.R`、`.py` 和 `.m`；三套代码读取同一份教学数据，采用相同的计算口径。
+
+**用自己熟悉的一种语言跑通即可，不必三种都学一遍。**
+
+- 用 R：双击 `统计课堂07.Rproj`，打开 `代码/normal_chisq_t_f.R`，点击 Source。
+- 用 Python：在 Spyder 中将本篇文件夹建为项目，打开 `代码/normal_chisq_t_f.py`，完整运行。
+- 用 MATLAB：把当前文件夹切到本篇目录，打开 `代码/normal_chisq_t_f.m`，点击 Run。
+
+R 只需基础环境；Python 需要 NumPy、SciPy、Matplotlib；MATLAB 需要 Statistics and Machine Learning Toolbox。具体安装、目录设置和结果位置，都写在同目录的 **README.md** 里，Python 依赖另列在 `requirements.txt` 中。
 
 本篇配套资料：https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article07_normal_chisq_t_f
 
 下载整个仓库 ZIP：https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip
 
-也可以进入仓库首页，选择 **Code → Download ZIP**。解压后进入 `stats_classroom/article07_normal_chisq_t_f`，用 RStudio 打开 `代码/normal_chisq_t_f.R`，点击 **Source** 完整运行。只需要基础 R，无须安装额外包。
+也可以进入仓库首页，选择 **Code → Download ZIP**。完整解压后进入 `stats_classroom/article07_normal_chisq_t_f`，保留代码、数据和项目文件的相对位置，不要只拿走一个脚本。
 
-脚本包含文章数值的核对、χ²、t／正态、F 三张分布图的生成、正态与卡方构造 t 的模拟，以及两组比较、一元回归中 t²＝F 的演示。配图坐标、理论计算表、模拟抽样值及运行输出均已提供。
+第一次运行，先核对三个结果：t(10) 的双侧 5% 临界值约为 **2.2281**，它的平方约为 **4.9646**；如果错用 1.96 作界值，理论第一类错误率约为 **7.84%**。
 
-`数据/teaching_data.csv` 是专为演示恒等关系编写的 12 行人工教学数据，**不是真实实验数据**；`运行结果/construction_draws.csv.gz` 是指定模型下的模拟数据。正文的 7.84% 则是理论概率计算结果。文件含义、运行步骤和核对结果见同目录 README。
+第二次，不妨把自由度改一改，看 t 的尾巴怎样靠近正态，再看 χ² 和 F 的曲线如何变化。代码还用两组数据和一元回归分别演示了 t²＝F，大家可以把输出中的数字对起来。
+
+这里把数据来源说清楚：`数据/teaching_data.csv` 是人为编写的 12 行教学数据，不是真实实验；脚本生成的随机抽样值是模型模拟数据；7.84% 则来自理论概率计算。曲线坐标、计算结果、模拟数据和运行记录都已提供。三种语言的理论结果已核对一致，随机模拟结果允许存在抽样差异。
 
 学这几个分布，不只是为了记住哪张表对应哪个检验。更有用的是，每次算出一个统计量之后，都能接着问：
 

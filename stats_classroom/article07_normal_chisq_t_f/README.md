@@ -8,18 +8,56 @@
 
 全仓库 ZIP：https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip
 
-解压后进入 `stats_classroom/article07_normal_chisq_t_f`，用 RStudio 打开 `代码/normal_chisq_t_f.R`，点击 Source 完整运行。只需基础 R，无额外包。命令行也可运行：
+完整解压后进入 `stats_classroom/article07_normal_chisq_t_f`，不要只下载单个脚本。三套语言主文件同名，扩展名分别为 `.R`、`.py`、`.m`，共享 `数据/teaching_data.csv`。
 
-```sh
-Rscript 代码/normal_chisq_t_f.R
+### R / RStudio
+
+双击本目录的 **`统计课堂07.Rproj`**，再打开 `代码/normal_chisq_t_f.R`，点击 **Source** 完整运行。只需基础 R，无额外包。也可在项目控制台运行：
+
+```r
+source("代码/normal_chisq_t_f.R", encoding = "UTF-8")
 ```
 
-脚本通过自身路径定位目录。逐行运行时须先将工作目录设为本篇目录。脚本及文字文件为 UTF-8；图中使用英文标签，正文提供中文解释，不需要额外中文字体。
+命令行：`Rscript 代码/normal_chisq_t_f.R`。项目设置不恢复旧工作空间，避免依赖上次会话的变量。
+
+### Python / Spyder
+
+Spyder 中选择 **Projects → New Project → Existing directory**，选择本篇目录；打开 `代码/normal_chisq_t_f.py`，按 F5 完整运行。工作目录应是含 `数据`、`代码`、`requirements.txt` 的这一层。脚本本身也通过 `__file__` 定位数据。
+
+需要 NumPy、SciPy、Matplotlib。在实际运行脚本的 Python 环境中安装：
+
+```sh
+python -m pip install -r requirements.txt
+python 代码/normal_chisq_t_f.py
+```
+
+若 Spyder 提示缺包，先用 `import sys; print(sys.executable)` 确认其解释器，不能仅凭另一个终端安装成功就判断环境已就绪。
+
+### MATLAB
+
+需要 **Statistics and Machine Learning Toolbox**。将 Current Folder 切到本篇目录，打开 `代码/normal_chisq_t_f.m`，点击 **Run**；或输入：
+
+```matlab
+run('代码/normal_chisq_t_f.m')
+```
+
+“当前文件夹”与“搜索路径”不同；无需为本课全局添加路径。完整运行脚本会根据自身位置定位项目目录。
+
+### 输出与编码
+
+R 的结果位于 `运行结果/`，正文配图位于 `文章配图/`；Python、MATLAB 各输出到这两个目录下同名的语言子目录，避免互相覆盖。重新运行会覆盖对应计算结果，不修改输入数据。
+
+脚本及文字文件使用 UTF-8。图中使用英文标签，正文配中文图注，无须安装中文字体。源文件乱码应检查编码；更换字体不能修复读错的文本。三套脚本均计算分位点、生成三张分布图和曲线 CSV、验证 t²=F、保存模拟数据及运行记录。数值定义和参数相同，图形样式允许略有差异。
+
+跨语言使用相同种子并不产生同一条随机数序列；模拟分位点只需接近理论值，不应逐行比较随机抽样。理论计算与共用教学数据的分析结果应在数值误差范围内一致。
 
 ## 文件与来源
 
 - `正态卡方tF的关系_公众号稿.md`：完整文章及显式来源链接。
-- `代码/normal_chisq_t_f.R`：全部计算、模拟、配图和恒等式检查。
+- `统计课堂07.Rproj`：RStudio 项目入口。
+- `requirements.txt`：Python 依赖。
+- `代码/normal_chisq_t_f.R`、`.py`、`.m`：三语言完整计算、模拟、配图和恒等式检查。
+- `VALIDATION.md`：实际运行环境、跨语言核对方法与结果。
 - `数据/teaching_data.csv`：12 行人为编写的教学数据，**不是实验观测**。`sample_id` 为虚构编号，`group` 为 A/B 两组，`x` 为无量纲教学自变量，`response` 为任意单位的教学响应。用于分别演示组别回归和连续自变量回归，不将两个模型解释为同一真实实验的效应分析，不由这些数值判定正态假设成立。
 - `运行结果/critical_values.csv`：理论分位点和错用 1.96 的理论拒绝概率；`n_one_sample` 仅对应单样本 df=n−1 的设定。
 - `运行结果/t_normal_curves.csv`：t 与正态比较图的完整横坐标与密度值。
