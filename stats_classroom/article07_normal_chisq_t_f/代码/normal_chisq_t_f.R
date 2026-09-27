@@ -39,6 +39,49 @@ legend('topright', c('N(0, 1)', 't: df = 1', 't: df = 5', 't: df = 30'),
        lty = c(2, 1, 1, 1), lwd = 2, bty = 'n', cex = .8)
 dev.off()
 
+# 二补充、卡方曲线：分面避免 df=1 在零附近的高密度压扁其他曲线。
+chi_x <- seq(.001, 55, length.out = 3001)
+chi_df <- c(1, 2, 3, 5, 10, 30)
+chi_curves <- data.frame(x = chi_x)
+for (k in chi_df) chi_curves[[paste0('df_', k)]] <- dchisq(chi_x, k)
+write.csv(chi_curves, file.path(out, 'chisq_curves.csv'), row.names = FALSE)
+png(file.path(figs, '03-卡方分布是一族曲线.png'), width = 1600, height = 1500, res = 160)
+par(mfrow = c(2, 1), mar = c(4, 4.5, 3, 1), las = 1)
+plot(chi_x, dchisq(chi_x, 1), type = 'l', col = '#178C88', lwd = 2,
+     xlim = c(0, 8), ylim = c(0, 1.5), xlab = 'Chi-square value', ylab = 'Density',
+     main = 'Chi-square: df = 1 and 2')
+lines(chi_x, dchisq(chi_x, 2), col = '#4144A5', lwd = 2, lty = 2)
+legend('topright', c('df = 1', 'df = 2'), col = c('#178C88', '#4144A5'), lty = c(1, 2), lwd = 2, bty = 'n')
+mtext('df = 1: density tends to infinity as x approaches 0; upper part clipped', side = 3, cex = .7, line = .2)
+cols <- c('#178C88', '#4144A5', '#E36854', '#333333')
+matplot(chi_x, chi_curves[, c('df_3', 'df_5', 'df_10', 'df_30')], type = 'l',
+        col = cols, lty = 1:4, lwd = 2, xlab = 'Chi-square value', ylab = 'Density',
+        main = 'Chi-square: increasing degrees of freedom')
+legend('topright', paste('df =', c(3, 5, 10, 30)), col = cols, lty = 1:4, lwd = 2, bty = 'n')
+dev.off()
+
+# F 曲线：分别固定分母和分子自由度，观察另一个自由度的影响。
+f_x <- seq(.001, 6, length.out = 2001)
+pairs <- data.frame(d1 = c(3, 5, 10, 5, 5), d2 = c(10, 10, 10, 5, 30))
+f_curves <- data.frame(x = f_x)
+for (j in seq_len(nrow(pairs))) {
+  name <- paste0('F_', pairs$d1[j], '_', pairs$d2[j])
+  f_curves[[name]] <- df(f_x, pairs$d1[j], pairs$d2[j])
+}
+write.csv(f_curves, file.path(out, 'f_curves.csv'), row.names = FALSE)
+png(file.path(figs, '04-F分布的两个自由度.png'), width = 1600, height = 1500, res = 160)
+par(mfrow = c(2, 1), mar = c(4, 4.5, 3, 1), las = 1)
+for (panel in 1:2) {
+  keys <- if (panel == 1) c('F_3_10', 'F_5_10', 'F_10_10') else c('F_5_5', 'F_5_10', 'F_5_30')
+  labs <- if (panel == 1) c('F(3, 10)', 'F(5, 10)', 'F(10, 10)') else c('F(5, 5)', 'F(5, 10)', 'F(5, 30)')
+  matplot(f_x, f_curves[, keys], type = 'l', col = cols[1:3], lty = 1:3, lwd = 2,
+          xlab = 'F value', ylab = 'Density',
+          main = if (panel == 1) 'Fixed denominator df = 10' else 'Fixed numerator df = 5')
+  abline(v = 1, col = '#999999', lty = 3)
+  legend('topright', labs, col = cols[1:3], lty = 1:3, lwd = 2, bty = 'n')
+}
+dev.off()
+
 # 三、人工教学数据：演示 t²=F 与回归等价，不代表真实实验。
 d <- read.csv(file.path(root, '数据', 'teaching_data.csv'))
 d$group <- factor(d$group, levels = c('A', 'B'))
