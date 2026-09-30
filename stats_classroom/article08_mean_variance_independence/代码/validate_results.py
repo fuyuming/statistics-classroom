@@ -9,7 +9,7 @@ root = Path(__file__).resolve().parents[1]
 for log in (root / '运行结果').glob('*/运行记录.txt'):
     lines = log.read_text(encoding='utf-8').splitlines()
     log.write_text('\n'.join(line.rstrip() for line in lines) + '\n', encoding='utf-8')
-files = ['parabola_coordinates.csv', 'direction_coordinates.csv', 'position_results.csv', 'covariance_identity.csv', 'sampling_summary.csv',
+files = ['parabola_coordinates.csv', 'position_results.csv', 'covariance_identity.csv', 'sampling_summary.csv',
          'conditional_summary.csv', 'pair_summary.csv', 'figure2_coordinates.csv',
          'normal_statistics.csv', 'shifted_exponential_statistics.csv']
 rows = []

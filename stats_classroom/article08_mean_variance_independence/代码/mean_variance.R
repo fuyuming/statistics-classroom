@@ -115,7 +115,7 @@ save_table(do.call(rbind,pair_summary),'pair_summary.csv')
 explain(do.call(rbind,pair_summary))
 explain('后两种模型存在非线性依赖；第三种虽各自正态，却不联合正态。')
 
-# 4. 用同一数据生成四张图；英文标签避免字体依赖 ------------------------------
+# 4. 用同一数据生成三张图；英文标签避免字体依赖 ------------------------------
 fig_dir <- file.path('文章配图','R')
 dir.create(fig_dir,recursive=TRUE,showWarnings=FALSE)
 png(file.path(fig_dir,'01_position.png'),width=1260,height=1080,res=150)
@@ -139,7 +139,6 @@ for (i in 1:3) {
     pch=16,cex=.5,col=adjustcolor('#167d80',alpha.f=.35),xlab='X',ylab='Y',main=labels[i])
 }
 dev.off()
-source('代码/plot_directions.R', encoding='UTF-8')
 source('代码/plot_parabola.R', encoding='UTF-8')
 explain(R.version.string)
 explain('练习：改变筛选均值的门槛，观察入选样本数和结果波动；不能用模拟证明独立。')

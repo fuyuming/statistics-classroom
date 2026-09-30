@@ -106,7 +106,7 @@ explain('正态模型理论拒绝率为5%；指数模型使用同一t界值仅�
 
 # %% 3. 不相关为什么不足以证明独立？
 pairs = pd.read_csv(root / '数据' / 'joint_pairs.csv')
-explain('\n问题3：图2输入字段为pair_id、x、independent_y、sign。')
+explain('\n问题3：图3输入字段为pair_id、x、independent_y、sign。')
 explain(pairs.head(3).to_string(index=False))
 assert pairs['sign'].isin([-1, 1]).all()
 assert np.isfinite(pairs.to_numpy()).all()
@@ -128,8 +128,6 @@ explain('三种模型理论协方差都为0，后两种仍有确定的非线性�
 
 # %% 4. 自动绘图：复杂排版在配套文件中
 make_figures(root, examples, pairs)
-from plot_directions import make_direction_figure
-make_direction_figure(root)
 from plot_parabola import make_parabola_figure
 make_parabola_figure(root)
 explain(f'Python {sys.version.split()[0]}；NumPy {np.__version__}；pandas {pd.__version__}；SciPy {scipy.__version__}')

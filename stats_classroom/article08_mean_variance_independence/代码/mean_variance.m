@@ -121,7 +121,7 @@ writetable(pairSummary,fullfile(out,'pair_summary.csv'));
 disp(pairSummary);
 disp('后两种模型不独立；各自正态也不保证联合正态。');
 
-%% 4. 同一输入生成四幅图；英文标签便于跨平台
+%% 4. 同一输入生成三幅图；英文标签便于跨平台
 figDir = fullfile(root,'文章配图','MATLAB');
 if ~exist(figDir,'dir'), mkdir(figDir); end
 f1 = figure('Color','w','Position',[80,80,840,720]);
@@ -148,7 +148,6 @@ for j=1:3
     xlabel('X'); ylabel('Y'); title(titles(j)); grid on;
 end
 exportgraphics(f2,fullfile(figDir,'02_dependence.png'),'Resolution',150);
-run(fullfile(root,'代码','plot_directions.m'));
 run(fullfile(root,'代码','plot_parabola.m'));
 disp(version);
 disp('练习：改变均值筛选门槛，观察入选样本数与估计波动。');

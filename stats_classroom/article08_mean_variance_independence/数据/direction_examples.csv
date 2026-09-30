@@ -1,5 +1,0 @@
-scenario,stage,x1,x2
-x1_increases,before,10,10
-x1_increases,after,12,10
-x2_increases,before,10,10
-x2_increases,after,10,12

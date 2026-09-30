@@ -33,7 +33,7 @@ shifted_exponential mean_gt_10_5   4163       8.046640      4.753235         6.7
 解释：有限模拟的协方差不必恰好为0。几个分位数相近也不是独立性的证明。
 正态模型理论拒绝率为5%；指数模型使用同一t界值仅作反例比较。
 
-问题3：图2输入字段为pair_id、x、independent_y、sign。
+问题3：图3输入字段为pair_id、x、independent_y、sign。
  pair_id        x  independent_y  sign
        1 0.799694      -0.173710    -1
        2 0.839878       0.366965    -1
