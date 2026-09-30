@@ -1,4 +1,8 @@
 file,compared_with_python,rows,max_absolute_difference,passed
+parabola_coordinates.csv,R,601,1.0658141036401503e-14,True
+parabola_coordinates.csv,MATLAB,601,1.0658141036401503e-14,True
+direction_coordinates.csv,R,4,0.0,True
+direction_coordinates.csv,MATLAB,4,0.0,True
 position_results.csv,R,3,0.0,True
 position_results.csv,MATLAB,3,0.0,True
 covariance_identity.csv,R,2,2.8421709430404e-14,True

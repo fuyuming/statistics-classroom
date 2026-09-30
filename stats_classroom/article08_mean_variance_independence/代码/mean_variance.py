@@ -128,6 +128,10 @@ explain('三种模型理论协方差都为0，后两种仍有确定的非线性�
 
 # %% 4. 自动绘图：复杂排版在配套文件中
 make_figures(root, examples, pairs)
+from plot_directions import make_direction_figure
+make_direction_figure(root)
+from plot_parabola import make_parabola_figure
+make_parabola_figure(root)
 explain(f'Python {sys.version.split()[0]}；NumPy {np.__version__}；pandas {pd.__version__}；SciPy {scipy.__version__}')
 explain('练习：把筛选门槛9.5、10.5改成9、11，先猜样本数及估计波动会怎样变化。')
 (out / '运行记录.txt').write_text('\n'.join(messages), encoding='utf-8')

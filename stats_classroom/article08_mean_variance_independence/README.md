@@ -14,7 +14,7 @@
 - **Python/Spyder**：Projects → New Project → Existing directory，选择本篇目录；打开 `代码/mean_variance.py`，按F5。需NumPy、pandas、SciPy、Matplotlib；在实际解释器环境运行 `python -m pip install -r requirements.txt`。脚本自动调用同目录 `plot_mean_variance.py`。命令行为 `python 代码/mean_variance.py`。
 - **MATLAB**：把Current Folder切到本篇目录，打开 `代码/mean_variance.m` 点击Run，或 `run('代码/mean_variance.m')`。`tinv`需要Statistics and Machine Learning Toolbox。Current Folder不是全局搜索路径，无需全局添加本课目录。
 
-输出在 `运行结果/Python`、`运行结果/R`、`运行结果/MATLAB`，重复运行覆盖对应结果，不修改输入。Python生成正文的两张图；R、MATLAB在 `文章配图` 下各自子目录生成对应英文标签图，统计内容相同。Python检测常用中文字体，缺少时自动使用英文标题。文件使用UTF-8；字体缺字与源文件编码错误是两类问题。
+输出在 `运行结果/Python`、`运行结果/R`、`运行结果/MATLAB`，重复运行覆盖对应结果，不修改输入。Python生成正文的四张图；R、MATLAB在 `文章配图` 下各自子目录生成对应英文标签图，统计内容相同。Python检测常用中文字体，缺少时自动使用英文标题。文件使用UTF-8；字体缺字与源文件编码错误是两类问题。
 
 ## 按什么顺序学习
 
@@ -22,7 +22,7 @@
 2. n=2的M、D：核对S²=D²/2，以及经验Cov(M,D)=[Var(X₁)−Var(X₂)]/2。有限样本的两列经验方差不同，所以经验Cov(M,D)不必为0；恒等式本身仍成立。
 3. n=10重复抽样：对比正态总体与平移指数总体的均值—方差关系；按固定门槛筛选均值，查看样本方差的条件摘要。
 4. t构造：逐行核对两种代数表达相等。正态模型才有这里使用的精确t(9)分布保证；代数相等本身不能保证分布。
-5. 图2：比较独立正态、Y=X²、Y=随机正负X。理论协方差都为0，只有第一种独立。
+5. 图4：比较独立正态、Y=X²、Y=随机正负X。理论协方差都为0，只有第一种独立。
 
 每节打印答案与解释。Python用 `# %%`、MATLAB用 `%%` 分节；首次请完整运行，之后再逐节学习。
 
@@ -32,6 +32,7 @@
 
 | 输入文件 | 行数 | 字段与来源 |
 | --- | --- | --- |
+| `数据/direction_examples.csv` | 4 | scenario表示只增加x1或x2；stage为before/after；x1、x2为人工数值，M、D由脚本计算 |
 | `数据/position_examples.csv` | 3 | group为A/B/C；x1、x2、x3为人为编写的三个观测 |
 | `数据/normal_samples.csv` | 20,000 | sample_id为模拟编号；x1至x10为每行10个独立N(10,4)观测 |
 | `数据/shifted_exponential_samples.csv` | 20,000 | 同上；每个观测为8+Exponential(scale=2)，总体均值10、方差4 |
@@ -49,7 +50,7 @@
 - `normal_statistics.csv`、`shifted_exponential_statistics.csv`：每份样本的mean、variance；M_n2、D_n2、S2_n2只用该行前两个观测；Z、Q、T则用全行10个观测及已知总体μ=10、σ=2。
 - `sampling_summary.csv`：均值和方差的模拟平均、经验协方差/相关、理论协方差；双侧t(9)界值2.26215716285410；t_rejection_fraction是20,000次模拟的拒绝比例，不是单次P值。两模型都在真实μ=10下计算，指数模型也套同一t界值作比较。rejection_mcse为二项比例的蒙特卡洛标准误√[p̂(1−p̂)/B]。
 - `conditional_summary.csv`：all、mean_lt_9_5、mean_gt_10_5三种筛选下的入选数及S²均值、25%、50%、75%分位数。分位数统一为R type=7 / NumPy linear；MATLAB显式线性插值。
-- `figure2_coordinates.csv`：图2完整坐标；independent_y_calculated为独立Y，square_y_calculated=X²，random_sign_y_calculated=sign×X。图形坐标有截断，数据未删除。
+- `figure2_coordinates.csv`：图4完整坐标；independent_y_calculated为独立Y，square_y_calculated=X²，random_sign_y_calculated=sign×X。图形坐标有截断，数据未删除。
 - `pair_summary.csv`：三种模型的经验Cov(X,Y)、相关系数及理论协方差0。
 - `运行记录.txt`：问题、结果、解释、实际版本。
 
@@ -93,3 +94,22 @@ python 代码/render_preview.py 均值与方差的独立性_公众号稿_v2.md �
 此脚本沿用公众号写作技能的渲染器，并为长目录名添加窄屏换行。只使用Python标准库。公众号上传/发布需在平台中另行完成。
 
 当前稿件为V2科学修订稿：保留第5次课《抽样分布、χ² / t》（2026年9月28日）去姓名封面，吸收文字润色，补充样本均值的方差与样本方差抽样分布的区别，以及协方差期望恒等式。三语言代码、模拟数据及数值结果不变；v1保留为历史稿件。
+
+## V2补图与公式展开
+
+正文图序与文件名的对应如下；历史文件名保留，以免破坏旧版链接。
+
+| 正文图号 | 内容 | 正文图片文件 | 计算/绘图入口 |
+| --- | --- | --- | --- |
+| 图1 | 整体位置与分散程度 | 01_位置与分散.png | 原有plot_mean_variance.py及R/MATLAB主文件 |
+| 图2 | 只增加X₁或X₂时，M和D的方向 | 03_均值与差值的变化方向.png | plot_directions.py / .R / .m |
+| 图3 | Y=X²与零协方差 | 04_抛物线与零协方差.png | plot_parabola.py / .R / .m |
+| 图4 | 独立正态、平方、随机变号对照 | 02_不相关与独立.png | 原有plot_mean_variance.py及R/MATLAB主文件 |
+
+三种语言的主脚本现在自动生成四幅图。新增绘图脚本也可单独运行；R需在本课根目录运行，Python/MATLAB自行定位项目目录。两个新脚本不依赖其他绘图脚本的中间变量。MATLAB独立运行这两个新脚本不需要统计工具箱；主脚本的tinv仍需要。
+
+每种语言新增 `direction_coordinates.csv`：scenario、stage、x1、x2以及计算得到的M、D。四行分别为(10,0)、(11,2)、(10,0)、(11,−2)。这是人工变化示例，不用箭头估计协方差。
+
+每种语言新增 `parabola_coordinates.csv`：601个x网格点从−3到3；y=x²；centered_product=x(x²−1)；normal_density为标准正态密度；weighted_integrand是前两者乘积。它是理论函数网格，不是随机样本；图内Y=X²不是概率密度曲线。x与−x有相同密度、相反中心化乘积，零协方差由整个实数轴上的对称积分得到，不以截断图或有限网格代替证明。
+
+第五节已从定义完整展开Cov(A,B)=E[AB]−E[A]E[B]，令B=A得到Var(A)=E[A²]−(E[A])²，并区分“平方的期望”和“期望的平方”。

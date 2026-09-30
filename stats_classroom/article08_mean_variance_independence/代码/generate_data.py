@@ -35,6 +35,10 @@ pairs.to_csv(folder / 'joint_pairs.csv', index=False, float_format='%.17g')
 examples = pd.DataFrame({'group': ['A', 'B', 'C'], 'x1': [8, 18, 6],
                          'x2': [10, 20, 10], 'x3': [12, 22, 14]})
 examples.to_csv(folder / 'position_examples.csv', index=False)
+# 图中的方向变化为人工确定值，独立于随机数流。
+directions = pd.DataFrame({'scenario':['x1_increases','x1_increases','x2_increases','x2_increases'],
+    'stage':['before','after','before','after'], 'x1':[10,12,10,10], 'x2':[10,10,10,12]})
+directions.to_csv(folder / 'direction_examples.csv',index=False)
 metadata = {'seed': 20260930, 'generator': 'NumPy default_rng / PCG64',
             'numpy': np.__version__, 'repetitions': repetitions, 'n': sample_size,
             'mu': 10, 'sigma_squared': 4, 'normal': 'N(10,4)',
