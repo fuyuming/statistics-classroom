@@ -1,0 +1,126 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>算方差明明用到了均值，为什么还说它们相互独立？</title><style>*{box-sizing:border-box}body{margin:0;background:#f1f4f3;color:#27343a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:720px;margin:24px auto;padding:32px 36px 56px;background:#fff;border-top:5px solid #167d80}.brand{display:flex;align-items:center;gap:12px;color:#167d80;font-size:14px;letter-spacing:.04em}.brand img{width:48px;height:48px;border-radius:50%}h1{font-size:30px;line-height:1.45;color:#142e41;margin:26px 0 20px}h2{font-size:22px;line-height:1.5;color:#163d48;border-left:4px solid #198c8b;padding-left:13px;margin:42px 0 20px}h3{font-size:19px;line-height:1.55;color:#163d48;margin:30px 0 14px}p{font-size:17px;line-height:1.95;margin:19px 0;text-align:justify}strong{color:#15696a;font-weight:650}blockquote{margin:20px 0 30px;padding:10px 18px;background:#f0f7f6;border-left:2px solid #6da6a0}blockquote p{font-size:14px;line-height:1.9;margin:8px 0;color:#53666c}a{color:#167d80;text-decoration:none;border-bottom:1px solid #bbd8d4}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;background:#f2f7f6;color:#15696a;padding:1px 5px;border-radius:4px}pre{background:#f7faf9;border:1px solid #e4ecea;border-radius:6px;padding:12px 14px;overflow-x:auto}pre code{background:none;padding:0;font-size:14px;line-height:1.7}div.formula{background:#f7faf9;border-left:3px solid #6da6a0;padding:12px 16px;margin:20px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:17px;color:#15696a;text-align:center;line-height:1.9}ul,ol{font-size:17px;line-height:1.95;margin:18px 0;padding-left:26px}li{margin:8px 0}table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px}th,td{border-bottom:1px solid #e4ecea;padding:9px 10px;text-align:left;line-height:1.7}th{background:#f0f7f6;color:#15696a;font-weight:650}footer{border-top:1px solid #dfe8e6;margin-top:36px;padding-top:16px;font-size:12px;color:#758787;line-height:1.8}@media(max-width:600px){body{background:#fff}main{margin:0;padding:24px 22px 40px;border-top-width:4px}h1{font-size:27px}h2{font-size:21px}h3{font-size:18px}p,ul,ol{font-size:16px;line-height:1.95}table{font-size:14px}}main > p img{display:block;width:100%;height:auto;margin:24px 0 8px;border:1px solid #e4ecea}main > p:has(img){margin:25px -12px 4px}main > p:has(img) a{border:0;display:block}main > p > em:only-child{display:block;font-size:13px;line-height:1.8;font-style:normal;color:#657a7d;text-align:left;margin:0 0 28px}@media(max-width:600px){main > p:has(img){margin-left:-12px;margin-right:-12px}}a{overflow-wrap:anywhere}table{display:block;overflow-x:auto}blockquote p{font-size:16px}hr{border:0;border-top:1px solid #dfe8e6;margin:30px 0}p,li,blockquote,h1,h2,h3{overflow-wrap:anywhere}main{min-width:0}</style></head><body><main><div class="brand"><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E8%B4%A6%E5%8F%B7%E5%A4%B4%E5%83%8F.png" alt="账号头像">明哥的微生物世界 · 统计课堂</div><h1>算方差明明用到了均值，为什么还说它们相互独立？</h1><blockquote><p>明哥的微生物世界 · 统计课堂</p><p>摘要：从方差公式里的一个“减去均值”出发，聊清楚计算上的联系、统计上的独立，以及正态分布为什么在这里如此关键。</p></blockquote>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/00_%E7%AC%AC6%E6%AC%A1%E5%8C%BB%E5%AD%A6%E7%BB%9F%E8%AE%A1%E5%AD%A6%E8%AF%BE%E7%A8%8B%E5%B0%81%E9%9D%A2_%E5%8E%BB%E5%A7%93%E5%90%8D.png" alt="第6次医学统计学课程封面"></p>
+<p><em>封面｜沿用第6次医学统计学课程封面，已去除授课教师姓名。图中日期为课程日期。</em></p>
+<p>大家好，我是明哥。</p>
+<p>讲到 t 统计量的构造，我们经常会用到一句话：<strong>来自同一个正态总体的独立样本，其样本均值与样本方差相互独立。</strong></p>
+<p>这句话读起来很顺，但往方差公式里看一眼，就容易卡住。</p>
+<blockquote><p>样本均值：X̄ = (X₁ + ⋯ + Xₙ) / n</p><p>样本方差：S² = Σ(Xᵢ − X̄)² / (n − 1)</p></blockquote>
+<p>Σ 表示把 n 项加起来。这里用的是分母为 n − 1 的样本方差，n 至少为2。</p>
+<p><strong>明明要先算均值，再用均值算方差，怎么还能说它们独立？</strong></p>
+<p>沿着这个问题往下追，还会遇到两个疑问：为什么协方差会等于零？为什么到了正态分布这里，“不相关”就能推出“独立”？今天把这几步连起来。</p>
+<h2>一、“独立”要放到一次次抽样中理解</h2>
+<p>先固定一个正态总体，它的均值是 μ，方差是 σ² &gt; 0。每次从中独立抽取 n 个观测值，样本量也保持不变。</p>
+<p>第一次抽样，算出一对“均值、方差”；第二次抽样，又得到一对；如此重复下去。</p>
+<p>我们讨论的独立性，就是这两个统计量在<strong>重复抽样中</strong>的关系。</p>
+<blockquote><p><strong>知道这一次抽样的均值是多少，不会改变这一次样本方差的概率分布。</strong></p></blockquote>
+<p>比如，从大量重复抽样的结果中，只挑出“样本均值高于某个门槛”的那些样本。这些样本的方差仍然服从原来的分布，不会因为我们筛选了较高的均值，就系统性地偏大或偏小。</p>
+<p>这里要求的是整个分布保持不变，仅仅“平均方差差不多”还不足以说明独立。有限次数的模拟中会有随机差异，理论说的是抽样分布。</p>
+<p>一份已经拿到手的数据，均值与方差都可以算成确定的数。只盯着这一次计算的先后顺序，很容易错过“独立”真正描述的对象。</p>
+<h2>二、减去均值，是为了把整体位置消掉</h2>
+<p>先看三组人为构造的数据。</p>
+<table><thead><tr><th>数据</th><th>样本均值</th><th>样本方差</th></tr></thead><tbody><tr><td>8、10、12</td><td>10</td><td>4</td></tr><tr><td>18、20、22</td><td>20</td><td>4</td></tr><tr><td>6、10、14</td><td>10</td><td>16</td></tr></tbody></table>
+<p>第一组整体加上10，就变成第二组。均值从10变成20，方差却没有变。</p>
+<p>因为每个观测值增加10，均值也增加10，相减之后的偏差仍然是 −2、0、2。</p>
+<p>第三组的均值仍然是10，但三个点离中心更远，方差就增大了。</p>
+<p><strong>均值描述这组数据的整体位置；方差描述它们围绕自身中心有多分散。</strong> 减去均值，正是在把位置消掉，留下围绕中心的偏差。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/01_%E4%BD%8D%E7%BD%AE%E4%B8%8E%E5%88%86%E6%95%A3.png" alt="数据整体平移与围绕中心展开"></p>
+<p><em>图1｜三组人工教学数据使用同一条横轴。整体平移会改变均值，却不改变样本方差；围绕同一个中心展开，则可以改变方差。图中竖虚线表示各组均值。</em></p>
+<p>不过，这个例子只说明：<strong>均值不能单独决定方差。它还没有证明二者统计独立。</strong> 要走到独立，需要继续看抽样分布的性质。</p>
+<h2>三、只抽两个数，把方差公式拆开看</h2>
+<p>设 X₁、X₂ 相互独立，都来自 N(μ, σ²)。N 表示正态分布，括号里依次是总体均值和方差。</p>
+<p>把这两个观测值换一种方式描述：</p>
+<blockquote><p>中点：M = (X₁ + X₂) / 2</p><p>两点之差：D = X₁ − X₂</p></blockquote>
+<p>M 就是样本均值。D 有正负，表示差的方向；它的绝对值表示两点之间的距离。</p>
+<p>因为样本量 n = 2，方差公式里的分母 n − 1 等于1。再注意到：</p>
+<blockquote><p>X₁ − M = D / 2</p><p>X₂ − M = −D / 2</p></blockquote>
+<p>所以：</p>
+<blockquote><p>S² = (D / 2)² + (−D / 2)²</p><p><strong>S² = D² / 2。</strong></p></blockquote>
+<p>公式里原来出现的样本均值，化简后消失了。此时的样本方差，完全由两点之间的差决定。</p>
+<p>因此，只要证明 M 与 D 独立，就能推出 M 与 D² / 2 独立，也就是样本均值与样本方差独立。</p>
+<h2>四、协方差为什么恰好等于零？</h2>
+<p>协方差记作 Cov，方差记作 Var。协方差的定义是：</p>
+<blockquote><p>Cov(A, B) = E[(A − E[A])(B − E[B])]</p></blockquote>
+<p>E 表示期望，可以理解为相应随机量的理论平均值。两个变量经常一起高于各自均值、或者一起低于各自均值，乘积就倾向于为正；一个高、另一个低，乘积就倾向于为负。</p>
+<p>从这个定义出发，利用乘法展开和期望的线性性质，可以得到：<strong>常数可以提出，加减可以逐项展开。</strong></p>
+<p>代入 M 和 D：</p>
+<blockquote><p>Cov(M, D)</p><p>= Cov((X₁ + X₂) / 2, X₁ − X₂)</p><p>= ½ Cov(X₁ + X₂, X₁ − X₂)</p></blockquote>
+<p>再把最后一项展开成四项：</p>
+<blockquote><p>= ½ [Cov(X₁, X₁) − Cov(X₁, X₂)</p><p>+ Cov(X₂, X₁) − Cov(X₂, X₂)]</p></blockquote>
+<p>一个变量与自身的协方差，就是它的方差；而 Cov(X₁, X₂) = Cov(X₂, X₁)，所以中间两项抵消。</p>
+<p>于是：</p>
+<blockquote><p>Cov(M, D) = ½ [Var(X₁) − Var(X₂)]</p><p>= ½ (σ² − σ²)</p><p><strong>= 0。</strong></p></blockquote>
+<p>这里可以停一下：中间两项相消用的是协方差的对称性，并不需要先把它们各自写成0。最后得到0，用的是 X₁、X₂ 方差相同。</p>
+<p>直观上，在本例独立、同方差的条件下，X₁ 增大，会同时把 M 和 D 往上推；X₂ 增大，会把 M 往上推、把 D 往下拉。这两种相反的共同变化，在协方差中恰好抵消。</p>
+<p><strong>算到这里，只证明了 M 与 D 不相关。正态假设还没有真正上场。</strong></p>
+<h2>五、不相关，为什么还不能直接说独立？</h2>
+<p>看一个简单的关系：</p>
+<blockquote><p>X ∼ N(0, 1)，Y = X²。</p></blockquote>
+<p>知道 X，就能完全确定 Y，它们当然不独立。但它们的协方差却等于0：</p>
+<blockquote><p>Cov(X, Y) = E[X³] − E[X]E[X²] = 0。</p></blockquote>
+<p>原因是标准正态分布关于0对称，E[X] 和 E[X³] 都为0。</p>
+<p>画出来就更容易理解：Y = X² 是一条抛物线。X 在右边很大时，Y 很大；X 在左边很小时，Y 也很大。协方差中的正负贡献抵消了，非线性关系却保留着。</p>
+<p><strong>独立要求知道一个变量后，另一个变量的分布不变；不相关仅仅说协方差为零。</strong> 在二阶矩存在时，独立可以推出不相关，反方向一般不成立。</p>
+<h2>六、各自正态，也不等于联合正态</h2>
+<p>读到这里，很自然会接着问：M 和 D 都是正态变量，为什么就能把“不相关”升级成“独立”？</p>
+<p>这句话里还缺少一个关键条件：<strong>M 和 D 联合服从正态分布。</strong></p>
+<p>“各自正态”只交代分别观察两个变量时的分布。“联合正态”还约束它们一起变化的方式：任意常数 a、b 构成的 aX + bY 都服从正态分布，允许方差为零的退化情形。</p>
+<p>各自正态并不足够。设 X 是标准正态变量，再独立抛一枚公平硬币：正面时令 Y = X，反面时令 Y = −X。</p>
+<p>由于正态分布对称，Y 仍然服从标准正态分布。两者的协方差也是0，因为正、反两种情形的贡献抵消。</p>
+<p>但它们不独立：<strong>无论硬币怎样，始终有 |Y| = |X|。</strong> 知道 X 的绝对值，就知道 Y 的绝对值。</p>
+<p>它们也不联合正态。比如 X + Y，有一半的概率恰好为0，另一半随 2X 变化，这不是正态分布。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/02_%E4%B8%8D%E7%9B%B8%E5%85%B3%E4%B8%8E%E7%8B%AC%E7%AB%8B.png" alt="不相关、独立与联合正态的三个例子"></p>
+<p><em>图2｜三个模型的理论协方差都为0。上图为两个独立标准正态变量；中图为 X ∼ N(0,1)、Y = X²；下图为 X ∼ N(0,1)、Y 随独立公平硬币取 X 或 −X。只有上图相互独立且联合正态。每幅图显示模型模拟的1200对观测值，有限样本的协方差不必恰好为0。坐标范围有所截断，中图纵轴与其余两图不同；图形帮助理解，证明仍依靠模型性质。</em></p>
+<p>回到本文的 X₁、X₂。我们一开始就假设它们<strong>独立且正态</strong>。独立正态变量的任意线性组合仍然正态，因此 X₁、X₂ 联合正态。</p>
+<p>M 和 D 也满足这个条件，因为对任意 a、b：</p>
+<blockquote><p>aM + bD</p><p>= (a / 2 + b)X₁ + (a / 2 − b)X₂。</p></blockquote>
+<p>右边仍然是独立正态变量的线性组合，所以是正态变量。这样才证明了 M、D 联合正态。</p>
+<p>这里没有预先假设 M 和 D 独立；用到的是原始观测值 X₁、X₂ 独立，因此不是循环论证。联合正态的定义和随机变号反例，可参阅在线教材：<a href="https://www.probabilitycourse.com/chapter5/5_3_2_bivariate_normal_dist.php" target="_blank" rel="noopener">https://www.probabilitycourse.com/chapter5/5_3_2_bivariate_normal_dist.php</a></p>
+<h2>七、联合正态为什么能让“不相关”推出“独立”？</h2>
+<p>这一步可以直接从密度公式看出来。不必记住整个公式，只关注它什么时候能拆成两部分。</p>
+<p>把一对联合正态变量分别标准化，记作 U、V。它们的均值都为0，方差都为1，相关系数记作 ρ。对于 |ρ| &lt; 1，联合密度为：</p>
+<blockquote><p>f(u,v) = [1 / (2π√(1 − ρ²))]</p><p>× exp{−(u² − 2ρuv + v²) / [2(1 − ρ²)]}。</p></blockquote>
+<p>这里 exp 表示以 e 为底的指数函数；u、v 是两个变量可能的取值；密度要对区域积分，才能得到落入该区域的概率。</p>
+<p>当协方差为0时，ρ = 0。把它代进去，连接 u 和 v 的交叉项 −2ρuv 消失，密度变成：</p>
+<blockquote><p>f(u,v) = [1 / (2π)] × exp[−(u² + v²) / 2]</p><p>= {exp(−u² / 2) / √(2π)}</p><p>× {exp(−v² / 2) / √(2π)}</p><p><strong>= fᵤ(u) × fᵥ(v)。</strong></p></blockquote>
+<p>前一部分只含 u，后一部分只含 v，恰好分别是两个标准正态变量的密度。</p>
+<p><strong>联合密度等于两个边缘密度的乘积，正是独立的判定条件。</strong> 对任意两个区间积分，就得到“同时落入两个区间的概率，等于各自落入区间的概率之积”。</p>
+<p>现在可以看到正态假设的作用了：在联合正态这个分布家族里，零协方差足以让联合密度拆开；一般分布没有这样的保证。相关证明见：<a href="https://statproofbook.github.io/P/mvn-ind.html" target="_blank" rel="noopener">https://statproofbook.github.io/P/mvn-ind.html</a></p>
+<p>于是，我们终于把两个数的例子接通了：</p>
+<blockquote><p>M、D 联合正态，且 Cov(M,D) = 0</p><p>→ M 与 D 独立</p><p>→ M 与 D² / 2 独立</p><p>→ 样本均值与样本方差独立。</p></blockquote>
+<p>注意，<strong>样本方差本身不服从正态分布</strong>。这里应用“联合正态且不相关”的对象是 M 和 D，然后才把结论传递给 D 的平方。</p>
+<h2>八、样本量增加以后，这个道理还能成立吗？</h2>
+<p>可以。对 n 个独立同分布的正态观测值，把每个观测值减去样本均值，记作偏差 Rᵢ = Xᵢ − X̄。</p>
+<p>因为观测值彼此独立且方差相同：</p>
+<blockquote><p>Cov(X̄, Xᵢ) = σ² / n</p><p>Var(X̄) = σ² / n。</p></blockquote>
+<p>第一式来自均值的 n 项中，只有 Xᵢ 与自身贡献方差，其他协方差都为0。因此：</p>
+<blockquote><p>Cov(X̄, Rᵢ)</p><p>= Cov(X̄, Xᵢ) − Var(X̄)</p><p>= 0。</p></blockquote>
+<p>样本均值和整个偏差向量都是原始正态样本的线性变换，联合正态。均值与每个偏差的协方差都为0，因而均值与<strong>整个偏差向量</strong>独立。</p>
+<p>样本方差完全由这些偏差的平方和计算出来，自然也与均值独立。这里用的是联合正态向量的性质；一般情况下，不能只凭一个变量与其他变量分别独立，就断定它与整个向量独立。</p>
+<p>偏差之间倒没有彼此独立，因为它们相加必须为0。这是另一个关系，不妨碍样本均值与整个偏差向量独立。</p>
+<h2>九、这正是 t 统计量需要的那块拼图</h2>
+<p>回到开头。对于来自同一个正态总体的独立同分布样本，有：</p>
+<blockquote><p>Z = (X̄ − μ) / (σ / √n)，服从标准正态分布；</p><p>Q = (n − 1)S² / σ²，服从自由度为 n − 1 的卡方分布。</p></blockquote>
+<p>由于样本均值与样本方差独立，Z 和 Q 也独立。于是：</p>
+<blockquote><p>T = Z / √[Q / (n − 1)]</p><p>= (X̄ − μ) / (S / √n)</p><p><strong>服从自由度为 n − 1 的 t 分布。</strong></p></blockquote>
+<p>分子表示样本均值偏离总体均值多少；分母 S / √n 是用样本标准差 S 估计的均值标准误。检验总体均值时，用假设值 μ₀ 替换 μ，在原假设成立时得到上述 t 分布。</p>
+<p>正态样本的均值、方差及相应抽样分布，可参阅宾州州立大学课程第26课：<a href="https://online.stat.psu.edu/stat414/Lesson26" target="_blank" rel="noopener">https://online.stat.psu.edu/stat414/Lesson26</a></p>
+<p>用独立的标准正态变量和卡方变量构造 t 分布，亦见 R 官方说明：<a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/TDist.html" target="_blank" rel="noopener">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/TDist.html</a></p>
+<p><strong>这套条件给出的是有限样本下的精确 t 分布。</strong> 非正态总体中，不能直接照搬“样本均值与样本方差独立”；适当条件下的大样本近似，是另一条推理路径。</p>
+<h2>十、自己算一遍：先核对，再改动</h2>
+<p>和前面的统计课堂一样，这次准备了 R、Python 和 MATLAB 三套脚本。用自己熟悉的一种跑通即可，它们读取同一份共享数据，方便对照结果。</p>
+<p>先核对三组人工数据的均值与方差，再计算 M、D，验证协方差展开式和 S² = D² / 2。随后比较两种总体：正态总体 N(10,4)，以及“8加上一个均值为2的指数变量”。两者的总体均值都为10、方差都为4，但分布形状不同。</p>
+<p>每种模型重复抽样20,000次，每次取10个独立观测。本次固定种子模拟中，按样本均值筛选后，得到下面的结果：</p>
+<table><thead><tr><th>总体模型</th><th>全部样本的平均S²</th><th>X̄ &lt; 9.5时的平均S²</th><th>X̄ &gt; 10.5时的平均S²</th></tr></thead><tbody><tr><td>正态</td><td>4.011</td><td>3.995</td><td>4.036</td></tr><tr><td>平移后的指数</td><td>4.004</td><td>1.419</td><td>8.047</td></tr></tbody></table>
+<p>这里“平均S²”是许多份样本各自算出方差后，再对这些方差取平均，不能把所有观测混起来计算一个方差。</p>
+<p>正态模型的三个数相近；指数模型中，筛出均值较大的样本时，平均样本方差也明显增大。<strong>这展示了条件的作用，但几个平均数相近不足以证明独立。</strong> 完整脚本还保存了条件分位数、每次抽样的统计量和模拟误差说明。</p>
+<p>第一次运行，核对上表；第二次，把筛选门槛从9.5、10.5改为9、11，观察入选样本数和结果波动。图2的三种模型也可以逐个画出来，对照它们的理论关系。</p>
+<ul><li>R / RStudio：打开“均值与方差的独立性.Rproj”，运行“代码/mean_variance.R”。</li><li>Python / Spyder：把本篇目录打开为项目，运行“代码/mean_variance.py”。</li><li>MATLAB：把当前文件夹切到本篇目录，运行“代码/mean_variance.m”。</li></ul>
+<p>安装、字段含义和结果文件的位置都写在项目 README 中。三套脚本均包含计算与配图；重新生成共享模拟数据的 Python 脚本也一并提供。</p>
+<p>本篇完整项目：<a href="https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article08_mean_variance_independence" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article08_mean_variance_independence</a></p>
+<p>全仓库 ZIP：<a href="https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip</a></p>
+<p>下载并完整解压后，进入 stats_classroom/article08_mean_variance_independence 文件夹。请保留数据、代码与配套绘图文件的目录关系。</p>
+<p>最后回到最初的疑问：算方差时，当然用到了样本均值，但减去它是为了找到围绕中心的偏差。统计上的独立，要看这些量在重复抽样中怎样一起变化。</p>
+<blockquote><p><strong>在独立同分布的正态样本中，知道样本中心在哪里，并不会改变它围绕自身中心有多分散的概率分布。</strong></p></blockquote>
+<p>这里是“明哥的微生物世界”。下次看到“均值与方差独立”，希望我们能同时想起它的抽样情境、成立条件，以及公式中那一步看似矛盾的“减去均值”。</p>
+<hr>
+<p><em>本文数值例子与两张统计配图均用于教学，不包含真实观测数据。图1为人工构造数据，图2为指定模型的模拟结果；封皮沿用课程封面。</em></p><footer>统计课堂 · v1 · 本地审阅稿</footer></main></body></html>

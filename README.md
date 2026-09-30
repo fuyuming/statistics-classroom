@@ -17,6 +17,7 @@
 | 公众号 | 主题 | 代码 |
 |---|---|---|
 | 04 | 变异系数（CV）与几何均数／几何标准差（GM／GSD）——课堂上没展开的两节（先发） | [stats_classroom/article04_cv_geometric_mean](stats_classroom/article04_cv_geometric_mean/) |
+| 新稿 | 算方差明明用到了均值，为什么还说它们相互独立？（三语言代码、共享模拟数据、完整推导） | [stats_classroom/article08_mean_variance_independence](stats_classroom/article08_mean_variance_independence/) |
 
 请进入对应文件夹，再按该文件夹的 README 运行。
 

@@ -1,0 +1,15 @@
+{
+  "seed": 20260930,
+  "generator": "NumPy default_rng / PCG64",
+  "numpy": "2.4.3",
+  "repetitions": 20000,
+  "n": 10,
+  "mu": 10,
+  "sigma_squared": 4,
+  "normal": "N(10,4)",
+  "shifted_exponential": "8 + Exponential(scale=2)",
+  "pair_count": 1200,
+  "missing_values": 0,
+  "units": "dimensionless",
+  "source": "synthetic teaching data"
+}

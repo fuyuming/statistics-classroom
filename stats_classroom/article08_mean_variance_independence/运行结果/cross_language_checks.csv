@@ -1,0 +1,17 @@
+file,compared_with_python,rows,max_absolute_difference,passed
+position_results.csv,R,3,0.0,True
+position_results.csv,MATLAB,3,0.0,True
+covariance_identity.csv,R,2,2.8421709430404e-14,True
+covariance_identity.csv,MATLAB,2,3.400058012914542e-15,True
+sampling_summary.csv,R,2,9.992007221626409e-16,True
+sampling_summary.csv,MATLAB,2,1.0658141036401503e-14,True
+conditional_summary.csv,R,6,0.0,True
+conditional_summary.csv,MATLAB,6,1.0658141036401503e-14,True
+pair_summary.csv,R,3,1.0408340855860843e-16,True
+pair_summary.csv,MATLAB,3,1.0408340855860843e-16,True
+figure2_coordinates.csv,R,1200,1.0658141036401503e-14,True
+figure2_coordinates.csv,MATLAB,1200,1.021405182655144e-14,True
+normal_statistics.csv,R,20000,1.0125233984581428e-13,True
+normal_statistics.csv,MATLAB,20000,1.0302869668521453e-13,True
+shifted_exponential_statistics.csv,R,20000,1.0658141036401503e-13,True
+shifted_exponential_statistics.csv,MATLAB,20000,1.0658141036401503e-13,True
