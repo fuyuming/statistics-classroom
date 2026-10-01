@@ -50,7 +50,7 @@ for i = 1:8
   fprintf(fid, '%d,%d,%d,%s\n', dose(i), nUnits(i), nSucc(i), numFmt(r4(nSucc(i)/nUnits(i)),4));
 end
 fclose(fid);
-[Ab, Bb, Wb] = grid2(linspace(-6, 2, 300), linspace(0, 1.2, 300), logLikB);
+[Ab, Bb, Wb] = grid2(linspace(-8, 3, 300), linspace(-1.5, 2.5, 300), logLikB);
 fid = fopen(fullfile(RES, '02_二项后验_matlab.csv'), 'w', 'n', 'UTF-8');
 fprintf(fid, '"参数","后验均值","下界89","上界89"\n');
 fprintf(fid, '截距 a,%s,%s,%s\n', numFmt(r4(sum(Ab.*Wb)),4), numFmt(r4(wQuant(Ab, Wb, 0.055)),4), numFmt(r4(wQuant(Ab, Wb, 0.945)),4));
@@ -71,13 +71,13 @@ counts = [1 2 3 1 3 5 2 5 8 2 6 10 4 9 14 4 11 18 5 14 23 6 18 30]';
 meanCnt = mean(counts);
 within = zeros(8, 2);
 for d = 0:7, v = counts(treat == d); within(d+1, :) = [var(v) mean(v)]; end
-varCnt = sum(within(:,1)) / sum(within(:,2));
+withinDisp = sum(within(:,1)) / sum(within(:,2));
 logLikP = @(a, b) sum(counts .* log(exp(a + b * treat)) - exp(a + b * treat) - gammaln(counts + 1));
 fid = fopen(fullfile(RES, '04_计数数据_matlab.csv'), 'w', 'n', 'UTF-8');
 fprintf(fid, '"处理水平","菌落数"\n');
 for i = 1:numel(treat), fprintf(fid, '%d,%d\n', treat(i), counts(i)); end
 fclose(fid);
-[Ap, Bp, Wp] = grid2(linspace(-1, 3, 300), linspace(0, 0.6, 300), logLikP);
+[Ap, Bp, Wp] = grid2(linspace(-1, 3, 300), linspace(-1, 1, 300), logLikP);
 fid = fopen(fullfile(RES, '05_泊松后验_matlab.csv'), 'w', 'n', 'UTF-8');
 fprintf(fid, '"参数","后验均值","下界89","上界89"\n');
 fprintf(fid, '截距 a,%s,%s,%s\n', numFmt(r4(sum(Ap.*Wp)),4), numFmt(r4(wQuant(Ap, Wp, 0.055)),4), numFmt(r4(wQuant(Ap, Wp, 0.945)),4));
@@ -87,10 +87,17 @@ rr = exp(Bp * 7);
 fid = fopen(fullfile(RES, '06_率比与过离散_matlab.csv'), 'w', 'n', 'UTF-8');
 fprintf(fid, '"量","值"\n');
 fprintf(fid, '每皿平均菌落数（观测）,%s\n', numFmt(r4(meanCnt),4));
-fprintf(fid, '方差/均值（同一剂量内合并，过离散检查）,%s\n', numFmt(r4(varCnt),4));
+fprintf(fid, '方差/均值（同一剂量内合并，过离散检查）,%s\n', numFmt(r4(withinDisp),4));
 fprintf(fid, '率比 exp(7b) 后验均值,%s\n', numFmt(r4(sum(rr.*Wp)),4));
 fprintf(fid, '率比 89%% 区间下,%s\n', numFmt(r4(wQuant(rr, Wp, 0.055)),4));
 fprintf(fid, '率比 89%% 区间上,%s\n', numFmt(r4(wQuant(rr, Wp, 0.945)),4));
+fclose(fid);
+lamFit = exp(sum(Ap.*Wp) + sum(Bp.*Wp) * treat);
+pearsonDisp = sum((counts - lamFit).^2 ./ lamFit) / (numel(counts) - 2);
+fid = fopen(fullfile(RES, '07_两种离散度_matlab.csv'), 'w', 'n', 'UTF-8');
+fprintf(fid, '"量","值"\n');
+fprintf(fid, '同一剂量内合并的离散度（描述性）,%s\n', numFmt(r4(withinDisp),4));
+fprintf(fid, '拟合泊松后的 Pearson 离散度,%s\n', numFmt(r4(pearsonDisp),4));
 fclose(fid);
 
 %% 3) offset
@@ -107,22 +114,22 @@ fclose(fid);
 %% 4) 有序类别（切点固定，只估斜率）
 ordX = [1 1 2 2 3 3 4 4 5 5 6 6]';
 ordY = [0 0 0 1 0 1 1 1 1 2 2 2]';
-c1Fix = 1.5; c2Fix = 0;
+c0Fix = 0; c1Fix = 1.5;      % logit(F_k) = c_k − b·x，切点必须 c0 < c1
 fid = fopen(fullfile(RES, '08_有序数据_matlab.csv'), 'w', 'n', 'UTF-8');
 fprintf(fid, '"剂量","等级"\n');
 for i = 1:12, fprintf(fid, '%d,%d\n', ordX(i), ordY(i)); end
 fclose(fid);
-bGrid = linspace(-0.5, 3, 400)';
+bGrid = linspace(-2, 3, 400)';
 lpOrd = zeros(400, 1);
 for j = 1:400
   b = bGrid(j);
-  p0 = min(max(1 ./ (1 + exp(-(c1Fix - b * ordX))), 1e-9), 1 - 1e-9);
-  p1 = min(max(1 ./ (1 + exp(-(c2Fix - b * ordX))), 1e-9), 1 - 1e-9);
+  F0 = 1 ./ (1 + exp(-(c0Fix - b * ordX)));
+  F1 = 1 ./ (1 + exp(-(c1Fix - b * ordX)));
   ll = 0;
   for i = 1:12
-    if ordY(i) == 0, ll = ll + log(p0(i));
-    elseif ordY(i) == 1, ll = ll + log(max(p1(i) - p0(i), 1e-9));
-    else, ll = ll + log(1 - p1(i)); end
+    if ordY(i) == 0, ll = ll + log(F0(i));
+    elseif ordY(i) == 1, ll = ll + log(F1(i) - F0(i));
+    else, ll = ll + log(1 - F1(i)); end
   end
   lpOrd(j) = ll;
 end
@@ -133,11 +140,13 @@ fprintf(fid, '斜率 b,%s,%s,%s\n', numFmt(r4(sum(bGrid.*wOrd)),4), numFmt(r4(wQ
 fclose(fid);
 contCoef = polyfit(ordX, ordY, 1);
 fid = fopen(fullfile(RES, '10_连续vs有序_matlab.csv'), 'w', 'n', 'UTF-8');
-fprintf(fid, '"剂量","轻的累积概率","中的累积概率","当连续变量_预测等级"\n');
+fprintf(fid, '"剂量","轻的累积概率","中的累积概率","当连续变量_平均编码得分","重的概率","轻的类别概率","中的类别概率"\n');
 for d = 1:6
-  pk = sum((1 ./ (1 + exp(-(c1Fix - bGrid * d)))) .* wOrd);
-  pz = sum((1 ./ (1 + exp(-(c2Fix - bGrid * d)))) .* wOrd);
-  fprintf(fid, '%d,%s,%s,%s\n', d, numFmt(r4(pk),4), numFmt(r4(pz),4), numFmt(r4(polyval(contCoef, d)),4));
+  pk = sum((1 ./ (1 + exp(-(c0Fix - bGrid * d)))) .* wOrd);
+  pz = sum((1 ./ (1 + exp(-(c1Fix - bGrid * d)))) .* wOrd);
+  % 概率类输出按 3 位小数写，避免三语言浮点求和顺序在进位边界造成末位差
+  fprintf(fid, '%d,%s,%s,%s,%s,%s,%s\n', d, numFmt(round(pk,3),3), numFmt(round(pz,3),3), numFmt(round(polyval(contCoef, d),3),3), ...
+          numFmt(round(1-pz,3),3), numFmt(round(pk,3),3), numFmt(round(pz-pk,3),3));
 end
 fclose(fid);
 

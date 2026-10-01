@@ -58,7 +58,8 @@ loglik_binom <- function(a, b) {
   p <- pmin(pmax(p, 1e-12), 1 - 1e-12)
   sum(n_succ * log(p) + (n_units - n_succ) * log(1 - p))
 }
-g_binom <- grid2(seq(-6, 2, length.out = 300), seq(0, 1.2, length.out = 300), loglik_binom)
+# 斜率网格要包含负值（否则"平坦先验"其实带着一个非负斜率的先验限制）
+g_binom <- grid2(seq(-8, 3, length.out = 300), seq(-1.5, 2.5, length.out = 300), loglik_binom)
 binom_sum <- data.frame(
   参数 = c("截距 a", "斜率 b"),
   后验均值 = r4(c(weighted.mean(g_binom$a, g_binom$post), weighted.mean(g_binom$b, g_binom$post))),
@@ -96,15 +97,15 @@ counts <- c(1, 2, 3,      # 剂量 0，均值 2
 cnt_df <- data.frame(处理水平 = treat, 菌落数 = counts)
 write_csv_fixed(cnt_df, file.path(RES, "04_计数数据.csv"))
 mean_cnt <- mean(counts)
-# 同一剂量内的方差与均值 → 合并的方差/均值比
+# 同一剂量内的方差与均值 → 合并的组内离散度指标（描述性，不是通用诊断参数）
 within <- sapply(0:7, function(d) c(var(counts[treat == d]), mean(counts[treat == d])))
-var_cnt <- sum(within[1, ]) / sum(within[2, ])
+within_disp <- sum(within[1, ]) / sum(within[2, ])
 
 loglik_pois <- function(a, b) {
   lam <- exp(a + b * treat)
   sum(counts * log(lam) - lam - lgamma(counts + 1))
 }
-g_pois <- grid2(seq(-1, 3, length.out = 300), seq(0, 0.6, length.out = 300), loglik_pois)
+g_pois <- grid2(seq(-1, 3, length.out = 300), seq(-1, 1, length.out = 300), loglik_pois)
 pois_sum <- data.frame(
   参数 = c("截距 a", "斜率 b"),
   后验均值 = r4(c(weighted.mean(g_pois$a, g_pois$post), weighted.mean(g_pois$b, g_pois$post))),
@@ -113,14 +114,20 @@ pois_sum <- data.frame(
 )
 write_csv_fixed(pois_sum, file.path(RES, "05_泊松后验.csv"))
 print(pois_sum)
+# 交叉核对：拟合泊松回归后的 Pearson 离散度（与上面的组内指标不是同一个量）
+lam_fit <- exp(weighted.mean(g_pois$a, g_pois$post) + weighted.mean(g_pois$b, g_pois$post) * treat)
+pearson_disp <- sum((counts - lam_fit)^2 / lam_fit) / (length(counts) - 2)
 # 率比：处理水平 7 相对 0
 rr <- exp(g_pois$b * 7)
 rr_tab <- data.frame(量 = c("每皿平均菌落数（观测）", "方差/均值（同一剂量内合并，过离散检查）",
                             "率比 exp(7b) 后验均值", "率比 89% 区间下", "率比 89% 区间上"),
-                     值 = r4(c(mean_cnt, var_cnt, weighted.mean(rr, g_pois$post),
+                     值 = r4(c(mean_cnt, within_disp, weighted.mean(rr, g_pois$post),
                                wq(rr, g_pois$post, 0.055), wq(rr, g_pois$post, 0.945))))
 write_csv_fixed(rr_tab, file.path(RES, "06_率比与过离散.csv"))
 print(rr_tab)
+write_csv_fixed(data.frame(量 = c("同一剂量内合并的离散度（描述性）", "拟合泊松后的 Pearson 离散度"),
+                           值 = r4(c(within_disp, pearson_disp))),
+                file.path(RES, "07_两种离散度.csv"))
 
 # ---------- 3) 率：暴露量不同（offset）----------
 plate <- c(10, 10, 10, 10)          # 接种体积（微升）
@@ -142,22 +149,22 @@ ord_x <- c(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6)
 ord_y <- c(0, 0, 0, 1, 0, 1, 1, 1, 1, 2, 2, 2)     # 0=轻 1=中 2=重
 ord_df <- data.frame(剂量 = ord_x, 等级 = ord_y)
 write_csv_fixed(ord_df, file.path(RES, "08_有序数据.csv"))
-# 累积 logit：切点固定（c1=1.5, c2=0），只估斜率 b。
-# 这样讲更清楚，也避开"切点自由 + 识别约束"带来的数值坑（初版两参数网格把似然压成了近似平坦）。
-c1_fix <- 1.5; c2_fix <- 0
+# 累积 logit：logit(F_k) = c_k − b·x，切点必须 c0 < c1
+# （初版把切点写反了：F(≤轻) > F(≤中)，导致 P(中) 为负；已修正并去掉掩盖负值的 pmax）
+# 本例暂把两个切点固定为 0 和 1.5，只估斜率——所以区间只反映"切点已知"时的不确定性
+c0_fix <- 0; c1_fix <- 1.5
 loglik_ord1 <- function(b) {
-  z1 <- c1_fix - b * ord_x; z2 <- c2_fix - b * ord_x
-  p_le0 <- 1 / (1 + exp(-z1)); p_le1 <- 1 / (1 + exp(-z2))
-  p_le0 <- pmin(pmax(p_le0, 1e-9), 1 - 1e-9); p_le1 <- pmin(pmax(p_le1, 1e-9), 1 - 1e-9)
+  F0 <- 1 / (1 + exp(-(c0_fix - b * ord_x)))     # P(Y ≤ 轻)
+  F1 <- 1 / (1 + exp(-(c1_fix - b * ord_x)))     # P(Y ≤ 中)
   ll <- 0
   for (i in seq_along(ord_y)) {
-    if (ord_y[i] == 0) ll <- ll + log(p_le0[i])
-    else if (ord_y[i] == 1) ll <- ll + log(pmax(p_le1[i] - p_le0[i], 1e-9))
-    else ll <- ll + log(1 - p_le1[i])
+    if (ord_y[i] == 0) ll <- ll + log(F0[i])
+    else if (ord_y[i] == 1) ll <- ll + log(F1[i] - F0[i])
+    else ll <- ll + log(1 - F1[i])
   }
   ll
 }
-b_seq <- seq(-0.5, 3, length.out = 400)
+b_seq <- seq(-2, 3, length.out = 400)
 lp_ord <- sapply(b_seq, loglik_ord1)
 w_ord <- exp(lp_ord - max(lp_ord)); w_ord <- w_ord / sum(w_ord)
 ord_sum <- data.frame(
@@ -168,15 +175,20 @@ ord_sum <- data.frame(
 )
 write_csv_fixed(ord_sum, file.path(RES, "09_有序后验.csv"))
 print(ord_sum)
-cat("切点固定为 c1 =", c1_fix, "（轻/中之间的切点）、c2 =", c2_fix, "（中/重之间的切点）\n")
+cat("切点固定为 c0 =", c0_fix, "（轻/中之间的切点）、c1 =", c1_fix, "（中/重之间的切点）；只估斜率\n")
 # 把等级当连续变量 vs 累积 logit：同一份数据的两种读法
 cont_fit <- coef(lm(ord_y ~ ord_x))
+# 概率类输出按 3 位小数写：三语言浮点求和顺序不同，4 位小数会在进位边界造成末位差
+r3 <- function(x) round(as.numeric(x), 3)
 ord_curve <- data.frame(
   剂量 = 1:6,
-  轻的累积概率 = r4(sapply(1:6, function(d) weighted.mean(1 / (1 + exp(-(c1_fix - b_seq * d))), w_ord))),
-  中的累积概率 = r4(sapply(1:6, function(d) weighted.mean(1 / (1 + exp(-(c2_fix - b_seq * d))), w_ord))),
-  当连续变量_预测等级 = r4(cont_fit[1] + cont_fit[2] * (1:6))
+  轻的累积概率 = r3(sapply(1:6, function(d) weighted.mean(1 / (1 + exp(-(c0_fix - b_seq * d))), w_ord))),
+  中的累积概率 = r3(sapply(1:6, function(d) weighted.mean(1 / (1 + exp(-(c1_fix - b_seq * d))), w_ord))),
+  当连续变量_平均编码得分 = r3(cont_fit[1] + cont_fit[2] * (1:6))
 )
+ord_curve$重的概率 <- r3(1 - ord_curve$中的累积概率)
+ord_curve$轻的类别概率 <- r3(ord_curve$轻的累积概率)
+ord_curve$中的类别概率 <- r3(ord_curve$中的累积概率 - ord_curve$轻的累积概率)
 write_csv_fixed(ord_curve, file.path(RES, "10_连续vs有序.csv"))
 print(ord_curve)
 
@@ -198,7 +210,8 @@ p2 <- ggplot(cnt_df, aes(处理水平, 菌落数)) +
                                           weighted.mean(g_pois$b, g_pois$post) * seq(0, 7, length.out = 60))),
             aes(处理水平, lam), colour = "#167d80", linewidth = 1.1) +
   labs(title = "计数数据：把线性预测放进指数里（泊松的 log 联系）",
-       subtitle = paste0("曲线是后验均值下的预测均值；方差/均值 = ", r4(var_cnt / mean_cnt), "，接近 1 说明泊松还站得住"),
+       subtitle = paste0("曲线是后验均值下的预测均值；同一剂量内合并的离散度 = ", r4(within_disp),
+                         "，明显大于 1 ——重复间的波动超过泊松预期"),
        x = "处理水平", y = "每皿菌落数")
 save_fig("02_泊松.png", p2, 7.4, 4.4)
 
@@ -223,15 +236,24 @@ p4 <- ggplot(data.frame(等级 = factor(c("轻", "中", "重"), levels = c("轻"
   ylim(0, max(table(ord_y)) * 1.3)
 save_fig("04_有序类别.png", p4, 7.4, 4.2)
 
-p5 <- ggplot(ord_curve, aes(剂量)) +
-  geom_line(aes(y = 当连续变量_预测等级 / 2, colour = "把等级当连续变量（预测等级 ÷2 以便同图）"), linewidth = 1.1) +
-  geom_line(aes(y = 轻的累积概率, colour = "累积 logit：P(等级 ≤ 轻)"), linewidth = 1.1) +
-  geom_line(aes(y = 中的累积概率, colour = "累积 logit：P(等级 ≤ 中)"), linewidth = 1.1) +
-  geom_point(data = ord_df, aes(剂量, 等级 / 2), colour = "#c1462c", size = 2.4) +
-  labs(title = "两种读法给出不同的东西",
-       subtitle = "红点＝原始等级（÷2 便于同图）；累积 logit 给出的是两条累积概率曲线，而不是一条直线",
-       x = "剂量", y = "值（概率或折算后的等级）", colour = NULL) +
-  coord_cartesian(ylim = c(0, 1.05))
+# 图 5 改成两个面板：左边「平均编码得分」，右边「三个等级的预测概率」——两者不是同一个量
+fig5_df <- rbind(
+  data.frame(面板 = "左：平均编码得分（把等级当 0/1/2）",
+             剂量 = c(1:6, ord_x),
+             值 = c(ord_curve$当连续变量_平均编码得分, ord_y),
+             系列 = c(rep("模型预测的平均得分", 6), rep("原始观测等级", 12))),
+  data.frame(面板 = "右：三个等级的预测概率（累积 logit）",
+             剂量 = rep(1:6, 3),
+             值 = c(ord_curve$轻的类别概率, ord_curve$中的类别概率, ord_curve$重的概率),
+             系列 = rep(c("轻", "中", "重"), each = 6))
+)
+p5 <- ggplot(fig5_df, aes(剂量, 值, colour = 系列)) +
+  geom_line(data = subset(fig5_df, 系列 != "原始观测等级"), linewidth = 1.1) +
+  geom_point(data = subset(fig5_df, 系列 == "原始观测等级"), size = 2) +
+  facet_wrap(~面板, scales = "free_y") +
+  labs(title = "两种模型回答的问题不同",
+       subtitle = "左：预测的是这套 0/1/2 编码下的平均得分；右：预测的是三个等级各自的概率",
+       x = "剂量", y = "值", colour = NULL)
 save_fig("05_连续vs有序.png", p5, 7.4, 4.4)
 
 cat("\n完成：5 张图 + 10 份 CSV 已写入\n")

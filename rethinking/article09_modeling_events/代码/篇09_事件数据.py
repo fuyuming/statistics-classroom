@@ -75,7 +75,7 @@ def loglik_binom(a, b):
     return float((n_succ * np.log(p) + (n_units - n_succ) * np.log(1 - p)).sum())
 
 
-a_seq = np.linspace(-6, 2, 300); b_seq = np.linspace(0, 1.2, 300)
+a_seq = np.linspace(-8, 3, 300); b_seq = np.linspace(-1.5, 2.5, 300)   # 含负斜率
 A_b, B_b, W_b = grid2(a_seq, b_seq, loglik_binom)
 write_csv(["参数", "后验均值", "下界89", "上界89"],
           [["截距 a", r4((A_b * W_b).sum()), r4(wq(A_b, W_b, 0.055)), r4(wq(A_b, W_b, 0.945))],
@@ -99,7 +99,7 @@ write_csv(["处理水平", "菌落数"], [[int(treat[i]), int(counts[i])] for i 
           os.path.join(RES, "04_计数数据_python.csv"))
 mean_cnt = float(counts.mean())
 within = np.array([[float(counts[treat == d].var(ddof=1)), float(counts[treat == d].mean())] for d in range(8)])
-var_cnt = float(within[:, 0].sum() / within[:, 1].sum())
+within_disp = float(within[:, 0].sum() / within[:, 1].sum())
 
 
 def loglik_pois(a, b):
@@ -107,7 +107,7 @@ def loglik_pois(a, b):
     return float((counts * np.log(lam) - lam - np.vectorize(math.lgamma)(counts + 1)).sum())
 
 
-a_p = np.linspace(-1, 3, 300); b_p = np.linspace(0, 0.6, 300)
+a_p = np.linspace(-1, 3, 300); b_p = np.linspace(-1, 1, 300)
 A_p, B_p, W_p = grid2(a_p, b_p, loglik_pois)
 write_csv(["参数", "后验均值", "下界89", "上界89"],
           [["截距 a", r4((A_p * W_p).sum()), r4(wq(A_p, W_p, 0.055)), r4(wq(A_p, W_p, 0.945))],
@@ -115,10 +115,15 @@ write_csv(["参数", "后验均值", "下界89", "上界89"],
           os.path.join(RES, "05_泊松后验_python.csv"))
 rr = np.exp(B_p * 7)
 write_csv(["量", "值"],
-          [["每皿平均菌落数（观测）", r4(mean_cnt)], ["方差/均值（同一剂量内合并，过离散检查）", r4(var_cnt)],
+          [["每皿平均菌落数（观测）", r4(mean_cnt)], ["方差/均值（同一剂量内合并，过离散检查）", r4(within_disp)],
            ["率比 exp(7b) 后验均值", r4((rr * W_p).sum())],
            ["率比 89% 区间下", r4(wq(rr, W_p, 0.055))], ["率比 89% 区间上", r4(wq(rr, W_p, 0.945))]],
           os.path.join(RES, "06_率比与过离散_python.csv"))
+lam_fit = np.exp(float((A_p * W_p).sum()) + float((B_p * W_p).sum()) * treat)
+pearson_disp = float(((counts - lam_fit) ** 2 / lam_fit).sum() / (len(counts) - 2))
+write_csv(["量", "值"], [["同一剂量内合并的离散度（描述性）", r4(within_disp)],
+                        ["拟合泊松后的 Pearson 离散度", r4(pearson_disp)]],
+          os.path.join(RES, "07_两种离散度_python.csv"))
 
 # ---------- 3) 率：暴露量不同（offset）----------
 plate = np.array([10.0, 10, 10, 10]); obs_small = np.array([3.0, 5, 4, 4])
@@ -135,24 +140,24 @@ ord_x = np.array([1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6], float)
 ord_y = np.array([0, 0, 0, 1, 0, 1, 1, 1, 1, 2, 2, 2], float)
 write_csv(["剂量", "等级"], [[int(ord_x[i]), int(ord_y[i])] for i in range(12)],
           os.path.join(RES, "08_有序数据_python.csv"))
-c1_fix, c2_fix = 1.5, 0.0
+c0_fix, c1_fix = 0.0, 1.5     # logit(F_k) = c_k − b·x，切点必须 c0 < c1（初版写反过）
 
 
 def loglik_ord1(b):
-    p_le0 = np.clip(1 / (1 + np.exp(-(c1_fix - b * ord_x))), 1e-9, 1 - 1e-9)
-    p_le1 = np.clip(1 / (1 + np.exp(-(c2_fix - b * ord_x))), 1e-9, 1 - 1e-9)
+    F0 = 1 / (1 + np.exp(-(c0_fix - b * ord_x)))
+    F1 = 1 / (1 + np.exp(-(c1_fix - b * ord_x)))
     ll = 0.0
     for i in range(len(ord_y)):
         if ord_y[i] == 0:
-            ll += math.log(p_le0[i])
+            ll += math.log(F0[i])
         elif ord_y[i] == 1:
-            ll += math.log(max(p_le1[i] - p_le0[i], 1e-9))
+            ll += math.log(F1[i] - F0[i])
         else:
-            ll += math.log(1 - p_le1[i])
+            ll += math.log(1 - F1[i])
     return ll
 
 
-b_grid = np.linspace(-0.5, 3, 400)
+b_grid = np.linspace(-2, 3, 400)
 lp_ord = np.array([loglik_ord1(b) for b in b_grid])
 w_ord = np.exp(lp_ord - lp_ord.max()); w_ord = w_ord / w_ord.sum()
 write_csv(["参数", "后验均值", "下界89", "上界89"],
@@ -162,10 +167,13 @@ print("  有序斜率 b =", r4((b_grid * w_ord).sum()))
 cont_fit = np.polyfit(ord_x, ord_y, 1)
 rows10 = []
 for d in range(1, 7):
-    pk = float((1 / (1 + np.exp(-(c1_fix - b_grid * d))) * w_ord).sum())
-    pz = float((1 / (1 + np.exp(-(c2_fix - b_grid * d))) * w_ord).sum())
-    rows10.append([d, r4(pk), r4(pz), r4(cont_fit[0] * d + cont_fit[1])])
-write_csv(["剂量", "轻的累积概率", "中的累积概率", "当连续变量_预测等级"], rows10,
+    pk = float((1 / (1 + np.exp(-(c0_fix - b_grid * d))) * w_ord).sum())
+    pz = float((1 / (1 + np.exp(-(c1_fix - b_grid * d))) * w_ord).sum())
+    r3 = lambda x: round(float(x), 3)
+    rows10.append([d, r3(pk), r3(pz), r3(cont_fit[0] * d + cont_fit[1]),
+                   r3(1 - pz), r3(pk), r3(pz - pk)])
+write_csv(["剂量", "轻的累积概率", "中的累积概率", "当连续变量_平均编码得分", "重的概率",
+           "轻的类别概率", "中的类别概率"], rows10,
           os.path.join(RES, "10_连续vs有序_python.csv"))
 
 # ---------- 图（两张对照图）----------
