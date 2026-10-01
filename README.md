@@ -35,6 +35,7 @@
 | 06 | 多控制一个变量，为什么反而离真值更远：好控制、坏控制与回归表里的陷阱（书第 6 章） | [rethinking/article06_good_bad_controls](rethinking/article06_good_bad_controls/) |
 | 07 | 样本内拟合得越好，预测就越准吗：过拟合、正则化与厚尾（书第 7、8 章） | [rethinking/article07_overfitting](rethinking/article07_overfitting/) |
 | 08 | 网格走不动的时候怎么办：MCMC 在后验上走一圈（书第 9 章） | [rethinking/article08_mcmc](rethinking/article08_mcmc/) |
+| 09 | 0/1 结果、计数、等级：logit、泊松与有序类别（书第 10、11 章） | [rethinking/article09_modeling_events](rethinking/article09_modeling_events/) |
 
 每篇都提供 R、Python、MATLAB 三个语言的等价脚本，输出逐位一致（02 篇起连 CSV 文件本身都逐字节一致）；
 跑一遍脚本就能逐项对照。
