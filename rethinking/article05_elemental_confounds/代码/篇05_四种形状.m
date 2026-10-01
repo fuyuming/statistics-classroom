@@ -77,9 +77,9 @@ fclose(fid);
 pTot = olsLS([ones(10,1), treatC], growthD);
 pDir = olsLS([ones(10,1), treatC, densityD], growthD);
 fid = fopen(fullfile(RES, '05_管_总效应与直接效应_matlab.csv'), 'w', 'n', 'UTF-8');
-fprintf(fid, '"写法","处理效应估计","说明"\n');
-fprintf(fid, '不控制中介（长势 ~ 处理）,%s,总效应\n', numFmt(r4(pTot(2)), 4));
-fprintf(fid, '控制中介（长势 ~ 处理 + 菌群密度）,%s,直接效应（总效应的一部分被中介带走）\n', numFmt(r4(pDir(2)), 4));
+fprintf(fid, '"写法","处理效应估计","机制真值","说明"\n');
+fprintf(fid, '不控制中介（长势 ~ 处理）,%s,3,估计的是总效应\n', numFmt(r4(pTot(2)), 4));
+fprintf(fid, '控制中介（长势 ~ 处理 + 菌群密度）,%s,0,在适当识别假设下估计直接效应；本例机制里直接通路不存在\n', numFmt(r4(pDir(2)), 4));
 fclose(fid);
 
 %% 4) 对撞（选择）
@@ -102,25 +102,32 @@ fprintf(fid, '"范围","处理与基线值的相关","单元数"\n');
 fprintf(fid, '全部 10 个单元,%s,10\n', numFmt(rcAll, 4));
 fprintf(fid, '只看被选中的 5 个单元,%s,%d\n', numFmt(rcSel, 4), numel(selIdx));
 fclose(fid);
+[~, ordS] = sort(scoreS, 'descend');
+top3 = ordS(1:3);
+rcTop3 = r4(pearsonR(treatB(top3), baseB(top3)));
+fid = fopen(fullfile(RES, '10_入选构成与前3名_matlab.csv'), 'w', 'n', 'UTF-8');
+fprintf(fid, '"范围","处理与基线值的相关","单元数"\n');
+fprintf(fid, '全部 10 个单元,%s,10\n', numFmt(rcAll, 4));
+fprintf(fid, '只看被选中的 5 个单元（处理 4、对照 1）,%s,%d\n', numFmt(rcSel, 4), numel(selIdx));
+fprintf(fid, '只取分数最高的 3 个,%s,3\n', numFmt(rcTop3, 4));
+fclose(fid);
 
-%% 5) 后代（治疗后变量）
-residP = [0.3 -0.5 0.8 -0.2 0.6 -0.7 0.4 -0.1 0.5 -0.8]';
-residY = [0.6 0.4 -0.7 0.8 -0.3 0.2 -0.5 0.7 -0.4 0.1]';
-postD = 3 + 1.6 * treatC + residP;
-growthP = 9 + 2.8 * treatC + 0.9 * postD + residY;
+%% 5) 后代：没有控制那个节点，却控制了它的后代
+repNoise = [0.4 -0.6 0.7 -0.2 0.5 -0.8 0.3 -0.1 0.6 -0.5]';
+hasReport = double(selected == 1 & repNoise > -0.55);
 fid = fopen(fullfile(RES, '08_我们的案例_后代_matlab.csv'), 'w', 'n', 'UTF-8');
-fprintf(fid, '"单元","处理","处理后指标","长势"\n');
+fprintf(fid, '"单元","处理","基线值","入选","报告扰动","有报告"\n');
 for i = 1:10
-  fprintf(fid, '%d,%d,%s,%s\n', i, treatC(i), numFmt(round(postD(i),6)), numFmt(round(growthP(i),6)));
+  fprintf(fid, '%d,%d,%s,%d,%s,%d\n', i, treatB(i), numFmt(baseB(i)), selected(i), numFmt(round(repNoise(i),6)), hasReport(i));
 end
 fclose(fid);
-dTot = olsLS([ones(10,1), treatC], growthP);
-dCtl = olsLS([ones(10,1), treatC, postD], growthP);
-truth = 2.8 + 0.9 * 1.6;
-fid = fopen(fullfile(RES, '09_后代_控制前后_matlab.csv'), 'w', 'n', 'UTF-8');
-fprintf(fid, '"写法","处理效应估计","真值"\n');
-fprintf(fid, '不控制后代（长势 ~ 处理）,%s,%s\n', numFmt(r4(dTot(2)),4), numFmt(r4(truth),4));
-fprintf(fid, '把后代当协变量（长势 ~ 处理 + 处理后指标）,%s,%s\n', numFmt(r4(dCtl(2)),4), numFmt(r4(truth),4));
+repIdx = find(hasReport == 1);
+rcRep = r4(pearsonR(treatB(repIdx), baseB(repIdx)));
+fid = fopen(fullfile(RES, '09_后代_间接筛选_matlab.csv'), 'w', 'n', 'UTF-8');
+fprintf(fid, '"范围","处理与基线值的相关","单元数"\n');
+fprintf(fid, '全部 10 个单元,%s,10\n', numFmt(rcAll, 4));
+fprintf(fid, '只看被选中的 5 个单元,%s,%d\n', numFmt(rcSel, 4), numel(selIdx));
+fprintf(fid, '只看有报告的单元,%s,%d\n', numFmt(rcRep, 4), numel(repIdx));
 fclose(fid);
 
 %% 图（两张对照图）

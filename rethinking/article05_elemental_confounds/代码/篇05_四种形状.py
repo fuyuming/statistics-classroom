@@ -89,9 +89,9 @@ write_csv(["单元", "处理", "菌群密度", "长势"],
           os.path.join(RES, "04_我们的案例_管_python.csv"))
 pt, _ = ols_ls(np.column_stack([np.ones(10), treat_c]), growth_d)
 pd_, _ = ols_ls(np.column_stack([np.ones(10), treat_c, density_d]), growth_d)
-write_csv(["写法", "处理效应估计", "说明"],
-          [["不控制中介（长势 ~ 处理）", r4(pt[1]), "总效应"],
-           ["控制中介（长势 ~ 处理 + 菌群密度）", r4(pd_[1]), "直接效应（总效应的一部分被中介带走）"]],
+write_csv(["写法", "处理效应估计", "机制真值", "说明"],
+          [["不控制中介（长势 ~ 处理）", r4(pt[1]), 3.0, "估计的是总效应"],
+           ["控制中介（长势 ~ 处理 + 菌群密度）", r4(pd_[1]), 0.0, "在适当识别假设下估计直接效应；本例机制里直接通路不存在"]],
           os.path.join(RES, "05_管_总效应与直接效应_python.csv"))
 print("  管：总效应", r4(pt[1]), "直接效应", r4(pd_[1]))
 
@@ -112,23 +112,28 @@ write_csv(["范围", "处理与基线值的相关", "单元数"],
           [["全部 10 个单元", rc_all, 10], ["只看被选中的 5 个单元", rc_sel, len(idx)]],
           os.path.join(RES, "07_对撞_条件化前后_python.csv"))
 print("  对撞：全体", rc_all, "子集", rc_sel)
+top3 = sorted(range(10), key=lambda i: -score_s[i])[:3]
+rc_top3 = r4(pearson([treat_b[i] for i in top3], [base_b[i] for i in top3]))
+write_csv(["范围", "处理与基线值的相关", "单元数"],
+          [["全部 10 个单元", rc_all, 10],
+           ["只看被选中的 5 个单元（处理 4、对照 1）", rc_sel, len(idx)],
+           ["只取分数最高的 3 个", rc_top3, 3]],
+          os.path.join(RES, "10_入选构成与前3名_python.csv"))
+print("  前 3 名相关", rc_top3)
 
-# ---------- 5) 后代（治疗后变量）----------
-resid_p = [0.3, -0.5, 0.8, -0.2, 0.6, -0.7, 0.4, -0.1, 0.5, -0.8]
-resid_y = [0.6, 0.4, -0.7, 0.8, -0.3, 0.2, -0.5, 0.7, -0.4, 0.1]
-post_d = [3 + 1.6 * t + e for t, e in zip(treat_c, resid_p)]
-growth_p = [9 + 2.8 * t + 0.9 * p + e for t, p, e in zip(treat_c, post_d, resid_y)]
-write_csv(["单元", "处理", "处理后指标", "长势"],
-          [[i + 1, treat_c[i], round(post_d[i], 6), round(growth_p[i], 6)] for i in range(10)],
+# ---------- 5) 后代：没有控制那个节点，却控制了它的后代 ----------
+rep_noise = [0.4, -0.6, 0.7, -0.2, 0.5, -0.8, 0.3, -0.1, 0.6, -0.5]
+has_report = [1 if (selected[i] == 1 and rep_noise[i] > -0.55) else 0 for i in range(10)]
+write_csv(["单元", "处理", "基线值", "入选", "报告扰动", "有报告"],
+          [[i + 1, treat_b[i], base_b[i], selected[i], round(rep_noise[i], 6), has_report[i]] for i in range(10)],
           os.path.join(RES, "08_我们的案例_后代_python.csv"))
-dt, _ = ols_ls(np.column_stack([np.ones(10), treat_c]), growth_p)
-dc, _ = ols_ls(np.column_stack([np.ones(10), treat_c, post_d]), growth_p)
-truth = 2.8 + 0.9 * 1.6
-write_csv(["写法", "处理效应估计", "真值"],
-          [["不控制后代（长势 ~ 处理）", r4(dt[1]), r4(truth)],
-           ["把后代当协变量（长势 ~ 处理 + 处理后指标）", r4(dc[1]), r4(truth)]],
-          os.path.join(RES, "09_后代_控制前后_python.csv"))
-print("  后代：不控制", r4(dt[1]), "控制", r4(dc[1]), "｜真值", r4(truth))
+rep_idx = [i for i in range(10) if has_report[i] == 1]
+rc_rep = r4(pearson([treat_b[i] for i in rep_idx], [base_b[i] for i in rep_idx]))
+write_csv(["范围", "处理与基线值的相关", "单元数"],
+          [["全部 10 个单元", rc_all, 10], ["只看被选中的 5 个单元", rc_sel, len(idx)],
+           ["只看有报告的单元", rc_rep, len(rep_idx)]],
+          os.path.join(RES, "09_后代_间接筛选_python.csv"))
+print("  有报告子集相关", rc_rep)
 
 # ---------- 图（两张对照图）----------
 fig, ax = plt.subplots(figsize=(7.0, 4.2), dpi=150)

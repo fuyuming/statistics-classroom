@@ -96,7 +96,8 @@ p_direct <- ols_ls(cbind(1, treat_c, density_d), growth_d)      # 控制中介�
 pipe_est <- tibble(
   写法 = c("不控制中介（长势 ~ 处理）", "控制中介（长势 ~ 处理 + 菌群密度）"),
   处理效应估计 = r4(c(p_total$coef[2], p_direct$coef[2])),
-  说明 = c("总效应", "直接效应（总效应的一部分被中介带走）")
+  机制真值 = c(3.0, 0.0),
+  说明 = c("估计的是总效应", "在适当识别假设下估计直接效应；本例机制里直接通路不存在")
 )
 write_csv_fixed(pipe_est, file.path(RES, "05_管_总效应与直接效应.csv"))
 print(pipe_est)
@@ -120,23 +121,34 @@ coll_tab <- tibble(
 )
 write_csv_fixed(coll_tab, file.path(RES, "07_对撞_条件化前后.csv"))
 print(coll_tab)
-
-# ---------- 5) 我们的案例（四）：后代（治疗后变量）----------
-# 接种 → 处理后测到的某个指标 → 长势；这个指标是"后代"，把它当协变量会把效应错抹掉
-resid_p <- c(0.3, -0.5, 0.8, -0.2, 0.6, -0.7, 0.4, -0.1, 0.5, -0.8)
-resid_y <- c(0.6, 0.4, -0.7, 0.8, -0.3, 0.2, -0.5, 0.7, -0.4, 0.1)
-post_d <- 3 + 1.6 * treat_c + resid_p          # 处理后测到的指标（后代）
-growth_p <- 9 + 2.8 * treat_c + 0.9 * post_d + resid_y
-desc_df <- tibble(单元 = 1:10, 处理 = treat_c, 处理后指标 = round(post_d, 6), 长势 = round(growth_p, 6))
-write_csv_fixed(desc_df, file.path(RES, "08_我们的案例_后代.csv"))
-d_total <- ols_ls(cbind(1, treat_c), growth_p)
-d_ctrl  <- ols_ls(cbind(1, treat_c, post_d), growth_p)
-desc_est <- tibble(
-  写法 = c("不控制后代（长势 ~ 处理）", "把后代当协变量（长势 ~ 处理 + 处理后指标）"),
-  处理效应估计 = r4(c(d_total$coef[2], d_ctrl$coef[2])),
-  真值 = c(2.8 + 0.9 * 1.6, 2.8 + 0.9 * 1.6)
+# 入选者的处理/对照构成，以及"收紧筛选"（只取前 3 名）时的相关
+sel_treat <- sum(treat_b[selected == 1] == 1)
+sel_ctrl  <- sum(treat_b[selected == 1] == 0)
+top3_idx  <- order(score_s, decreasing = TRUE)[1:3]
+r_coll_top3 <- pearson(treat_b[top3_idx], base_b[top3_idx]) %>% r4()
+sel_comp <- tibble(
+  范围 = c("全部 10 个单元", "只看被选中的 5 个单元（处理 4、对照 1）", "只取分数最高的 3 个"),
+  处理与基线值的相关 = c(r_coll_all, r_coll_sel, r_coll_top3),
+  单元数 = c(10L, sum(selected), 3L)
 )
-write_csv_fixed(desc_est, file.path(RES, "09_后代_控制前后.csv"))
+write_csv_fixed(sel_comp, file.path(RES, "10_入选构成与前3名.csv"))
+print(sel_comp)
+
+# ---------- 5) 我们的案例（四）：后代——没有控制那个节点，却控制了它的后代 ----------
+# 结构：处理 → 入选 ← 基线；入选 → 是否有报告。
+# 只分析"有报告"的单元，等于通过后代间接按"入选"做了筛选。
+rep_noise <- c(0.4, -0.6, 0.7, -0.2, 0.5, -0.8, 0.3, -0.1, 0.6, -0.5)
+has_report <- as.integer(selected == 1 & rep_noise > -0.55)
+desc_df <- tibble(单元 = 1:10, 处理 = treat_b, 基线值 = base_b,
+                  入选 = selected, 报告扰动 = round(rep_noise, 6), 有报告 = has_report)
+write_csv_fixed(desc_df, file.path(RES, "08_我们的案例_后代.csv"))
+r_coll_rep <- pearson(treat_b[has_report == 1], base_b[has_report == 1]) %>% r4()
+desc_est <- tibble(
+  范围 = c("全部 10 个单元", "只看被选中的 5 个单元", "只看有报告的单元"),
+  处理与基线值的相关 = c(r_coll_all, r_coll_sel, r_coll_rep),
+  单元数 = c(10L, sum(selected), sum(has_report))
+)
+write_csv_fixed(desc_est, file.path(RES, "09_后代_间接筛选.csv"))
 print(desc_est)
 
 # ---------- 图 ----------
@@ -160,12 +172,13 @@ P3 <- mk_panel("对撞（选择）",
   tibble(name = c("处理 X", "基线值 B", "被选中 C"), x = c(0.22, 0.78, 0.50), y = c(0.0, 0.0, 1.05)),
   tibble(from = c("处理 X", "基线值 B"), to = c("被选中 C", "被选中 C"),
          x = c(0.22, 0.78), y = c(0.0, 0.0), xend = c(0.50, 0.50), yend = c(1.05, 1.05), style = c("solid", "solid")))
-P4 <- mk_panel("后代（治疗后）",
-  tibble(name = c("处理 X", "后代 P", "长势 Y"), x = c(0.16, 0.50, 0.84), y = c(1.05, 0.0, 0.72)),
-  tibble(from = c("处理 X", "处理 X", "后代 P"), to = c("后代 P", "长势 Y", "长势 Y"),
-         x = c(0.16, 0.16, 0.50), y = c(1.05, 1.05, 0.0), xend = c(0.50, 0.84, 0.84), yend = c(0.0, 0.72, 0.72),
+P4 <- mk_panel("对撞的后代",
+  tibble(name = c("处理 X", "基线值 B", "被选中 C", "后代 R"),
+         x = c(0.16, 0.84, 0.50, 0.50), y = c(0.0, 0.0, 0.72, 1.25)),
+  tibble(from = c("处理 X", "基线值 B", "被选中 C"), to = c("被选中 C", "被选中 C", "后代 R"),
+         x = c(0.16, 0.84, 0.50), y = c(0.0, 0.0, 0.72), xend = c(0.50, 0.50, 0.50), yend = c(0.72, 0.72, 1.25),
          style = c("solid", "solid", "solid")))
-lvl <- c("叉（混杂）", "管（中介）", "对撞（选择）", "后代（治疗后）")
+lvl <- c("叉（混杂）", "管（中介）", "对撞（选择）", "对撞的后代")
 nodes <- bind_rows(P1$n, P2$n, P3$n, P4$n)
 edges <- bind_rows(P1$e, P2$e, P3$e, P4$e)
 nodes$panel <- factor(nodes$panel, levels = lvl)
@@ -176,9 +189,9 @@ p1 <- ggplot() +
   geom_label(data = nodes, aes(x, y, label = name), size = 3.0, colour = "#163d48", fill = "#eef5f5") +
   facet_wrap(~ panel, nrow = 2) +
   scale_linetype_manual(values = c(solid = "solid", dashed = "dashed"), guide = "none") +
-  coord_cartesian(xlim = c(0.02, 0.98), ylim = c(-0.25, 1.3)) +
+  coord_cartesian(xlim = c(0.02, 0.98), ylim = c(-0.25, 1.5)) +
   labs(title = "混杂的四种基本形状",
-       subtitle = "虚线＝共同原因；管＝中介；对撞＝共同结果；后代＝处理造成、又影响结果") +
+       subtitle = "虚线＝共同原因（本图绘图约定）；管＝中介；对撞＝共同结果；其后代＝携带对撞的信息") +
   theme_void() +
   theme(plot.title = element_text(face = "bold", size = 12),
         plot.subtitle = element_text(size = 9, colour = "#43585c"),
@@ -202,7 +215,7 @@ p3 <- ggplot(pipe_est, aes(写法, 处理效应估计)) +
   geom_col(fill = c("#167d80", "#e8b4a8"), width = 0.55) +
   geom_text(aes(label = sprintf("%.2f", 处理效应估计)), vjust = -0.5, size = 4) +
   labs(title = "管（中介）：控制中介会把总效应带走",
-       subtitle = "接种的效应有一部分是「通过菌群密度」实现的；控制中介后剩下的只是直接效应",
+       subtitle = "本例生成机制：总效应真值 3、直接效应真值 0；控制中介后得到的 1.4807 是有限数据的估计偏离",
        x = NULL, y = "处理效应估计") +
   ylim(0, 4.4)
 save_fig("03-管.png", p3, 7.0, 4.2)
@@ -220,14 +233,14 @@ p4 <- ggplot(coll_long, aes(基线值, 处理)) +
 save_fig("04-对撞.png", p4, 7.4, 4.4)
 
 # 图 5：后代——控制处理后变量
-p5 <- ggplot(desc_est, aes(写法, 处理效应估计)) +
-  geom_col(fill = c("#167d80", "#e8b4a8"), width = 0.55) +
-  geom_hline(yintercept = 2.8 + 0.9 * 1.6, linetype = "dashed", colour = "#c1462c") +
-  geom_text(aes(label = sprintf("%.2f", 处理效应估计)), vjust = -0.5, size = 4) +
-  labs(title = "后代（治疗后变量）：把它当协变量，效应被错抹掉",
-       subtitle = "红线是总效应 4.24（处理 2.8 + 通过后代 0.9×1.6）",
-       x = NULL, y = "处理效应估计") +
-  ylim(0, 6.0)
+p5 <- ggplot(desc_est, aes(范围, 处理与基线值的相关)) +
+  geom_col(fill = c("#e8b4a8", "#c1462c", "#167d80"), width = 0.55) +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "#9aa8a8") +
+  geom_text(aes(label = sprintf("%.4f", 处理与基线值的相关)), vjust = -0.5, size = 3.8) +
+  labs(title = "没控制那个节点，却控制了它的后代",
+       subtitle = "只看「有报告」的单元＝通过后代间接按入选做了筛选；相关仍被拉动",
+       x = NULL, y = "处理与基线值的相关") +
+  ylim(min(desc_est$处理与基线值的相关) * 1.35, max(desc_est$处理与基线值的相关) * 1.2)
 save_fig("05-后代.png", p5, 7.0, 4.2)
 
 cat("\n完成：5 张图 + 10 份 CSV 已写入\n")
