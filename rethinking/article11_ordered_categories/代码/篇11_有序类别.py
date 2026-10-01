@@ -76,9 +76,11 @@ def loglik(b, u, v):
     return float(np.log(np.maximum(P[np.arange(len(y)), y], 1e-300)).sum())
 
 
-b_seq = np.linspace(-2, 3, 70)
-u_seq = np.linspace(-4, 4, 70)
-v_seq = np.linspace(math.log(0.05), math.log(5), 70)
+# 范围要足够宽，否则先验边界会支配后验（初版窄范围约 39.8% 的质量贴边界；放宽后斜率 0.96→1.30）
+B_RNG, U_RNG, V_RNG, N_GRID = (-2, 4), (-4, 8), (0.05, 12), 90
+b_seq = np.linspace(B_RNG[0], B_RNG[1], N_GRID)
+u_seq = np.linspace(U_RNG[0], U_RNG[1], N_GRID)
+v_seq = np.linspace(math.log(V_RNG[0]), math.log(V_RNG[1]), N_GRID)
 B, U, V = np.meshgrid(b_seq, u_seq, v_seq, indexing="ij")
 B, U, V = B.ravel(order="F"), U.ravel(order="F"), V.ravel(order="F")   # 与 R 的 expand.grid 同序：b 变得最快
 lp = np.array([loglik(B[i], U[i], V[i]) for i in range(len(B))])
@@ -124,8 +126,9 @@ def loglik_bin(a, b):
     return float((y_bin * np.log(p) + (1 - y_bin) * np.log(1 - p)).sum())
 
 
-a_seq = np.linspace(-8, 3, 300)
-b2_seq = np.linspace(-1.5, 2.5, 300)
+# 与有序模型对齐：b 同一个 [-2,4]；a 对应 -c2，需覆盖到 -14 附近
+a_seq = np.linspace(-16, 2, 300)
+b2_seq = np.linspace(-2, 4, 300)
 Aa, Bb = np.meshgrid(a_seq, b2_seq, indexing="ij")
 Aa, Bb = Aa.ravel(order="F"), Bb.ravel(order="F")
 lpa = np.array([loglik_bin(Aa[i], Bb[i]) for i in range(len(Aa))])
@@ -136,18 +139,40 @@ se_ord = float(np.sqrt(((B - (B * post).sum()) ** 2 * post).sum()))
 write_csv(["写法", "斜率后验均值", "斜率后验标准差", "说明"],
           [["有序模型（三档全用）", r4((B * post).sum()), r4(se_ord), "斜率是「累积几率的共同位移」"],
            ["合并成二分类（重 vs 其余）", r4((Bb * wa).sum()), r4(se_bin),
-            "斜率是「重 vs 其余」的几率变化——不是同一个量"]],
+            "在比例优势假设下这是同一个 b；本例两者的先验范围已按同一 b 区间设置"]],
           os.path.join(RES, "05_有序vs二分类_python.csv"))
 
 rows6 = []
 for dd in (3, 5, 7):
     F1 = 1 / (1 + np.exp(-(c1_arr - B * dd)))
     F2 = 1 / (1 + np.exp(-(c2_arr - B * dd)))
-    p_bin = 1 / (1 + np.exp(-((Aa * wa).sum() + (Bb * wa).sum() * dd)))
+    # 与有序模型口径统一：后验平均概率（逐点算再平均）
+    p_bin = float((1 / (1 + np.exp(-(Aa + Bb * dd))) * wa).sum())
     rows6.append([dd, r4((F1 * post).sum()), r4(((F2 - F1) * post).sum()), r4(((1 - F2) * post).sum()),
                   r4(p_bin), r4(1 - p_bin)])
 write_csv(["剂量", "有序_轻", "有序_中", "有序_重", "二分类_重", "二分类_其余"], rows6,
           os.path.join(RES, "06_信息损失的形态_python.csv"))
+
+
+def scan_setting(br, ur, vr, n=90):
+    bs = np.linspace(br[0], br[1], n); us = np.linspace(ur[0], ur[1], n)
+    vs = np.linspace(math.log(vr[0]), math.log(vr[1]), n)
+    BB, UU, VV = np.meshgrid(bs, us, vs, indexing="ij")
+    BB, UU, VV = BB.ravel(order="F"), UU.ravel(order="F"), VV.ravel(order="F")
+    lpv = np.array([loglik(BB[i], UU[i], VV[i]) for i in range(len(BB))])
+    po = np.exp(lpv - lpv.max()); po = po / po.sum()
+    mb = float((BB * po).sum())
+    return mb, float(np.sqrt(((BB - mb) ** 2 * po).sum())), float((UU * po).sum()), float(((UU + np.exp(VV)) * po).sum())
+
+
+sens_rows = []
+for name, (br, ur, vr) in [("初版范围 b[-2,3] c1[-4,4] 间距[0.05,5]", ((-2, 3), (-4, 4), (0.05, 5))),
+                           ("本篇采用 b[-2,4] c1[-4,8] 间距[0.05,12]", (B_RNG, U_RNG, V_RNG)),
+                           ("再放宽 b[-3,5] c1[-6,12] 间距[0.05,20]", ((-3, 5), (-6, 12), (0.05, 20)))]:
+    mb, sd, c1m, c2m = scan_setting(br, ur, vr)
+    sens_rows.append([name, r4(mb), r4(sd), r4(c1m), r4(c2m)])
+write_csv(["设置", "斜率均值", "斜率后验标准差", "切点1均值", "切点2均值"], sens_rows,
+          os.path.join(RES, "07_范围敏感性_python.csv"))
 
 # 图（两张对照图）
 fig, ax = plt.subplots(figsize=(7.4, 4.4), dpi=150)

@@ -53,9 +53,13 @@ loglik <- function(b, u, v) {
   P <- cbind(F1, F2 - F1, 1 - F2)                       # 每行一个观测的三档概率
   sum(log(pmax(P[cbind(seq_along(y), y + 1)], 1e-300)))
 }
-b_seq <- seq(-2, 3, length.out = 70)
-u_seq <- seq(-4, 4, length.out = 70)
-v_seq <- seq(log(0.05), log(5), length.out = 70)
+# 范围要足够宽，否则先验边界会支配后验（初版用 b∈[-2,3]、u∈[-4,4]、间距∈[0.05,5]，
+# 结果约 39.8% 的后验质量贴在"切点间距 > 4.5"的边界上；放宽后斜率从 0.96 变成 1.30）
+B_RNG <- c(-2, 4); U_RNG <- c(-4, 8); V_RNG <- c(0.05, 12)
+N_GRID <- 90
+b_seq <- seq(B_RNG[1], B_RNG[2], length.out = N_GRID)
+u_seq <- seq(U_RNG[1], U_RNG[2], length.out = N_GRID)
+v_seq <- seq(log(V_RNG[1]), log(V_RNG[2]), length.out = N_GRID)
 g <- expand.grid(b = b_seq, u = u_seq, v = v_seq)
 lp <- numeric(nrow(g))
 for (i in seq_len(nrow(g))) lp[i] <- loglik(g$b[i], g$u[i], g$v[i])
@@ -70,7 +74,34 @@ post_tab <- data.frame(
 )
 write_csv_fixed(post_tab, file.path(RES, "02_后验.csv"))
 print(post_tab)
-cat("网格：70×70×70 =", nrow(g), "个格点（三参数网格，切点次序由参数化保证）\n")
+cat("网格：", N_GRID, "³ =", nrow(g), "个格点；范围 b", B_RNG[1], "~", B_RNG[2],
+    "、c1", U_RNG[1], "~", U_RNG[2], "、切点间距", V_RNG[1], "~", V_RNG[2], "\n")
+
+# 范围/分辨率敏感性：证明"数字不是被边界逼出来的"
+scan_setting <- function(br, ur, vr, n) {
+  gg <- expand.grid(b = seq(br[1], br[2], length.out = n),
+                    u = seq(ur[1], ur[2], length.out = n),
+                    v = seq(log(vr[1]), log(vr[2]), length.out = n))
+  lpv <- numeric(nrow(gg))
+  for (i in seq_len(nrow(gg))) lpv[i] <- loglik(gg$b[i], gg$u[i], gg$v[i])
+  po <- exp(lpv - max(lpv)); po <- po / sum(po)
+  mb <- weighted.mean(gg$b, po)
+  c(b = mb, sd = sqrt(weighted.mean((gg$b - mb)^2, po)),
+    c1 = weighted.mean(gg$u, po), c2 = weighted.mean(gg$u + exp(gg$v), po))
+}
+s1 <- scan_setting(c(-2, 3), c(-4, 4), c(0.05, 5), 90)      # 初版范围
+s2 <- scan_setting(B_RNG, U_RNG, V_RNG, 90)                  # 本篇采用
+s3 <- scan_setting(c(-3, 5), c(-6, 12), c(0.05, 20), 90)     # 再放宽
+sens <- data.frame(
+  设置 = c("初版范围 b[-2,3] c1[-4,4] 间距[0.05,5]", "本篇采用 b[-2,4] c1[-4,8] 间距[0.05,12]",
+           "再放宽 b[-3,5] c1[-6,12] 间距[0.05,20]"),
+  斜率均值 = r4(c(s1["b"], s2["b"], s3["b"])),
+  斜率后验标准差 = r4(c(s1["sd"], s2["sd"], s3["sd"])),
+  切点1均值 = r4(c(s1["c1"], s2["c1"], s3["c1"])),
+  切点2均值 = r4(c(s1["c2"], s2["c2"], s3["c2"]))
+)
+write_csv_fixed(sens, file.path(RES, "07_范围敏感性.csv"))
+print(sens)
 
 # ---------- 3) 累积概率曲线与各等级概率 ----------
 dose_fine <- 1:10
@@ -117,7 +148,8 @@ loglik_bin <- function(a, b) {
   p <- 1 / (1 + exp(-(a + b * x))); p <- pmin(pmax(p, 1e-12), 1 - 1e-12)
   sum(y_bin * log(p) + (1 - y_bin) * log(1 - p))
 }
-ga <- expand.grid(a = seq(-8, 3, length.out = 300), b = seq(-1.5, 2.5, length.out = 300))
+# 二分类模型的先验范围与有序模型对齐：b 用同一个 [-2,4]；截距 a 对应 -c2，需要覆盖到 -14 附近
+ga <- expand.grid(a = seq(-16, 2, length.out = 300), b = seq(-2, 4, length.out = 300))
 lpa <- numeric(nrow(ga))
 for (i in seq_len(nrow(ga))) lpa[i] <- loglik_bin(ga$a[i], ga$b[i])
 ga$post <- exp(lpa - max(lpa)); ga$post <- ga$post / sum(ga$post)
@@ -127,7 +159,7 @@ cmp <- data.frame(
   写法 = c("有序模型（三档全用）", "合并成二分类（重 vs 其余）"),
   斜率后验均值 = r4(c(weighted.mean(g$b, g$post), weighted.mean(ga$b, ga$post))),
   斜率后验标准差 = r4(c(se_ord, se_bin)),
-  说明 = c("斜率是「累积几率的共同位移」", "斜率是「重 vs 其余」的几率变化——不是同一个量")
+  说明 = c("斜率是「累积几率的共同位移」", "在比例优势假设下这是同一个 b；本例两者的先验范围已按同一 b 区间设置")
 )
 write_csv_fixed(cmp, file.path(RES, "05_有序vs二分类.csv"))
 print(cmp)
@@ -136,7 +168,8 @@ loss_rows <- list()
 for (dd in c(3, 5, 7)) {
   F1 <- 1 / (1 + exp(-(g$c1 - g$b * dd)))
   F2 <- 1 / (1 + exp(-(g$c2 - g$b * dd)))
-  p_bin <- 1 / (1 + exp(-(weighted.mean(ga$a, ga$post) + weighted.mean(ga$b, ga$post) * dd)))
+  # 与有序模型口径统一：后验平均概率（逐点算再平均），不是代入均值参数
+  p_bin <- weighted.mean(1 / (1 + exp(-(ga$a + ga$b * dd))), ga$post)
   loss_rows[[length(loss_rows) + 1]] <- data.frame(
     剂量 = dd,
     有序_轻 = r4(weighted.mean(F1, g$post)),

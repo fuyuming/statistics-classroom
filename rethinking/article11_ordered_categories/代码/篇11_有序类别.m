@@ -46,7 +46,9 @@ fprintf(fid, '"剂量","等级"\n');
 for i = 1:numel(y), fprintf(fid, '%d,%d\n', x(i), y(i)); end
 fclose(fid);
 
-bSeq = linspace(-2, 3, 70)'; uSeq = linspace(-4, 4, 70)'; vSeq = linspace(log(0.05), log(5), 70)';
+% 范围要足够宽，否则先验边界会支配后验
+B_RNG = [-2 4]; U_RNG = [-4 8]; V_RNG = [0.05 12]; N_GRID = 90;
+bSeq = linspace(B_RNG(1), B_RNG(2), N_GRID)'; uSeq = linspace(U_RNG(1), U_RNG(2), N_GRID)'; vSeq = linspace(log(V_RNG(1)), log(V_RNG(2)), N_GRID)';
 [Bg, Ug, Vg] = ndgrid(bSeq, uSeq, vSeq);     % 与 R 的 expand.grid 同序：b 变得最快
 Bv = reshape(Bg, [], 1); Uv = reshape(Ug, [], 1); Vv = reshape(Vg, [], 1);
 lp = zeros(numel(Bv), 1);
@@ -88,7 +90,7 @@ fclose(fid);
 yBin = double(y >= 2);
 logLikBin = @(a, b) sum(yBin .* log(min(max(1 ./ (1 + exp(-(a + b * x))), 1e-12), 1-1e-12)) + ...
                     (1 - yBin) .* log(1 - min(max(1 ./ (1 + exp(-(a + b * x))), 1e-12), 1-1e-12)));
-[Ag, B2g] = ndgrid(linspace(-8, 3, 300)', linspace(-1.5, 2.5, 300)');
+[Ag, B2g] = ndgrid(linspace(-16, 2, 300)', linspace(-2, 4, 300)');   % 与有序模型对齐的先验范围
 Av = reshape(Ag, [], 1); B2v = reshape(B2g, [], 1);
 lpa = zeros(numel(Av), 1);
 for i = 1:numel(Av), lpa(i) = logLikBin(Av(i), B2v(i)); end
@@ -98,7 +100,26 @@ seOrd = sqrt(sum((Bv - sum(Bv.*post)).^2 .* post));
 fid = fopen(fullfile(RES, '05_有序vs二分类_matlab.csv'), 'w', 'n', 'UTF-8');
 fprintf(fid, '"写法","斜率后验均值","斜率后验标准差","说明"\n');
 fprintf(fid, '有序模型（三档全用）,%s,%s,斜率是「累积几率的共同位移」\n', numFmt(r4(sum(Bv.*post)),4), numFmt(r4(seOrd),4));
-fprintf(fid, '合并成二分类（重 vs 其余）,%s,%s,斜率是「重 vs 其余」的几率变化——不是同一个量\n', numFmt(r4(sum(B2v.*wa)),4), numFmt(r4(seBin),4));
+fprintf(fid, '合并成二分类（重 vs 其余）,%s,%s,在比例优势假设下这是同一个 b；本例两者的先验范围已按同一 b 区间设置\n', numFmt(r4(sum(B2v.*wa)),4), numFmt(r4(seBin),4));
+fclose(fid);
+
+fid = fopen(fullfile(RES, '07_范围敏感性_matlab.csv'), 'w', 'n', 'UTF-8');
+fprintf(fid, '"设置","斜率均值","斜率后验标准差","切点1均值","切点2均值"\n');
+st = { '初版范围 b[-2,3] c1[-4,4] 间距[0.05,5]', [-2 3], [-4 4], [0.05 5];
+       '本篇采用 b[-2,4] c1[-4,8] 间距[0.05,12]', B_RNG, U_RNG, V_RNG;
+       '再放宽 b[-3,5] c1[-6,12] 间距[0.05,20]', [-3 5], [-6 12], [0.05 20] };
+for r = 1:3
+  bs = linspace(st{r,2}(1), st{r,2}(2), 90); us = linspace(st{r,3}(1), st{r,3}(2), 90);
+  vs = linspace(log(st{r,4}(1)), log(st{r,4}(2)), 90);
+  [Bg2, Ug2, Vg2] = ndgrid(bs, us, vs);
+  B2 = reshape(Bg2, [], 1); U2 = reshape(Ug2, [], 1); V2 = reshape(Vg2, [], 1);
+  lpv = zeros(numel(B2), 1);
+  for i = 1:numel(B2), lpv(i) = logLik3(B2(i), U2(i), V2(i), x, y); end
+  po = exp(lpv - max(lpv)); po = po / sum(po);
+  mb = sum(B2.*po);
+  fprintf(fid, '%s,%s,%s,%s,%s\n', st{r,1}, numFmt(r4(mb),4), numFmt(r4(sqrt(sum((B2-mb).^2 .* po))),4), ...
+          numFmt(r4(sum(U2.*po)),4), numFmt(r4(sum((U2 + exp(V2)).*po)),4));
+end
 fclose(fid);
 
 fid = fopen(fullfile(RES, '06_信息损失的形态_matlab.csv'), 'w', 'n', 'UTF-8');
@@ -106,7 +127,7 @@ fprintf(fid, '"剂量","有序_轻","有序_中","有序_重","二分类_重","�
 for dd = [3 5 7]
   F1 = 1 ./ (1 + exp(-(c1v - Bv * dd)));
   F2 = 1 ./ (1 + exp(-(c2v - Bv * dd)));
-  pBin = 1 / (1 + exp(-(sum(Av.*wa) + sum(B2v.*wa) * dd)));
+  pBin = sum((1 ./ (1 + exp(-(Av + B2v * dd)))) .* wa);   % 后验平均概率，口径与有序模型一致
   fprintf(fid, '%d,%s,%s,%s,%s,%s\n', dd, numFmt(r4(sum(F1.*post)),4), numFmt(r4(sum((F2-F1).*post)),4), ...
           numFmt(r4(sum((1-F2).*post)),4), numFmt(r4(pBin),4), numFmt(r4(1-pBin),4));
 end
