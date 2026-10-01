@@ -102,8 +102,10 @@ se_b <- ols_ls(cbind(1, treat_x, parasite), y_out)$sigma_hat /
   sqrt(sum((treat_x - mean(treat_x))^2) * (1 - r2_xz))
 par_tab <- tibble(
   量 = c("处理与寄生虫的决定系数 R²", "不控制时的系数标准误", "控制寄生虫后的系数标准误",
-         "标准误放大倍数", "理论值 1/sqrt(1-R²)"),
-  值 = r4(c(r2_xz, se_a, se_b, se_b / se_a, 1 / sqrt(1 - r2_xz)))
+         "标准误放大倍数", "仅考虑共线性的乘数 1/sqrt(1-R²)",
+         "残差自由度的修正 sqrt(10/9)", "两者相乘"),
+  值 = r4(c(r2_xz, se_a, se_b, se_b / se_a, 1 / sqrt(1 - r2_xz),
+            sqrt((n - 2) / (n - 3)), 1 / sqrt(1 - r2_xz) * sqrt((n - 2) / (n - 3))))
 )
 write_csv_fixed(par_tab, file.path(RES, "04_精度寄生虫.csv"))
 print(par_tab)
@@ -142,11 +144,11 @@ B <- mk_panel("坏的控制：w 是对撞",
   tibble(name = c("处理 x", "结果 y", "对撞 w"), x = c(0.18, 0.82, 0.50), y = c(0.0, 0.0, 1.05)),
   tibble(x = c(0.18, 0.82, 0.50), y = c(0.0, 0.0, 1.05), xend = c(0.50, 0.50, 0.50), yend = c(1.05, 1.05, 1.05),
          style = c("solid", "solid", "solid")))
-C <- mk_panel("精度寄生虫：只影响结果",
-  tibble(name = c("处理 x", "结果 y", "寄生虫 p"), x = c(0.18, 0.82, 0.50), y = c(0.5, 0.5, 1.05)),
-  tibble(x = c(0.18, 0.82, 0.50), y = c(0.5, 0.5, 1.05), xend = c(0.82, 0.82, 0.82), yend = c(0.5, 0.5, 0.5),
-         style = c("solid", "solid", "solid")))
-lvl <- c("好的控制：z 是混杂", "坏的控制：w 是对撞", "精度寄生虫：只影响结果")
+C <- mk_panel("与处理相关，但不提供额外解释力",
+  tibble(name = c("处理 x", "结果 y", "寄生虫 p"), x = c(0.18, 0.84, 0.18), y = c(0.35, 0.35, 1.05)),
+  tibble(x = c(0.18, 0.18), y = c(0.35, 0.35), xend = c(0.84, 0.18), yend = c(0.35, 1.05),
+         style = c("solid", "solid")))
+lvl <- c("好的控制：z 是混杂", "坏的控制：w 是对撞", "与处理相关，但不提供额外解释力")
 nodes <- bind_rows(A$n, B$n, C$n); edges <- bind_rows(A$e, B$e, C$e)
 nodes$panel <- factor(nodes$panel, levels = lvl); edges$panel <- factor(edges$panel, levels = lvl)
 p1 <- ggplot() +
@@ -157,7 +159,7 @@ p1 <- ggplot() +
   scale_linetype_manual(values = c(solid = "solid", dashed = "dashed"), guide = "none") +
   coord_cartesian(xlim = c(0.0, 1.0), ylim = c(-0.3, 1.35)) +
   labs(title = "三种「要不要控制它」的情形",
-       subtitle = "虚线＝控制它是对的；实线指向它＝控制它会出错（对撞／寄生虫）") +
+       subtitle = "左图虚线＝共同原因；中图＝对撞（处理与结果的共同后果）；右图＝与处理相关、给定处理后没有额外线性解释力的变量") +
   theme_void() +
   theme(plot.title = element_text(face = "bold", size = 12),
         plot.subtitle = element_text(size = 9, colour = "#43585c"),
@@ -188,7 +190,7 @@ save_fig("03-对撞偏倚.png", p3, 7.4, 4.2)
 p4 <- ggplot(par_tab[2:3, ], aes(量, 值)) +
   geom_col(fill = c("#167d80", "#c1462c"), width = 0.5) +
   geom_text(aes(label = sprintf("%.4f", 值)), vjust = -0.5, size = 4) +
-  labs(title = "精度寄生虫：控制它不会减小偏倚，只会放大方差",
+  labs(title = "控制它不会减小偏离，只会放大标准误",
        subtitle = paste0("系数标准误从 ", par_tab$值[2], " 变成 ", par_tab$值[3],
                          "（放大 ", par_tab$值[4], " 倍，理论值 1/sqrt(1-R²) = ", par_tab$值[5], "）"),
        x = NULL, y = "系数标准误") +
@@ -199,8 +201,8 @@ p5 <- ggplot(amp_hidden, aes(写法, 处理效应估计)) +
   geom_col(fill = c("#e8b4a8", "#167d80", "#c1462c"), width = 0.55) +
   geom_hline(yintercept = 3.0, linetype = "dashed", colour = "#163d48") +
   geom_text(aes(label = sprintf("%.2f", 处理效应估计)), vjust = -0.5, size = 4) +
-  labs(title = "有不可测混杂时：控制「后果」会比不控制更糟",
-       subtitle = "虚线是真值 3.0；三根柱依次是：什么都不控制、只控制已观测混杂 z、再控制后果 w",
+  labs(title = "还有未测混杂时：再控制 w 会比只控制 z 更偏",
+       subtitle = "虚线是真值 3.0；三根柱依次是：什么都不控制、只控制已观测混杂 z、再控制 w（同时受处理与结果影响）",
        x = NULL, y = "处理效应估计") +
   ylim(0, max(amp_hidden$处理效应估计) * 1.25)
 save_fig("05-偏倚放大.png", p5, 7.4, 4.2)

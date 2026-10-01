@@ -32,7 +32,7 @@
 | 03 | 生物膜的趋势拟合得很准，下一次测量就能算准吗：从地心说到线性回归（书第 4 章） | [rethinking/article03_geocentric_line](rethinking/article03_geocentric_line/) |
 | 04 | 处理组差多少？曲线拟合好，为什么还会预测错：分类变量、中心化与曲线（书第 4、5 章） | [rethinking/article04_categories_and_curves](rethinking/article04_categories_and_curves/) |
 | 05 | 多控制一个变量，为什么可能更错：混杂、中介与选择偏倚（书第 5、6 章） | [rethinking/article05_elemental_confounds](rethinking/article05_elemental_confounds/) |
-| 06 | 控制得越多就越准吗：后门准则、坏控制与 Table 2 谬误（书第 6 章） | [rethinking/article06_good_bad_controls](rethinking/article06_good_bad_controls/) |
+| 06 | 多控制一个变量，为什么反而离真值更远：好控制、坏控制与回归表里的陷阱（书第 6 章） | [rethinking/article06_good_bad_controls](rethinking/article06_good_bad_controls/) |
 
 每篇都提供 R、Python、MATLAB 三个语言的等价脚本，输出逐位一致（02 篇起连 CSV 文件本身都逐字节一致）；
 跑一遍脚本就能逐项对照。

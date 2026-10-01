@@ -98,7 +98,9 @@ se_b = ols_ls(np.column_stack([np.ones(n), treat_x, parasite]), y_out)[1] / \
     math.sqrt(float(((treat_x - treat_x.mean()) ** 2).sum()) * (1 - r2_xz))
 rows4 = [["处理与寄生虫的决定系数 R²", r4(r2_xz)], ["不控制时的系数标准误", r4(se_a)],
          ["控制寄生虫后的系数标准误", r4(se_b)], ["标准误放大倍数", r4(se_b / se_a)],
-         ["理论值 1/sqrt(1-R²)", r4(1 / math.sqrt(1 - r2_xz))]]
+         ["仅考虑共线性的乘数 1/sqrt(1-R²)", r4(1 / math.sqrt(1 - r2_xz))],
+         ["残差自由度的修正 sqrt(10/9)", r4(math.sqrt((n - 2) / (n - 3)))],
+         ["两者相乘", r4(1 / math.sqrt(1 - r2_xz) * math.sqrt((n - 2) / (n - 3)))]]
 write_csv(["量", "值"], rows4, os.path.join(RES, "04_精度寄生虫_python.csv"))
 for r in rows4:
     print("  ", r)

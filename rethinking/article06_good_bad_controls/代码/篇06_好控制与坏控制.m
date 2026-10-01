@@ -82,7 +82,9 @@ fprintf(fid, '处理与寄生虫的决定系数 R²,%s\n', numFmt(round(r2XZ,4),
 fprintf(fid, '不控制时的系数标准误,%s\n', numFmt(round(seA,4),4));
 fprintf(fid, '控制寄生虫后的系数标准误,%s\n', numFmt(round(seB,4),4));
 fprintf(fid, '标准误放大倍数,%s\n', numFmt(round(seB/seA,4),4));
-fprintf(fid, '理论值 1/sqrt(1-R²),%s\n', numFmt(round(1/sqrt(1-r2XZ),4),4));
+fprintf(fid, '仅考虑共线性的乘数 1/sqrt(1-R²),%s\n', numFmt(round(1/sqrt(1-r2XZ),4),4));
+fprintf(fid, '残差自由度的修正 sqrt(10/9),%s\n', numFmt(round(sqrt((n-2)/(n-3)),4),4));
+fprintf(fid, '两者相乘,%s\n', numFmt(round(1/sqrt(1-r2XZ) * sqrt((n-2)/(n-3)),4),4));
 fclose(fid);
 
 % 偏倚放大
