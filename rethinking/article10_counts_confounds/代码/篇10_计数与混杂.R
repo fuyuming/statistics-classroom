@@ -112,6 +112,16 @@ od_tab <- data.frame(
          "泊松假设下的 log 率比标准误", "按 φ 校正后的标准误", "校正倍数"),
   值 = r4(c(pearson, df_res, phi, se_pois, se_quasi, sqrt(phi)))
 )
+
+# 零与过离散的"共同来源"：两个失败单元贡献了多少 Pearson 量？成功子集自己的 φ 是多少？
+pearson_fail <- sum((y[!keep] - muB[!keep])^2 / muB[!keep])
+pearson_share <- pearson_fail / pearson
+phi_succ <- sum((y[keep] - muC)^2 / muC) / (sum(keep) - ncol(XB))
+od_tab <- rbind(od_tab, data.frame(
+  量 = c("两个失败单元贡献的 Pearson 量", "其占 Pearson 总量的比例",
+         "只看成功子集的离散系数 φ（14 个观测、3 个参数）"),
+  值 = r4(c(pearson_fail, pearson_share, phi_succ))
+))
 write_csv_fixed(od_tab, file.path(RES, "04_过离散.csv"))
 print(od_tab)
 
@@ -178,5 +188,22 @@ p5 <- ggplot(unit, aes(factor(处理), 菌落数)) +
        subtitle = "箱线是原始计数（含体积与批次的影响）；调整后的率比见第 2 张图",
        x = "处理（0 对照 / 1 接种）", y = "每皿菌落数", colour = "批次")
 save_fig("05_处理对比.png", p5, 7.4, 4.2)
+
+# 图 6：同一条估计，两种方差假设下的区间
+ci_df <- data.frame(
+  口径 = c("泊松假设", "按 φ 校正（准泊松）"),
+  下 = c(rr_quasi$值[2], rr_quasi$值[4]),
+  上 = c(rr_quasi$值[3], rr_quasi$值[5]),
+  点估计 = rr_quasi$值[1]
+)
+p6 <- ggplot(ci_df, aes(点估计, 口径, colour = 口径)) +
+  geom_errorbarh(aes(xmin = 下, xmax = 上), height = 0.16, linewidth = 1.1) +
+  geom_point(aes(y = 口径), size = 3.4, show.legend = FALSE) +
+  geom_vline(xintercept = 1, linetype = "dashed", colour = "#9aa8a8") +
+  geom_vline(xintercept = rr_quasi$值[1], linetype = "dotted", colour = "#163d48") +
+  labs(title = "同一条估计，换一个方差假设，区间就变了",
+       subtitle = paste0("点估计都是 ", r4(rr_quasi$值[1]), "；泊松区间不包含 1，按 φ 校正后包含 1"),
+       x = "率比", y = NULL, colour = NULL)
+save_fig("06_校正后的率比.png", p6, 7.4, 3.6)
 
 cat("\n完成：5 张图 + 5 份 CSV 已写入\n")

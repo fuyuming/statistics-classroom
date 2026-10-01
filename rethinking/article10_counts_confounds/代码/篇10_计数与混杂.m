@@ -90,6 +90,12 @@ fprintf(fid, '离散系数 φ（卡方/自由度）,%s\n', numFmt(r4(phi),4));
 fprintf(fid, '泊松假设下的 log 率比标准误,%s\n', numFmt(r4(sePois),4));
 fprintf(fid, '按 φ 校正后的标准误,%s\n', numFmt(r4(seQuasi),4));
 fprintf(fid, '校正倍数,%s\n', numFmt(r4(sqrt(phi)),4));
+pearsonFail = sum((y(~keep) - muB(~keep)).^2 ./ muB(~keep));
+pearsonShare = pearsonFail / pearson;
+phiSucc = sum((y(keep) - muC).^2 ./ muC) / (sum(keep) - size(XB, 2));
+fprintf(fid, '两个失败单元贡献的 Pearson 量,%s\n', numFmt(r4(pearsonFail),4));
+fprintf(fid, '其占 Pearson 总量的比例,%s\n', numFmt(r4(pearsonShare),4));
+fprintf(fid, '只看成功子集的离散系数 φ（14 个观测、3 个参数）,%s\n', numFmt(r4(phiSucc),4));
 fclose(fid);
 
 fid = fopen(fullfile(RES, '05_拟合值_matlab.csv'), 'w', 'n', 'UTF-8');

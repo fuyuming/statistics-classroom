@@ -117,6 +117,15 @@ write_csv(["量", "值"],
           [["Pearson 卡方", r4(pearson)], ["残差自由度", r4(df_res)], ["离散系数 φ（卡方/自由度）", r4(phi)],
            ["泊松假设下的 log 率比标准误", r4(se_pois)], ["按 φ 校正后的标准误", r4(se_quasi)], ["校正倍数", r4(math.sqrt(phi))]],
           os.path.join(RES, "04_过离散_python.csv"))
+pearson_fail = float(((y[~keep] - muB[~keep]) ** 2 / muB[~keep]).sum())
+pearson_share = pearson_fail / pearson
+phi_succ = float(((y[keep] - muC) ** 2 / muC).sum() / (int(keep.sum()) - XB.shape[1]))
+write_csv(["量", "值"],
+          [["Pearson 卡方", r4(pearson)], ["残差自由度", r4(df_res)], ["离散系数 φ（卡方/自由度）", r4(phi)],
+           ["泊松假设下的 log 率比标准误", r4(se_pois)], ["按 φ 校正后的标准误", r4(se_quasi)], ["校正倍数", r4(math.sqrt(phi))],
+           ["两个失败单元贡献的 Pearson 量", r4(pearson_fail)], ["其占 Pearson 总量的比例", r4(pearson_share)],
+           ["只看成功子集的离散系数 φ（14 个观测、3 个参数）", r4(phi_succ)]],
+          os.path.join(RES, "04_过离散_python.csv"))
 
 write_csv(["单元", "处理", "批次", "体积微升", "接种成功", "菌落数", "模型B预测均值"],
           [[i + 1, int(treat[i]), int(batch[i]), int(plate[i]), int(ok[i]), int(y[i]), r4(muB[i])] for i in range(16)],
