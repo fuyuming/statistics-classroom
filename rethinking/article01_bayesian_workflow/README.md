@@ -53,13 +53,9 @@ matlab -batch "run('代码/篇01_科学先于统计.m')"
 - MATLAB R2025a：Statistics and Machine Learning Toolbox（只用 `binopdf`／`poisspdf`／`nbinpdf`）
 - 中文字体：macOS 用 PingFang SC，Windows 换 Microsoft YaHei，Linux 换 Noto Sans CJK SC（脚本里有说明位置）
 
-## 正文与记录
+## 正文
 
-本目录除代码外，同时存放公众号正文与送评记录（便于读者核对每个数字的来路）：
-
-- `科学先于统计_公众号稿.md` —— 定稿正文《接种组长得更好，就能说这株菌有效吗？——统计模型再高级，也分不清是菌还是批次》
-- `评审与修订记录.md` —— 送 Codex（＋Monica）评阅后的逐条落地记录，含复算过程
-- `标题与开头_备选对照.md` —— 标题与开头的三版备选
+- `科学先于统计_公众号稿.md` —— 本篇公众号正文《接种组长得更好，就能说这株菌有效吗？——统计模型再高级，也分不清是菌还是批次》
 
 ## 阅读顺序
 

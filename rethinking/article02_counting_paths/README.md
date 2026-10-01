@@ -46,7 +46,6 @@ matlab -batch "run('代码/篇02_数路径.m')"
 - MATLAB R2025a：Statistics and Machine Learning Toolbox（只用 `binopdf`／`betainv`）
 - 中文字体：macOS 用 PingFang SC，Windows 换 Microsoft YaHei，Linux 换 Noto Sans CJK SC
 
-## 正文与记录
+## 正文
 
-- `数路径_公众号稿.md` —— 定稿正文《凭什么拿 9 次取点去说水面比例？——数路径，就是贝叶斯推断》
-- `VALIDATION.md` —— 每个数字的来路与三语言核对记录
+- `数路径_公众号稿.md` —— 本篇公众号正文《9 次里 6 次是水，水面比例就是三分之二吗？——从数路径理解贝叶斯》
