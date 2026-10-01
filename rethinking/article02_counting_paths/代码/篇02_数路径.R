@@ -230,15 +230,17 @@ p4a <- ggplot(post_curve, aes(p, 密度)) +
   theme(plot.title = element_text(size = 12))
 
 pred_long <- pred2 %>%
-  pivot_longer(-未来两次里的水数, names_to = "算法", values_to = "概率")
+  pivot_longer(-未来两次里的水数, names_to = "算法", values_to = "概率") %>%
+  # 钉死因子顺序，否则中文列名会按字典序重排，图例颜色就跟说明对不上
+  mutate(算法 = factor(算法, levels = c("概率（整条后验）", "概率（固定均值）")))
 p4b <- ggplot(pred_long, aes(factor(未来两次里的水数), 概率, fill = 算法)) +
-  geom_col(position = position_dodge(0.62), width = 0.58) +
-  geom_text(aes(label = sprintf("%.3f", 概率)), position = position_dodge(0.62),
-            vjust = -0.5, size = 3.6) +
+  geom_col(position = position_dodge(0.8), width = 0.62) +
+  geom_text(aes(label = sprintf("%.3f", 概率)), position = position_dodge(0.8),
+            vjust = -0.45, size = 3.1) +
   scale_fill_manual(values = c("#c1462c", "#e8b4a8")) +
   scale_y_continuous(limits = c(0, 0.5)) +
   labs(title = "预测：未来两次取点里有几次是水",
-       subtitle = "深色用整条后验；浅色把后验均值当成固定 p",
+       subtitle = "深色：用整条后验；浅色：把后验均值当成固定的 p",
        x = "未来两次里的水数", y = "概率", fill = NULL) +
   theme(legend.position = "top")
 
