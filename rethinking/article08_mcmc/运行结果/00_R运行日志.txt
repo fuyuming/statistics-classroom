@@ -1,0 +1,24 @@
+                                               方法 截距均值 截距89下 截距89上
+1                        网格（300×300 = 9 万格点）  12.0000  11.2375  12.7625
+2 Metropolis（两条链，预热 2000 步，各留 18000 步）  12.0026  11.5896  12.4280
+  斜率均值 斜率89下 斜率89上
+1    2.500   2.4247   2.5753
+2    2.499   2.4551   2.5418
+                                     量        值
+1                      步长太大：接受率    0.0222
+2                      合适步长：接受率    0.6322
+3                      步长太小：接受率    0.9326
+4               步长太大：滞后 1 自相关    0.9757
+5               合适步长：滞后 1 自相关    0.8121
+6               步长太小：滞后 1 自相关    0.8746
+7  合适步长：近似有效样本量（3.6 万步） 1866.1617
+8  简化 R-hat（斜率，两条合适步长的链）    1.0000
+9                  斜率后验均值（链 1）    2.4995
+10                 斜率后验均值（链 2）    2.4984
+Scale for y is already present.
+Adding another scale for y, which will replace the existing scale.
+Warning message:
+Removed 8 rows containing missing values or values outside the scale range
+(`geom_col()`). 
+
+完成：5 张图 + 5 份 CSV 已写入
