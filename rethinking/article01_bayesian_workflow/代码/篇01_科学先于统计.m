@@ -26,7 +26,13 @@ curves = cell(size(cases, 1), 4);
 for i = 1:size(cases, 1)
     W = cases(i, 1); N = cases(i, 2);
     p = linspace(0, 1, nGrid)';            % 网格：20 个候选比例
-    prior = ones(nGrid, 1);                % 平坦先验
+    % 先验：默认平坦；练习 2 把下一行的 "flat" 改成 "triangular"（偏向 0.5 的三角形先验）
+    priorType = "flat";
+    if priorType == "flat"
+        prior = ones(nGrid, 1);
+    else
+        prior = min(p ./ 0.5, (1 - p) ./ 0.5);
+    end
     like  = binopdf(W, N, p);              % 似然
     post  = like .* prior;
     post  = post / sum(post);              % 归一化
@@ -69,7 +75,7 @@ plot(curves{2,2}, curves{2,3}, '--', 'Color', [0.76 0.27 0.17], 'LineWidth', 1.4
 plot(curves{2,2}, curves{2,4}, '-o', 'Color', [0.09 0.49 0.50], 'LineWidth', 1.4, 'MarkerSize', 3);
 hold off; box off; grid on
 title('把 20 个候选比例各自算一遍，就得到后验', 'FontWeight', 'bold', 'FontSize', 12);
-xlabel('水面比例 p'); ylabel('相对密度（各自归一化）');
+xlabel('水面比例 p'); ylabel('归一化权重');
 legend({'先验（还没看数据）','似然（数据说什么）','后验（看完之后）'}, ...
        'Location','northoutside','Orientation','horizontal','Box','off','FontSize',8);
 
@@ -81,8 +87,8 @@ for i = 1:size(cases, 1)
     lg{end+1} = curves{i,1};
 end
 hold off; box off; grid on
-title('观测比例都是 2/3，样本越多，后验越尖', 'FontWeight', 'bold', 'FontSize', 12);
-xlabel('水面比例 p'); ylabel('后验密度');
+title('观测比例都是 2/3，样本越多，后验越集中', 'FontWeight', 'bold', 'FontSize', 12);
+xlabel('水面比例 p'); ylabel('网格点后验概率');
 legend(lg, 'Location','northoutside','Orientation','horizontal','Box','off','FontSize',8);
 
 exportgraphics(f, fullfile(OUT, '07-MATLAB版-先验似然后验与收窄.png'), 'Resolution', 240);

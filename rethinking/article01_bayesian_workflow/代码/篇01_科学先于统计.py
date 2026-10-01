@@ -22,14 +22,22 @@ os.makedirs(OUT, exist_ok=True)
 os.makedirs(RES, exist_ok=True)
 
 
-def grid_approx(W, N, n_grid=20):
-    """网格近似：先验 × 似然 → 归一化后验（与 R 的 grid_approx 一一对应）"""
+def grid_approx(W, N, n_grid=20, prior_type="flat"):
+    """网格近似：先验 × 似然 → 归一化后验（与 R 的 grid_approx 一一对应）
+    prior_type="flat" 平坦先验；"triangular" 偏向 0.5 的三角形先验（正文练习 2）"""
     p = np.linspace(0, 1, n_grid)
-    prior = np.ones(n_grid)                       # 平坦先验
+    if prior_type == "flat":
+        prior = np.ones(n_grid)
+    else:
+        prior = np.where(p < 0.5, p / 0.5, (1 - p) / 0.5)
     like = binom.pmf(W, N, p)
     post = like * prior
     post = post / post.sum()
     return p, prior / prior.sum(), like / like.sum(), post
+
+
+# 练习 2 一行启用：
+# print(grid_approx(6, 9, prior_type="triangular")[0:1], grid_approx(6, 9, prior_type="triangular")[3])
 
 
 cases = [(2, 3), (6, 9), (20, 30)]
@@ -71,13 +79,13 @@ ax[0].plot(p, prior, color="#8a8a8a", lw=1.6, marker="o", ms=3, label="先验（
 ax[0].plot(p, like, color="#c1462c", lw=1.4, ls="--", label="似然（数据说什么）")
 ax[0].plot(p, post, color="#167d80", lw=1.6, marker="o", ms=3, label="后验（看完之后）")
 ax[0].set(title="把 20 个候选比例各自算一遍，就得到后验",
-          xlabel="水面比例 p", ylabel="相对密度（各自归一化）")
+          xlabel="水面比例 p", ylabel="归一化权重")
 ax[0].legend(loc="upper center", ncol=3, fontsize=8, frameon=False,
              bbox_to_anchor=(0.5, 1.22))
 for name, pp, _, _, po in curves:
     ax[1].plot(pp, po, lw=1.8, label=name)
 ax[1].set(title="观测比例都是 2/3，样本越多，后验越尖",
-          xlabel="水面比例 p", ylabel="后验密度")
+          xlabel="水面比例 p", ylabel="网格点后验概率")
 ax[1].legend(loc="upper center", ncol=3, fontsize=8, frameon=False,
              bbox_to_anchor=(0.5, 1.22))
 for a in ax:

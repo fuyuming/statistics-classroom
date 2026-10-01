@@ -36,15 +36,19 @@ save_fig <- function(file, plot, w, h) ggsave(file.path(OUT, file), plot,
 # 观测：抛 N 次小球，W 次落在水上。网格近似（grid approximation）
 # 89% 等尾区间直接按后验累积和取网格点：不用随机抽样，三语言结果才能逐位一致
 # ------------------------------------------------------------
-grid_approx <- function(W, N, n_grid = 20) {
+grid_approx <- function(W, N, n_grid = 20, prior_type = "flat") {
   p_grid <- seq(0, 1, length.out = n_grid)
-  prior <- rep(1, n_grid)                       # 平坦先验
+  # 先验：默认平坦（每个候选一视同仁）；练习 2 用 "triangular"（偏向 0.5 的三角形先验）
+  prior <- if (prior_type == "flat") rep(1, n_grid) else
+    ifelse(p_grid < 0.5, p_grid / 0.5, (1 - p_grid) / 0.5)
   likelihood <- dbinom(W, size = N, prob = p_grid)
   posterior <- likelihood * prior
   posterior <- posterior / sum(posterior)
   data.frame(p = p_grid, prior = prior / sum(prior),
              likelihood = likelihood / sum(likelihood), posterior = posterior)
 }
+# 练习 2 一行启用（把上一行的默认换成下面这句即可）：
+# g_tri <- grid_approx(6, 9, prior_type = "triangular")
 
 cases <- list(c(2, 3), c(6, 9), c(20, 30))
 
@@ -93,8 +97,8 @@ p_null <- ggplot(d, aes(x = 计数, fill = 过程)) +
                  colour = "white", linewidth = 0.2) +
   scale_fill_manual(values = c("#c1462c", "#167d80")) +
   scale_x_continuous(breaks = seq(0, 15, 3)) +
-  labs(title = "两个完全不同的过程，产生几乎一样的计数分布",
-       subtitle = "各模拟 500 个个体，均值都设为 3；只看数据本身，分不出是哪一个过程",
+  labs(title = "不同生成机制，也可能产生相近的计数分布",
+       subtitle = "各模拟 500 个个体，平均事件数都设为 3；相近不等于相同，两者方差并不一样",
        x = "某个体在一段时间内记录到的事件数", y = "个体数", fill = NULL) +
   theme(legend.position = "top")
 save_fig("01-两种过程相近的分布.png", p_null, 7.2, 4.4)
@@ -141,8 +145,8 @@ nA <- data.frame(name = c("Z", "X", "Y"), x = c(0, -1.1, 1.1), y = c(1.1, -0.2, 
 eA <- data.frame(from = c("Z", "Z"), to = c("X", "Y"))
 nB <- data.frame(name = c("X", "Y", "Z"), x = c(-1.1, 1.1, 0), y = c(1.1, 1.1, -0.2))
 eB <- data.frame(from = c("X", "Y"), to = c("Z", "Z"))
-p_dag <- dag_plot(nA, eA, "甲：混杂（共同原因）", "Z 同时指向 X 与 Y：要估 X 对 Y 的作用，Z 是混杂") |
-  dag_plot(nB, eB, "乙：对撞（共同结果）", "X 与 Y 都指向 Z：控制 Z 反而会造出假关联")
+p_dag <- dag_plot(nA, eA, "甲：混杂（共同原因）", "共同原因 Z 打开了一条混杂路径；估因果效应时需要阻断它") |
+  dag_plot(nB, eB, "乙：对撞（共同结果）", "按共同结果 Z 筛选或调整，通常会引入条件关联")
 save_fig("02-DAG两种结构.png", p_dag, 8.6, 4.1)
 
 # ------------------------------------------------------------
@@ -152,7 +156,7 @@ steps <- data.frame(
   id = 1:5,
   x  = 0,
   y  = c(0, -1.05, -2.10, -3.15, -4.20),
-  lab = c("① 说清要估的量\n（理论上的估计量）",
+  lab = c("① 说清目标量：我们究竟想知道什么？",
           "② 写科学模型（含因果关系）",
           "③ 由 ①② 推出统计模型",
           "④ 从 ② 生成数据，检验 ③ 能否还原 ①",
@@ -196,7 +200,7 @@ p_curve <- ggplot(gl, aes(p, 密度, colour = 成分, linetype = 成分)) +
   scale_linetype_manual(values = c("solid", "dashed", "solid")) +
   labs(title = "把 20 个候选比例各自算一遍，就得到后验",
        subtitle = "观测 9 次里 6 次落在水上；先验平坦时，后验与似然形状完全重合",
-       x = "水面比例 p", y = "相对密度（各自归一化）", colour = NULL, linetype = NULL) +
+       x = "水面比例 p", y = "归一化权重", colour = NULL, linetype = NULL) +
   theme(legend.position = "top")
 save_fig("04-先验似然后验.png", p_curve, 7.2, 4.2)
 
@@ -208,9 +212,9 @@ wide$组 <- factor(wide$组, levels = c("3 次里 2 次是水", "9 次里 6 次�
 p_narrow <- ggplot(wide, aes(p, posterior, colour = 组)) +
   geom_line(linewidth = 1.15) +
   scale_colour_manual(values = c("#b9b9b9", "#198c8b", "#163d48")) +
-  labs(title = "观测比例都是 2/3，样本越多，后验越尖",
+  labs(title = "观测比例都是 2/3，样本越多，后验越集中",
        subtitle = "每一个点都是「这一步之后你还能接受的候选比例」",
-       x = "水面比例 p", y = "后验密度", colour = NULL) +
+       x = "水面比例 p", y = "网格点后验概率", colour = NULL) +
   theme(legend.position = "top")
 save_fig("05-样本量越大后验越窄.png", p_narrow, 7.2, 4.2)
 
