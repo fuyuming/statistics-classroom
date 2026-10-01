@@ -28,8 +28,10 @@
 | 公众号 | 主题 | 代码 |
 |---|---|---|
 | 01 | 科学先于统计：泥人、DAG 与贝叶斯工作流（书第 1、2 章） | [rethinking/article01_bayesian_workflow](rethinking/article01_bayesian_workflow/) |
+| 02 | 数路径：贝叶斯推断为什么可以先不背公式（书第 2 章，Garden of Forking Data） | [rethinking/article02_counting_paths](rethinking/article02_counting_paths/) |
 
-每篇都提供 R、Python、MATLAB 三个语言的等价脚本，输出逐位一致（对照见各篇的 `VALIDATION.md`）。
+每篇都提供 R、Python、MATLAB 三个语言的等价脚本，输出逐位一致（对照见各篇的 `VALIDATION.md`；
+02 篇起连 CSV 文件本身都逐字节一致）。
 R 代码按 tidyverse 语法写。请进入对应文件夹，再按该文件夹的 README 运行。
 
 ## 首课：开始运行
