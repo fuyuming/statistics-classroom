@@ -53,10 +53,6 @@ matlab -batch "run('代码/篇01_科学先于统计.m')"
 - MATLAB R2025a：Statistics and Machine Learning Toolbox（只用 `binopdf`／`poisspdf`／`nbinpdf`）
 - 中文字体：macOS 用 PingFang SC，Windows 换 Microsoft YaHei，Linux 换 Noto Sans CJK SC（脚本里有说明位置）
 
-## 正文
-
-- `科学先于统计_公众号稿.md` —— 本篇公众号正文《接种组长得更好，就能说这株菌有效吗？——统计模型再高级，也分不清是菌还是批次》
-
 ## 阅读顺序
 
 公众号里 01 篇先讲「模型前面还有两步」（科学模型与因果模型），再落到这个最小例子上。
