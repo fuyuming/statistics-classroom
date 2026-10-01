@@ -30,7 +30,8 @@
 | 01 | 科学先于统计：泥人、DAG 与贝叶斯工作流（书第 1、2 章） | [rethinking/article01_bayesian_workflow](rethinking/article01_bayesian_workflow/) |
 | 02 | 数路径：贝叶斯推断为什么可以先不背公式（书第 2 章，Garden of Forking Data） | [rethinking/article02_counting_paths](rethinking/article02_counting_paths/) |
 | 03 | 生物膜的趋势拟合得很准，下一次测量就能算准吗：从地心说到线性回归（书第 4 章） | [rethinking/article03_geocentric_line](rethinking/article03_geocentric_line/) |
-| 04 | 处理组之间差多少？曲线该弯还是直：分类变量、中心化与曲线（书第 4、5 章） | [rethinking/article04_categories_and_curves](rethinking/article04_categories_and_curves/) |
+| 04 | 处理组差多少？曲线拟合好，为什么还会预测错：分类变量、中心化与曲线（书第 4、5 章） | [rethinking/article04_categories_and_curves](rethinking/article04_categories_and_curves/) |
+| 05 | 控制了一个变量，结论反而更错：混杂的四种基本形状（书第 5、6 章） | [rethinking/article05_elemental_confounds](rethinking/article05_elemental_confounds/) |
 
 每篇都提供 R、Python、MATLAB 三个语言的等价脚本，输出逐位一致（02 篇起连 CSV 文件本身都逐字节一致）；
 跑一遍脚本就能逐项对照。
