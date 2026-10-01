@@ -36,6 +36,7 @@
 | 07 | 曲线越贴数据，预测就越可靠吗：过拟合、先验约束与异常点（书第 7 章） | [rethinking/article07_overfitting](rethinking/article07_overfitting/) |
 | 08 | 网格走不动的时候怎么办：MCMC 在后验上走一圈（书第 9 章） | [rethinking/article08_mcmc](rethinking/article08_mcmc/) |
 | 09 | 0/1 结果、计数、等级：logit、泊松与有序类别（书第 10、11 章） | [rethinking/article09_modeling_events](rethinking/article09_modeling_events/) |
+| 10 | 计数数据里的三个坑：零膨胀、混杂与过离散（书第 11、12 章） | [rethinking/article10_counts_confounds](rethinking/article10_counts_confounds/) |
 
 每篇都提供 R、Python、MATLAB 三个语言的等价脚本，输出逐位一致（02 篇起连 CSV 文件本身都逐字节一致）；
 跑一遍脚本就能逐项对照。
