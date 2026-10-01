@@ -121,9 +121,13 @@ def logB(x, y):
 
 
 pred_next = a / (a + b)
-pred_rows = [[k, round(math.exp(math.log(math.comb(2, k)) + logB(a + k, b + 2 - k) - logB(a, b)), 6)]
+p_hat = pred_next          # 对照：把后验均值当成固定 p（会丢掉后验宽度）
+pred_rows = [[k,
+              round(math.exp(math.log(math.comb(2, k)) + logB(a + k, b + 2 - k) - logB(a, b)), 6),
+              round(math.comb(2, k) * p_hat ** k * (1 - p_hat) ** (2 - k), 6)]
              for k in range(3)]
-write_csv(os.path.join(RES, "04_预测分布_python.csv"), ["未来两次里的水数", "概率"], pred_rows)
+write_csv(os.path.join(RES, "04_预测分布_python.csv"),
+          ["未来两次里的水数", "概率（整条后验）", "概率（固定均值）"], pred_rows)
 print("下一次取到水的概率 =", round(pred_next, 6), pred_rows)
 
 # ------------------------------------------------------------
@@ -132,14 +136,14 @@ print("下一次取到水的概率 =", round(pred_next, 6), pred_rows)
 true_water, true_land = 3, 1
 # 练习 2：判定取法改成 10 种（判对 9、判错 1）→ judge_correct, judge_wrong = 9, 1
 judge_correct, judge_wrong = 2, 1
-rows5 = [["真样本是水", "记为水", true_water, judge_correct, true_water * judge_correct],
-         ["真样本是水", "记为陆", true_water, judge_wrong,   true_water * judge_wrong],
-         ["真样本是陆", "记为水", true_land,  judge_wrong,   true_land * judge_wrong],
-         ["真样本是陆", "记为陆", true_land,  judge_correct, true_land * judge_correct]]
+rows5 = [["真实是水", "记录为水", true_water, judge_correct, true_water * judge_correct],
+         ["真实是水", "记录为陆", true_water, judge_wrong,   true_water * judge_wrong],
+         ["真实是陆", "记录为水", true_land,  judge_wrong,   true_land * judge_wrong],
+         ["真实是陆", "记录为陆", true_land,  judge_correct, true_land * judge_correct]]
 write_csv(os.path.join(RES, "05_误分类路径计数_python.csv"),
           ["来源", "判定结果", "真样本数", "每次判定的取法", "路径数"], rows5)
-ways_obs_water = sum(r[4] for r in rows5 if r[1] == "记为水")
-ways_obs_land = sum(r[4] for r in rows5 if r[1] == "记为陆")
+ways_obs_water = sum(r[4] for r in rows5 if r[1] == "记录为水")
+ways_obs_land = sum(r[4] for r in rows5 if r[1] == "记录为陆")
 print(f"观测到水 = 6 + 1 = {ways_obs_water}；观测到陆 = 3 + 2 = {ways_obs_land}；合计 = {ways_obs_water + ways_obs_land}")
 
 # ============================================================

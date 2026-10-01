@@ -109,9 +109,12 @@ pred_next <- a / (a + b)                                  # 下一次取到水�
 k <- 0:2
 # P(k 次水 in 2 次) = C(2,k) * B(a+k, b+2-k) / B(a,b)
 logB <- function(x, y) lgamma(x) + lgamma(y) - lgamma(x + y)
+# 对照：把后验均值当成固定 p 去算（会丢掉后验的宽度）
+p_hat <- pred_next
 pred2 <- tibble(
   未来两次里的水数 = k,
-  概率 = round(exp(log(choose(2, k)) + logB(a + k, b + 2 - k) - logB(a, b)), 6)
+  `概率（整条后验）` = round(exp(log(choose(2, k)) + logB(a + k, b + 2 - k) - logB(a, b)), 6),
+  `概率（固定均值）` = round(choose(2, k) * p_hat^k * (1 - p_hat)^(2 - k), 6)
 )
 cat("下一次取到水的概率 =", round(pred_next, 6), "\n"); print(pred2)
 write.csv(pred2, file.path(RES, "04_预测分布.csv"), row.names = FALSE)
@@ -125,18 +128,20 @@ true_water <- 3; true_land <- 1
 # 练习 2：判定取法改成 10 种（判对 9、判错 1）→ judge_correct <- 9; judge_wrong <- 1
 judge_correct <- 2; judge_wrong <- 1
 mis <- tibble(
-  来源       = c("真样本是水", "真样本是水", "真样本是陆", "真样本是陆"),
-  判定结果   = c("记为水", "记为陆", "记为水", "记为陆"),
+  来源       = c("真实是水", "真实是水", "真实是陆", "真实是陆"),
+  判定结果   = c("记录为水", "记录为陆", "记录为水", "记录为陆"),
   真样本数   = c(true_water, true_water, true_land, true_land),
   # 每次判定有 3 种取法：判对的 2 种、判错的 1 种
   每次判定的取法 = c(judge_correct, judge_wrong, judge_wrong, judge_correct)
 ) %>% mutate(路径数 = 真样本数 * 每次判定的取法)
 print(mis)
-ways_obs_water <- sum(mis$路径数[mis$判定结果 == "记为水"])
-ways_obs_land  <- sum(mis$路径数[mis$判定结果 == "记为陆"])
+ways_obs_water <- sum(mis$路径数[mis$判定结果 == "记录为水"])
+ways_obs_land  <- sum(mis$路径数[mis$判定结果 == "记录为陆"])
 cat("观测到水的路径数 = 6 + 1 =", ways_obs_water,
     "；观测到陆的路径数 = 3 + 2 =", ways_obs_land,
     "；合计 =", ways_obs_water + ways_obs_land, "\n")
+cat("记录为水的概率 =", round(ways_obs_water / (ways_obs_water + ways_obs_land), 6),
+    "（= 7/12）；记录为陆的概率 =", round(ways_obs_land / (ways_obs_water + ways_obs_land), 6), "\n")
 write.csv(mis, file.path(RES, "05_误分类路径计数.csv"), row.names = FALSE)
 
 # ============================================================
@@ -202,7 +207,7 @@ p3 <- ggplot(pri_tab, aes(p, post, colour = 情形)) +
   geom_line(linewidth = 1.1) + geom_point(size = 1.6) +
   scale_colour_manual(values = c("#b9b9b9", "#167d80", "#c1462c")) +
   labs(title = "同一份数据，换一个先验，后验会被拉多远？",
-       subtitle = "观测不变（9 次里 6 次是水）；样本量越大，先验拉动力越小",
+       subtitle = "观测不变（9 次里 6 次是水）；先验若把某一片区域设成零权重，数据也救不回来",
        x = "水面比例 p", y = "后验概率", colour = NULL) +
   theme(legend.position = "top")
 save_fig("03-换先验后的后验.png", p3, 7.6, 4.3)
@@ -224,12 +229,18 @@ p4a <- ggplot(post_curve, aes(p, 密度)) +
   labs(title = "后验：Beta(7, 4)", x = "水面比例 p", y = "后验密度") +
   theme(plot.title = element_text(size = 12))
 
-p4b <- ggplot(pred2, aes(factor(未来两次里的水数), 概率)) +
-  geom_col(fill = "#c1462c", width = 0.55) +
-  geom_text(aes(label = sprintf("%.3f", 概率)), vjust = -0.4, size = 4) +
+pred_long <- pred2 %>%
+  pivot_longer(-未来两次里的水数, names_to = "算法", values_to = "概率")
+p4b <- ggplot(pred_long, aes(factor(未来两次里的水数), 概率, fill = 算法)) +
+  geom_col(position = position_dodge(0.62), width = 0.58) +
+  geom_text(aes(label = sprintf("%.3f", 概率)), position = position_dodge(0.62),
+            vjust = -0.5, size = 3.6) +
+  scale_fill_manual(values = c("#c1462c", "#e8b4a8")) +
   scale_y_continuous(limits = c(0, 0.5)) +
   labs(title = "预测：未来两次取点里有几次是水",
-       x = "未来两次里的水数", y = "概率")
+       subtitle = "深色用整条后验；浅色把后验均值当成固定 p",
+       x = "未来两次里的水数", y = "概率", fill = NULL) +
+  theme(legend.position = "top")
 
 p4 <- p4a | p4b
 save_fig("04-从后验到预测.png", p4, 8.8, 4.0)

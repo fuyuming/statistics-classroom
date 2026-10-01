@@ -85,13 +85,15 @@ fprintf('解析后验 Beta(%d,%d): %s\n', a, b, strjoin(cellfun(@numFmt, num2cel
 predNext = a / (a + b);
 logB = @(x, y) gammaln(x) + gammaln(y) - gammaln(x + y);
 pred2 = zeros(3, 1);
+pred2fix = zeros(3, 1);            % 对照：把后验均值当成固定 p
 for k = 0:2
     pred2(k+1) = exp(log(nchoosek(2, k)) + logB(a + k, b + 2 - k) - logB(a, b));
+    pred2fix(k+1) = nchoosek(2, k) * predNext^k * (1 - predNext)^(2 - k);
 end
 fid = fopen(fullfile(RES, '04_预测分布_matlab.csv'), 'w', 'n', 'UTF-8');
-fprintf(fid, '"未来两次里的水数","概率"\n');
+fprintf(fid, '"未来两次里的水数","概率（整条后验）","概率（固定均值）"\n');
 for k = 0:2
-    fprintf(fid, '%d,%s\n', k, numFmt(round(pred2(k+1), 6)));
+    fprintf(fid, '%d,%s,%s\n', k, numFmt(round(pred2(k+1), 6)), numFmt(round(pred2fix(k+1), 6)));
 end
 fclose(fid);
 fprintf('下一次取到水的概率 = %s，未来两次：%s\n', numFmt(round(predNext, 6)), ...
@@ -105,10 +107,10 @@ trueWater = 3; trueLand = 1;
 judge_correct = 2; judge_wrong = 1;
 fid = fopen(fullfile(RES, '05_误分类路径计数_matlab.csv'), 'w', 'n', 'UTF-8');
 fprintf(fid, '"来源","判定结果","真样本数","每次判定的取法","路径数"\n');
-fprintf(fid, '"真样本是水","记为水",%d,%d,%d\n', trueWater, judge_correct, trueWater * judge_correct);
-fprintf(fid, '"真样本是水","记为陆",%d,%d,%d\n', trueWater, judge_wrong,   trueWater * judge_wrong);
-fprintf(fid, '"真样本是陆","记为水",%d,%d,%d\n', trueLand,  judge_wrong,   trueLand * judge_wrong);
-fprintf(fid, '"真样本是陆","记为陆",%d,%d,%d\n', trueLand,  judge_correct, trueLand * judge_correct);
+fprintf(fid, '"真实是水","记录为水",%d,%d,%d\n', trueWater, judge_correct, trueWater * judge_correct);
+fprintf(fid, '"真实是水","记录为陆",%d,%d,%d\n', trueWater, judge_wrong,   trueWater * judge_wrong);
+fprintf(fid, '"真实是陆","记录为水",%d,%d,%d\n', trueLand,  judge_wrong,   trueLand * judge_wrong);
+fprintf(fid, '"真实是陆","记录为陆",%d,%d,%d\n', trueLand,  judge_correct, trueLand * judge_correct);
 fclose(fid);
 waysObsWater = trueWater * judge_correct + trueLand * judge_wrong;
 waysObsLand  = trueWater * judge_wrong + trueLand * judge_correct;
