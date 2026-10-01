@@ -29,6 +29,7 @@
 |---|---|---|
 | 01 | 科学先于统计：泥人、DAG 与贝叶斯工作流（书第 1、2 章） | [rethinking/article01_bayesian_workflow](rethinking/article01_bayesian_workflow/) |
 | 02 | 数路径：贝叶斯推断为什么可以先不背公式（书第 2 章，Garden of Forking Data） | [rethinking/article02_counting_paths](rethinking/article02_counting_paths/) |
+| 03 | 生物膜的趋势拟合得很准，下一次测量就能算准吗：从地心说到线性回归（书第 4 章） | [rethinking/article03_geocentric_line](rethinking/article03_geocentric_line/) |
 
 每篇都提供 R、Python、MATLAB 三个语言的等价脚本，输出逐位一致（02 篇起连 CSV 文件本身都逐字节一致）；
 跑一遍脚本就能逐项对照。
