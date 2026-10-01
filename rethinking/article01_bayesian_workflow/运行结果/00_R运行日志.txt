@@ -1,0 +1,28 @@
+
+载入程序包：‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+  样本量N 水上次数W 观测比例 网格后验均值 网格最大值点 区间下89 区间上89
+1       3         2   0.6667     0.598892     0.684211   0.2632   0.8947
+2       9         6   0.6667     0.636382     0.684211   0.4211   0.8421
+3      30        20   0.6667     0.656250     0.684211   0.5263   0.7895
+  后验密度峰值
+1     0.093629
+2     0.142835
+3     0.244429
+泊松 vs 负二项(size=20) 全变差距离 = 0.035176，最大单点概率差 = 0.015235
+
+出图完成：
+[1] "01-两种过程相近的分布.png"          "02-DAG两种结构.png"                
+[3] "03-贝叶斯工作流五步.png"            "04-先验似然后验.png"               
+[5] "05-样本量越大后验越窄.png"          "06-Python版-先验似然后验与收窄.png"
+[7] "07-MATLAB版-先验似然后验与收窄.png"
+
+R 版本: R version 4.6.1 (2026-06-24) 
