@@ -176,8 +176,7 @@ p2 <- ggplot(dens_df, aes(x, 密度, colour = 对比)) +
   geom_line(linewidth = 1.1) +
   geom_vline(xintercept = 0, linetype = "dashed", colour = "#9aa8a8") +
   labs(title = "报系数不如报对比：三组两两差多少",
-       subtitle = paste0("三条曲线是差值的后验分布；P(差值 > 0) 分别是 ",
-                         paste(pairs_df$P大于0, collapse = "、")),
+       subtitle = "三条曲线是差值的后验分布；几乎全部质量落在 0 右侧（P(差值 > 0) 均 > 0.999）",
        x = "厚度差（微米）", y = "后验密度", colour = NULL)
 save_fig("02-组间对比后验.png", p2, 7.4, 4.2)
 
@@ -193,8 +192,10 @@ ctr_df <- tibble(
 )
 write_csv_fixed(ctr_df, file.path(RES, "09_中心化对照.csv"))
 print(ctr_df)
+# 横轴必须同时覆盖两条分布（未中心化的均值 24.2 在旧横轴之外，会被截掉大半质量）
+x3 <- 10 + (0:399) * (45 / 399)
 dens2 <- do.call(rbind, lapply(seq_len(nrow(ctr_df)), function(i) {
-  tibble(x = dens_x + 40, 密度 = dnorm(dens_x + 40, ctr_df$截距后验均值[i], ctr_df$截距后验标准差[i]),
+  tibble(x = x3, 密度 = dnorm(x3, ctr_df$截距后验均值[i], ctr_df$截距后验标准差[i]),
          写法 = ctr_df$写法[i])
 }))
 p3 <- ggplot(dens2, aes(x, 密度, fill = 写法)) +
