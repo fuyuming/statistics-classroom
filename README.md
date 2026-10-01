@@ -38,6 +38,7 @@
 | 09 | 0/1 结果、计数、等级：logit、泊松与有序类别（书第 10、11 章） | [rethinking/article09_modeling_events](rethinking/article09_modeling_events/) |
 | 10 | 计数数据里的三个坑：零膨胀、混杂与过离散（书第 11、12 章） | [rethinking/article10_counts_confounds](rethinking/article10_counts_confounds/) |
 | 11 | 轻/中/重怎么建模：切点自由估计与"合并"的代价（书第 11 章） | [rethinking/article11_ordered_categories](rethinking/article11_ordered_categories/) |
+| 12 | 每个瓶三个孔：部分合并与多层模型入门（书第 13 章） | [rethinking/article12_multilevel_models](rethinking/article12_multilevel_models/) |
 
 每篇都提供 R、Python、MATLAB 三个语言的等价脚本，输出逐位一致（02 篇起连 CSV 文件本身都逐字节一致）；
 跑一遍脚本就能逐项对照。
