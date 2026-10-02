@@ -208,3 +208,15 @@ if matplotlib.get_backend().lower() == "agg":
 else:
     plt.show()
 print("Python 图已保存；numpy", np.__version__)
+
+# %% 9) 先取面、再抽签：把所有组合列出来。每次签放回后再抽。
+# 1/3 是给定的教学误判率，不是根据前面的记录估计出来的。
+face_truth = ["水"] * true_water + ["陆"] * true_land
+ticket_text = ["照实记录"] * judge_correct + ["记反"] * judge_wrong
+rows9 = []
+for face_id, truth in enumerate(face_truth, 1):
+    for ticket_id, text in enumerate(ticket_text, 1):
+        recorded = truth if text == "照实记录" else ("陆" if truth == "水" else "水")
+        rows9.append([face_id, truth, ticket_id, text, recorded])
+write_csv(RES / "09_误判抽签_python.csv", ["面编号", "实际取到", "签编号", "签上写着", "最终记录"], rows9)
+print("抽签的可能组合：", rows9)

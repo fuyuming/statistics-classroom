@@ -343,3 +343,32 @@ p_beta <- ggplot(beta_read, aes(p, 密度)) +
         plot.caption = element_text(hjust = 0, size = 10),
         panel.spacing = grid::unit(0.7, "lines"))
 save_fig("08-Beta从哪里来.png", p_beta, 7.5, 9)
+
+# 9) 用十二个格子解释误判：先取面，再抽签；每次抽后放回。
+# 误判概率是教学假设 judge_wrong/(judge_correct+judge_wrong)，不是用观测估出来的。
+face_truth <- c(rep("水", true_water), rep("陆", true_land))
+ticket_text <- c(rep("照实记录", judge_correct), rep("记反", judge_wrong))
+ticket_grid <- expand.grid(签编号 = seq_along(ticket_text), 面编号 = seq_along(face_truth)) %>%
+  mutate(实际取到 = face_truth[面编号], 签上写着 = ticket_text[签编号],
+         最终记录 = ifelse(签上写着 == "照实记录", 实际取到,
+                           ifelse(实际取到 == "水", "陆", "水"))) %>%
+  select(面编号, 实际取到, 签编号, 签上写着, 最终记录)
+write.csv(ticket_grid, file.path(RES, "09_误判抽签.csv"), row.names = FALSE)
+print(ticket_grid)
+face_labels <- paste0(ifelse(face_truth == "水", "水面 ", "陆面 "), LETTERS[seq_along(face_truth)])
+ticket_labels <- paste0("签 ", seq_along(ticket_text), "\n", ticket_text)
+ticket_plot <- ticket_grid %>%
+  mutate(面 = factor(面编号, levels = rev(seq_along(face_truth)), labels = rev(face_labels)),
+         签 = factor(签编号, levels = seq_along(ticket_text), labels = ticket_labels))
+p_tickets <- ggplot(ticket_plot, aes(签, 面, fill = 最终记录)) +
+  geom_tile(colour = "white", linewidth = 3, width = 0.98, height = 0.95) +
+  geom_text(aes(label = paste0("记为", 最终记录)), size = 5, family = font_family, colour = "#163d48") +
+  scale_fill_manual(values = c("水" = "#b7deda", "陆" = "#e8e8e5"), guide = "none") +
+  scale_x_discrete(position = "top") +
+  labs(title = paste0(nrow(ticket_grid), " 种等可能组合：", sum(ticket_grid$最终记录 == "水"), " 种记为水"),
+       subtitle = "看一格：实际取到哪个面？抽到哪张签？最后写下什么？",
+       x = NULL, y = "实际取到的面",
+       caption = "每次独立取面、抽签，签抽完放回。格子列出可能组合，不是实测次数。") +
+  theme(panel.grid = element_blank(), axis.text = element_text(size = 12),
+        plot.caption = element_text(hjust = 0, size = 10))
+save_fig("09-误判抽签.png", p_tickets, max(7.5, length(ticket_text)*1.2+3), 5.3)

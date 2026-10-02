@@ -197,6 +197,25 @@ legend(priorList, 'Location', 'northoutside', 'Orientation', 'horizontal', 'Box'
 exportgraphics(f, fullfile(OUT, '07-MATLAB版-网格与先验.png'), 'Resolution', 200);
 close(f);
 
+%% 9) 先取面、再抽签：误判率为教学设定，不是观测估计值
+% 每次独立抽取；签放回后再抽，上次结果不改变下次概率。
+faceTruth = [repmat({'水'}, 1, trueWater), repmat({'陆'}, 1, trueLand)];
+ticketText = [repmat({'照实记录'}, 1, judge_correct), repmat({'记反'}, 1, judge_wrong)];
+fid = fopen(fullfile(RES, '09_误判抽签_matlab.csv'), 'w', 'n', 'UTF-8');
+fprintf(fid, '"面编号","实际取到","签编号","签上写着","最终记录"\n');
+for faceId = 1:numel(faceTruth)
+    for ticketId = 1:numel(ticketText)
+        recorded = faceTruth{faceId};
+        if strcmp(ticketText{ticketId}, '记反')
+            if strcmp(recorded, '水'), recorded = '陆'; else, recorded = '水'; end
+        end
+        fprintf(fid, '%d,"%s",%d,"%s","%s"\n', faceId, faceTruth{faceId}, ...
+            ticketId, ticketText{ticketId}, recorded);
+    end
+end
+fclose(fid);
+disp('抽签组合已输出到09表；每格等可能，记录水的概率=记为水的格数/总格数。');
+
 % ------------------------------------------------------------
 function s = numFmt(x)
 % 按 R 的习惯打印数字：6 位小数后去掉多余的 0，统一 CSV 的输出格式；数值差异按容差核对
