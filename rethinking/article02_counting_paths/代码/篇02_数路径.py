@@ -6,19 +6,21 @@
 # ============================================================
 import math
 import os
+from pathlib import Path
 from math import lgamma
 
 import numpy as np
 import matplotlib
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy.stats import beta as beta_dist
+from scipy.stats import binom
 
 # 中文字体（macOS；Windows 换 Microsoft YaHei，Linux 换 Noto Sans CJK SC）
 plt.rcParams["font.sans-serif"] = ["PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC"]
 plt.rcParams["axes.unicode_minus"] = False
 
-OUT, RES = "文章配图", "运行结果"
+ROOT = Path(__file__).resolve().parent.parent
+OUT, RES = ROOT / "文章配图", ROOT / "运行结果"
 os.makedirs(OUT, exist_ok=True)
 os.makedirs(RES, exist_ok=True)
 
@@ -39,7 +41,7 @@ def write_csv(path, cols, rows):
 
 
 # ------------------------------------------------------------
-# 1) 四面地球仪：数路径
+# %% 1) 四面地球仪：数路径
 # ------------------------------------------------------------
 n_faces = 4                                   # 练习 1：改成 6 就是六面地球仪（三语言同名）
 face_water = list(range(n_faces + 1))
@@ -57,28 +59,15 @@ print("路径数 ways =", ways, " 总数 =", total_ways)
 print("后验 =", [num(x) for x in post_globe])
 
 # ------------------------------------------------------------
-# 2) 20 点网格：三种先验
+# %% 2) 20 点网格：三种先验
 # ------------------------------------------------------------
 W, L = 6, 3
 N = W + L
 p_grid = np.linspace(0, 1, 20)
 
 
-def binom_pmf(k, n, p):
-    """与 R 的 dbinom、MATLAB 的 binopdf 一致：直接按组合数算，避免库之间的尾位差异"""
-    out = []
-    for pi in p:
-        if pi <= 0:
-            out.append(1.0 if k == 0 else 0.0)
-        elif pi >= 1:
-            out.append(1.0 if k == n else 0.0)
-        else:
-            out.append(math.comb(n, k) * pi ** k * (1 - pi) ** (n - k))
-    return np.array(out)
-
-
 def grid_post(prior):
-    like = binom_pmf(W, N, p_grid)
+    like = binom.pmf(W, N, p_grid)
     post = like * prior
     return p_grid, prior / prior.sum(), like / like.sum(), post / post.sum()
 
@@ -102,7 +91,7 @@ for r in rows2:
     print(r)
 
 # ------------------------------------------------------------
-# 3) 解析解 Beta(W+1, L+1)
+# %% 3) 解析解 Beta(W+1, L+1)
 # ------------------------------------------------------------
 a, b = W + 1, L + 1
 an_rows = [["后验均值", round(a / (a + b), 6)],
@@ -114,7 +103,7 @@ write_csv(os.path.join(RES, "03_解析后验对照_python.csv"), ["指标", "解
 print(f"解析后验 Beta({a},{b}):", an_rows)
 
 # ------------------------------------------------------------
-# 4) 从后验到预测（beta-二项，确定性）
+# %% 4) 从后验到预测（beta-二项，确定性）
 # ------------------------------------------------------------
 def logB(x, y):
     return lgamma(x) + lgamma(y) - lgamma(x + y)
@@ -131,7 +120,7 @@ write_csv(os.path.join(RES, "04_预测分布_python.csv"),
 print("下一次取到水的概率 =", round(pred_next, 6), pred_rows)
 
 # ------------------------------------------------------------
-# 5) 测量误差：路径计数
+# %% 5) 测量误差：路径计数
 # ------------------------------------------------------------
 true_water, true_land = 3, 1
 # 练习 2：判定取法改成 10 种（判对 9、判错 1）→ judge_correct, judge_wrong = 9, 1
@@ -144,7 +133,27 @@ write_csv(os.path.join(RES, "05_误分类路径计数_python.csv"),
           ["来源", "判定结果", "真样本数", "每次判定的取法", "路径数"], rows5)
 ways_obs_water = sum(r[4] for r in rows5 if r[1] == "记录为水")
 ways_obs_land = sum(r[4] for r in rows5 if r[1] == "记录为陆")
-print(f"观测到水 = 6 + 1 = {ways_obs_water}；观测到陆 = 3 + 2 = {ways_obs_land}；合计 = {ways_obs_water + ways_obs_land}")
+print(f"记录为水有 {ways_obs_water} 条路；记录为陆有 {ways_obs_land} 条路；总数 {ways_obs_water + ways_obs_land}")
+print("记录为水的概率 =", ways_obs_water / (ways_obs_water + ways_obs_land))
+
+# %% 6) 同一组“水—陆—水”：把测量误差一路算进后验
+# 每个候选先验等权；取点独立，判定误差也独立且对称。
+# q 是记录为水的概率，p 是真实水面比例，二者需要分开。
+error_rate = judge_wrong / (judge_correct + judge_wrong)
+obs_water_ways = np.array(face_water) * judge_correct + np.array(face_land) * judge_wrong
+obs_land_ways = np.array(face_water) * judge_wrong + np.array(face_land) * judge_correct
+q_record_water = obs_water_ways / (n_faces * (judge_correct + judge_wrong))
+# 对于指定的 W-L-W 序列，似然是 q*(1-q)*q。
+mis_likelihood = q_record_water * (1 - q_record_water) * q_record_water
+mis_posterior = mis_likelihood / mis_likelihood.sum()
+mis_paths = obs_water_ways * obs_land_ways * obs_water_ways
+rows6 = []
+for i, p in enumerate(p_globe):
+    rows6.append([p, error_rate, q_record_water[i], mis_paths[i], post_globe[i], mis_posterior[i]])
+write_csv(RES / "06_误判后验对照_python.csv",
+          ["p", "误判率", "记录为水的概率", "相容路径数", "无误判后验", "含误判后验"], rows6)
+print("同一观测下，允许误判后的后验：", [num(x) for x in mis_posterior])
+print("端点重新获得支持，是因为含误判模型的似然不再为零；此处先验一直等权。")
 
 # ============================================================
 # 配图：01、02 两张对照图（R 版是主图，这里只做同内容对照）
@@ -170,5 +179,8 @@ ax[1].legend(loc="upper center", ncol=2, fontsize=8, frameon=False, bbox_to_anch
 
 fig.tight_layout()
 fig.savefig(os.path.join(OUT, "06-Python版-网格与先验.png"), dpi=200)
-plt.close(fig)
+if matplotlib.get_backend().lower() == "agg":
+    plt.close(fig)
+else:
+    plt.show()
 print("Python 图已保存；numpy", np.__version__)

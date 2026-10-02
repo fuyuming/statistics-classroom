@@ -1,12 +1,11 @@
 % ============================================================
 % 精读 02｜数路径（MATLAB 版，与 R 版、Python 版逐位一致）
 % 对应：McElreath 2023 第 02 讲 Garden of Forking Data；教材第 2 章
-% 用法： 在 MATLAB 里直接运行本脚本（或 matlab -batch "run('代码/篇02_数路径.m')"）
+% 用法： 在 MATLAB 里直接运行本脚本（或 在代码文件夹执行 matlab -batch "counting_paths"）
 % ============================================================
 clear; clc;
-% 注：MATLAB 的 -batch 命令行参数不能带中文路径，所以脚本里自己 cd 进去
-root = '/Users/yumingfu/03_写作箱/公众号平台/20261002-Rethinking精读-02-数路径';
-cd(root);
+% 根据脚本自身位置定位项目，解压到任意文件夹均可运行。
+root = fileparts(fileparts(mfilename('fullpath')));
 OUT = fullfile(root, '文章配图'); RES = fullfile(root, '运行结果');
 if ~exist(OUT, 'dir'), mkdir(OUT); end
 if ~exist(RES, 'dir'), mkdir(RES); end
@@ -23,7 +22,7 @@ ways      = faceWater .* faceLand .* faceWater;
 totalWays = sum(ways);
 pGlobe    = faceWater / n_faces;          % 比例由"水面数 / 面数"推出
 postGlobe = ways / totalWays;
-fprintf('路径数 ways = %d %d %d %d %d，总数 = %d\n', ways, totalWays);
+fprintf('路径数 = %s，总数 = %d\n', mat2str(ways'), totalWays);
 fprintf('后验 = %s\n', strjoin(cellfun(@numFmt, num2cell(postGlobe), 'UniformOutput', false), ', '));
 
 fid = fopen(fullfile(RES, '01_四面地球仪路径计数_matlab.csv'), 'w', 'n', 'UTF-8');
@@ -117,6 +116,26 @@ waysObsLand  = trueWater * judge_wrong + trueLand * judge_correct;
 fprintf('观测到水 = %d + %d = %d；观测到陆 = %d + %d = %d；合计 = %d\n', ...
     trueWater*judge_correct, trueLand*judge_wrong, waysObsWater, ...
     trueWater*judge_wrong, trueLand*judge_correct, waysObsLand, waysObsWater + waysObsLand);
+
+%% 6) 同一组 W-L-W：把测量误差一路算进后验
+% 各次取点和误判独立，误判对称，候选先验等权。
+errorRate = judge_wrong / (judge_correct + judge_wrong);
+obsWaterWays = faceWater * judge_correct + faceLand * judge_wrong;
+obsLandWays = faceWater * judge_wrong + faceLand * judge_correct;
+qRecordWater = obsWaterWays / (n_faces * (judge_correct + judge_wrong));
+% q 是记录为水的概率；q.*(1-q).*q 是指定序列的似然。
+misLikelihood = qRecordWater .* (1 - qRecordWater) .* qRecordWater;
+misPosterior = misLikelihood / sum(misLikelihood);
+misPaths = obsWaterWays .* obsLandWays .* obsWaterWays;
+fid = fopen(fullfile(RES, '06_误判后验对照_matlab.csv'), 'w', 'n', 'UTF-8');
+fprintf(fid, '"p","误判率","记录为水的概率","相容路径数","无误判后验","含误判后验"\n');
+for i = 1:numel(pGlobe)
+    fprintf(fid, '%s,%s,%s,%s,%s,%s\n', numFmt(pGlobe(i)), numFmt(errorRate), ...
+        numFmt(qRecordWater(i)), numFmt(misPaths(i)), numFmt(postGlobe(i)), numFmt(misPosterior(i)));
+end
+fclose(fid);
+fprintf('含误判后验 = %s\n', mat2str(misPosterior', 6));
+disp('端点重新获得支持，是因为含误判模型的似然不再为零；此处先验一直等权。');
 
 % ============================================================
 % 配图：06、07 两张对照图（R 版是主图）

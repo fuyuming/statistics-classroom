@@ -14,7 +14,13 @@ suppressPackageStartupMessages({
   library(patchwork)
 })
 
-OUT <- "文章配图"; RES <- "运行结果"
+# 命令行与 RStudio Source 自动定位脚本；逐行运行请先打开本课 Rproj。
+source_files <- unlist(lapply(sys.frames(), function(x) x$ofile))
+cli <- sub("^--file=", "", commandArgs(FALSE)[grepl("^--file=", commandArgs(FALSE))])
+script_file <- if (length(source_files)) tail(source_files, 1) else cli
+root <- if (length(script_file)) dirname(dirname(normalizePath(script_file))) else getwd()
+OUT <- file.path(root, "文章配图")
+RES <- file.path(root, "运行结果")
 dir.create(OUT, showWarnings = FALSE); dir.create(RES, showWarnings = FALSE)
 
 # 中文字体：macOS 用 PingFang SC（ragg 设备直接吃系统字体，不用 showtext）
@@ -23,7 +29,8 @@ save_fig <- function(name, p, w, h) {
   print(p); dev.off()
   cat("已保存图：", name, "\n")
 }
-theme_set(theme_minimal(base_size = 12, base_family = "PingFang SC") +
+font_family <- if (Sys.info()[["sysname"]] == "Darwin") "PingFang SC" else if (.Platform$OS.type == "windows") "Microsoft YaHei" else "Noto Sans CJK SC"
+theme_set(theme_minimal(base_size = 12, base_family = font_family) +
             theme(plot.title = element_text(face = "bold"),
                   panel.grid.minor = element_blank()))
 
@@ -48,7 +55,8 @@ globe <- tibble(
   后验     = ways / sum(ways)
 )
 print(globe)
-write.csv(globe, file.path(RES, "01_四面地球仪路径计数.csv"), row.names = FALSE)
+write.csv(mutate(globe, across(everything(), ~round(.x, 6))),
+          file.path(RES, "01_四面地球仪路径计数.csv"), row.names = FALSE)
 cat("路径总数 =", sum(ways), "（= ways 之和）\n")
 
 # ------------------------------------------------------------
@@ -137,12 +145,28 @@ mis <- tibble(
 print(mis)
 ways_obs_water <- sum(mis$路径数[mis$判定结果 == "记录为水"])
 ways_obs_land  <- sum(mis$路径数[mis$判定结果 == "记录为陆"])
-cat("观测到水的路径数 = 6 + 1 =", ways_obs_water,
-    "；观测到陆的路径数 = 3 + 2 =", ways_obs_land,
-    "；合计 =", ways_obs_water + ways_obs_land, "\n")
-cat("记录为水的概率 =", round(ways_obs_water / (ways_obs_water + ways_obs_land), 6),
-    "（= 7/12）；记录为陆的概率 =", round(ways_obs_land / (ways_obs_water + ways_obs_land), 6), "\n")
+cat("记录为水有", ways_obs_water, "条路；记录为陆有", ways_obs_land,
+    "条路；总数", ways_obs_water + ways_obs_land, "\n")
+cat("记录为水的概率 =", ways_obs_water / (ways_obs_water + ways_obs_land), "\n")
 write.csv(mis, file.path(RES, "05_误分类路径计数.csv"), row.names = FALSE)
+
+# 6) 同一组 W-L-W：把测量误差一路算进后验
+# 各次取点与误判独立，误判对称，候选先验等权。
+error_rate <- judge_wrong / (judge_correct + judge_wrong)
+obs_water_ways <- face_water * judge_correct + face_land * judge_wrong
+obs_land_ways <- face_water * judge_wrong + face_land * judge_correct
+q_record_water <- obs_water_ways / (n_faces * (judge_correct + judge_wrong))
+# q 是记录为水的概率；q*(1-q)*q 是指定序列的似然。
+mis_likelihood <- q_record_water * (1 - q_record_water) * q_record_water
+mis_posterior <- mis_likelihood / sum(mis_likelihood)
+mis_paths <- obs_water_ways * obs_land_ways * obs_water_ways
+mis_post <- tibble(p = globe$p, 误判率 = error_rate,
+                   记录为水的概率 = q_record_water, 相容路径数 = mis_paths,
+                   无误判后验 = globe$后验, 含误判后验 = mis_posterior)
+write.csv(mutate(mis_post, across(everything(), ~round(.x, 6))),
+          file.path(RES, "06_误判后验对照.csv"), row.names = FALSE)
+print(mis_post)
+cat("端点重新获得支持，是因为含误判模型的似然不再为零；此处先验一直等权。\n")
 
 # ============================================================
 # 图 1｜分岔路径计数（确定性）
@@ -157,7 +181,7 @@ p1a <- ggplot(tree, aes(步, factor(p), label = 取法)) +
   geom_tile(fill = "#eef4f3", colour = "white", linewidth = 1.2) +
   geom_text(colour = "#163d48", size = 4.6) +
   labs(title = "每一抛，把这个比例下的取法乘一次",
-       subtitle = "四面地球仪：水面 0/1/2/3/4 面，观测序列 W L W",
+       subtitle = paste0(n_faces, " 面地球仪；各面等可能；观测 W L W"),
        x = NULL, y = "候选水面比例 p") +
   theme(panel.grid = element_blank())
 
@@ -165,9 +189,9 @@ p1b <- ggplot(globe, aes(factor(p), 路径数, fill = 路径数 > 0)) +
   geom_col(width = 0.62) +
   geom_text(aes(label = paste0(路径数, "/", sum(ways))), vjust = -0.4, size = 4) +
   scale_fill_manual(values = c("#c9c9c9", "#167d80"), guide = "none") +
-  scale_y_continuous(limits = c(0, 11), breaks = seq(0, 10, 2)) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2))) +
   labs(title = "路径数 ÷ 总数 = 后验概率",
-       subtitle = paste0("总数 = ", sum(ways), " 条路径；比例 0 和 1 都被排除"),
+       subtitle = paste0("相容路径合计 ", sum(ways), " 条\n先验等权、独立取点、无误判"),
        x = "候选水面比例 p", y = "路径数")
 
 p1 <- p1a | p1b
@@ -210,7 +234,7 @@ p3 <- ggplot(pri_tab, aes(p, post, colour = 情形)) +
        subtitle = "观测不变（9 次里 6 次是水）；先验若把某一片区域设成零权重，数据也救不回来",
        x = "水面比例 p", y = "后验概率", colour = NULL) +
   theme(legend.position = "top")
-save_fig("03-换先验后的后验.png", p3, 7.6, 4.3)
+save_fig("03-换先验后的后验.png", p3, 9, 4.8)
 
 # ============================================================
 # 图 4｜从后验到预测（确定性：beta-二项）
@@ -224,7 +248,7 @@ p4a <- ggplot(post_curve, aes(p, 密度)) +
   geom_vline(xintercept = a / (a + b), linetype = "dashed", colour = "#c1462c") +
   annotate("label", x = a / (a + b), y = max(post_curve$密度) * 0.9,
            label = paste0("下一次取到水的概率\n", round(a / (a + b), 3)),
-           family = "PingFang SC", size = 3.4, colour = "#c1462c", hjust = -0.05) +
+           family = font_family, size = 3.4, colour = "#c1462c", hjust = -0.05) +
   scale_x_continuous(limits = c(0, 1)) +
   labs(title = "后验：Beta(7, 4)", x = "水面比例 p", y = "后验密度") +
   theme(plot.title = element_text(size = 12))
@@ -245,7 +269,7 @@ p4b <- ggplot(pred_long, aes(factor(未来两次里的水数), 概率, fill = �
   theme(legend.position = "top")
 
 p4 <- p4a | p4b
-save_fig("04-从后验到预测.png", p4, 8.8, 4.0)
+save_fig("04-从后验到预测.png", p4, 10.8, 4.8)
 
 # ============================================================
 # 图 5｜测量误差：判定会看错时的路径计数（确定性）
@@ -255,14 +279,14 @@ p5 <- ggplot(mis, aes(来源, 路径数, fill = 判定结果)) +
   geom_text(aes(label = paste0(真样本数, "×", 每次判定的取法, "=", 路径数)),
             position = position_dodge(0.62), vjust = -0.6, size = 3.8) +
   scale_fill_manual(values = c("#167d80", "#c9c9c9")) +
-  scale_y_continuous(limits = c(0, 7.6)) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2))) +
   labs(title = "判定会看错时，观测结果有多少条路？",
-       subtitle = paste0("真样本 3 水 1 陆；判定 3 种取法里判对 2 种、判错 1 种 → ",
+       subtitle = paste0("3 水 1 陆；判对分支 ", judge_correct, "，判错分支 ", judge_wrong, " → ",
                          "观测到水 ", ways_obs_water, " 条路、观测到陆 ", ways_obs_land, " 条路，合计 ",
                          ways_obs_water + ways_obs_land, " 条"),
        x = NULL, y = "路径数", fill = NULL) +
   theme(legend.position = "top")
-save_fig("05-误分类路径计数.png", p5, 7.4, 4.0)
+save_fig("05-误分类路径计数.png", p5, 8.6, 4.5)
 
 cat("\nR 版本:", R.version.string, "\n")
 cat("全部完成。\n")

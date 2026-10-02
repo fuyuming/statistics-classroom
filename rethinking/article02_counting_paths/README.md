@@ -1,52 +1,52 @@
-# 精读 02｜数路径：贝叶斯推断为什么可以先不背公式
+# 精读 02｜从数路径理解贝叶斯
 
-《Statistical Rethinking》精读系列的配套代码。对应公众号「明哥的微生物世界 · Statistical Rethinking 精读 02」。
+明哥的微生物世界 · Statistical Rethinking 精读 02。正文、封面、三种语言脚本和结果一起提供。所有数字来自人工设定的教学模型，没有真实实验数据，也没有随机模拟。
 
-- 课程：Statistical Rethinking 2023 第 02 讲 *Garden of Forking Data*
-- 教材：McElreath, R. (2020). *Statistical Rethinking: A Bayesian Course with Examples in R and Stan*, 2nd ed. 第 2 章（并用到第 3 章少量内容）
+## 下载后怎么运行
 
-## 这一篇做了什么
+先下载整个仓库 ZIP 并解压，进入 `rethinking/article02_counting_paths`。不要只下载一个脚本，否则会缺少正文和配套资料。
 
-1. **四面地球仪数路径**：观测序列 W L W，五个候选水面比例的路径数是 0、3、8、9、0，除以总数 20 就是后验（0、0.15、0.40、0.45、0）。
-2. **20 点网格 + 三种先验**：平坦先验、`exp(-5·|p-0.5|)`、"p<0.5 时为 0"，看后验被拉动多少。
-3. **解析解对照**：Beta(7, 4) 的均值 0.636364 与 20 点网格的 0.636382 相差 0.000018。
-4. **从后验到预测**：beta-二项给出"未来两次取点里有几次是水"的分布（0.151515 / 0.424242 / 0.424242）。
-5. **测量误差**：判定会看错时，观测到"水"有 3×2 + 1×1 = 7 条路（观测到"陆"5 条）。
+- 阅读：`数路径_公众号稿_v2.md`；双击 `数路径_手机预览_v2.html` 可看排版和图片。
+- RStudio：打开 `数路径.Rproj`，打开 `代码/篇02_数路径.R`，点击 Source 运行全文。首次安装依赖可在 R 控制台运行 `install.packages(c("ggplot2", "dplyr", "tidyr", "tibble", "patchwork", "ragg"))`。
+- Python / Spyder：用现有文件夹项目打开本目录，打开 `代码/篇02_数路径.py`，按 F5。需要 numpy、scipy、matplotlib；在 Spyder 所用解释器环境安装 `requirements.txt` 中的依赖。
+- MATLAB：打开 `代码/counting_paths.m`，点击 Run，允许切换到脚本文件夹。需要 Statistics and Machine Learning Toolbox（`binopdf` 和 `betainv`）。Current Folder 决定当前工作位置，搜索路径决定 MATLAB 到哪里找函数；脚本按自身位置找项目，不需要写死本机路径。脚本采用英文文件名，避免中文脚本名的执行兼容问题。
 
-## 运行
+三份脚本按自身位置定位输出，使用 UTF-8。R 输出正文五张图，Python 与 MATLAB 各输出一张网格与先验对照图。数学计算三种语言等价，绘图范围不同。
 
-三个语言的脚本各自独立可跑，输出应当完全一致（本篇连 CSV 文件本身都逐字节一致）。
+命令行备选（从本课根目录运行）：
 
-```bash
-# R（主）
+```sh
 Rscript 代码/篇02_数路径.R
-
-# Python
-pip install -r requirements.txt
-python 代码/篇02_数路径.py
-
-# MATLAB（-batch 传不了中文路径，脚本里自带 cd）
-matlab -batch "run('代码/篇02_数路径.m')"
+python3 代码/篇02_数路径.py
 ```
 
-输出：
+MATLAB 可先进入 `代码` 文件夹，再运行 `matlab -batch "counting_paths"`。
 
-- `运行结果/01–05*.csv` —— 路径计数、三种先验汇总、解析对照、预测分布、误分类路径计数
-- 配图：运行脚本后在本目录生成 `文章配图/`（五张正文配图；`06-`、`07-` 是 Python、MATLAB 的同内容对照图）。
-  仓库只放代码与运行结果，配图不入库——跑一遍脚本即可得到，且与正文用图完全一致。
+macOS 默认中文字体为 PingFang SC；Windows 可用 Microsoft YaHei，Linux 可用 Noto Sans CJK SC。MATLAB 的字体设置在脚本开头。Python 不强制无界面后端；在 Spyder 可显示图，自动运行时可设置环境变量 `MPLBACKEND=Agg`。
 
-## 练习开关（正文第七节）
+## 计算与预期结果
 
-- **练习 1**：把脚本里的 `n_faces` 从 `4` 改成 `6`（六面地球仪），路径数变成 5、16、27、32、25（合计 105）。
-- **练习 2**：把 `judge_correct / judge_wrong` 从 `2 / 1` 改成 `9 / 1`（判定有 10 种取法），观测到"水"的路径数变成 3×9 + 1×1 = 28。
+1. 四面地球仪，五个候选先验等权；观测 W-L-W。相容路径为 0、3、8、9、0，总数 20，后验为 0、0.15、0.40、0.45、0。
+2. 20 点网格，观测 9 次中 6 次是水。平坦、中心集中、截断先验的后验均值分别约 0.636382、0.586171、0.681388。
+3. 连续均匀先验下解析后验 Beta(7,4)：均值 0.636364，众数 2/3，89% 等尾区间约 0.400320–0.845431。网格均值与解析值的未舍入差约 0.00001872545；不能用两个已舍入的均值计算该差。
+4. 未来两次水数为 0、1、2 的概率：整条后验给出 0.151515、0.424242、0.424242；固定后验均值给出 0.132231、0.462810、0.404959。
+5. 真实 3 水 1 陆、对称误判率 1/3：记录为水有 7 条路，记录为陆有 5 条路，记录为水的概率 7/12。
+6. 新增完整误判后验：同一组 W-L-W，独立取点与独立误判，五候选先验等权。相容路径为 128、175、216、245、256，总数 1020；后验约 0.125490、0.171569、0.211765、0.240196、0.250980。
 
-## 环境
+`运行结果/01–06*.csv` 按编号对应以上六项。无后缀为 R，`_python` 与 `_matlab` 为对应语言。CSV 保留的精度相同；跨语言核对与运行版本见 `VALIDATION.md`。重新运行会更新本语言的结果及配图。
 
-- R 4.6.1：ggplot2、ragg、patchwork、dplyr／tidyr／tibble（R 代码按 tidyverse 语法写）
-- Python 3.9+：numpy、scipy、matplotlib
-- MATLAB R2025a：Statistics and Machine Learning Toolbox（只用 `binopdf`／`betainv`）
-- 中文字体：macOS 用 PingFang SC，Windows 换 Microsoft YaHei，Linux 换 Noto Sans CJK SC
+## 先猜，再改参数
 
-## 阅读顺序
+- 把 `n_faces` 从 4 改成 6。七个候选的路径数应为 **0、5、16、27、32、25、0**，总数 105。新版图轴随数据变化，非零结果不会被裁切。
+- 把 `judge_correct`、`judge_wrong` 从 2、1 改成 9、1。固定 3 水 1 陆时，记录为水 28 条路，总数 40，概率 0.7；再观察第六张表中的后验怎样改变。这里把误判率当作已知，并非用这三次观测估出了误判率。
 
-先跑一遍脚本，再看正文里的五张图。公众号正文按系列发布，这里只放可运行的代码与结果。
+## 文件与来源
+
+- `数路径_公众号稿.md` 与 `数路径_公众号稿_v2.md`：当前正文（内容相同）。
+- `数路径_手机预览_v2.html`：手机排版；所有引用图片均随项目提供。
+- `文章配图/`：正文科学图由 R 脚本生成；封面为 AI 辅助编辑插画，不代表真实地图数据或统计结果。
+- `封面生成说明_v2.md`：生成方式、提示词和版本说明。
+- 课程：https://github.com/rmcelreath/stat_rethinking_2023
+- 第 02 讲：https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02
+- 项目：https://github.com/fuyuming/statistics-classroom/tree/main/rethinking/article02_counting_paths
+- ZIP：https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip
