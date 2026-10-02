@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # ============================================================
-# 精读 02｜数路径（Python 版，与 R 版、MATLAB 版逐位一致）
+# 精读 02｜数路径（Python 版，与 R 版、MATLAB 版按数值容差核对）
 # 对应：McElreath 2023 第 02 讲 Garden of Forking Data；教材第 2 章
 # 用法： python 代码/篇02_数路径.py
 # ============================================================
@@ -20,13 +20,13 @@ plt.rcParams["font.sans-serif"] = ["PingFang SC", "Microsoft YaHei", "Noto Sans 
 plt.rcParams["axes.unicode_minus"] = False
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT, RES = ROOT / "文章配图", ROOT / "运行结果"
+OUT, RES = ROOT / "文章配图_v3", ROOT / "运行结果"
 os.makedirs(OUT, exist_ok=True)
 os.makedirs(RES, exist_ok=True)
 
 
 def num(x):
-    """按 R 的习惯打印数字：保留 6 位后去掉多余的 0，保证三语言 CSV 逐位一致"""
+    """按 R 的习惯打印数字：保留 6 位后去掉多余的 0，统一 CSV 的输出格式；数值差异按容差核对"""
     s = f"{round(float(x), 6):.6f}".rstrip("0").rstrip(".")
     return s if s not in ("", "-") else "0"
 
@@ -93,7 +93,10 @@ for r in rows2:
 # ------------------------------------------------------------
 # %% 3) 解析解 Beta(W+1, L+1)
 # ------------------------------------------------------------
+# 平坦先验 Beta(1,1)；看到 W 次水、L 次陆，两个形状参数分别增加 W、L。
+# beta.pdf 返回密度高度，beta.ppf 返回累计面积达到指定比例时的横轴位置。
 a, b = W + 1, L + 1
+print(f"从平坦先验 Beta(1,1) 出发，{W} 水 {L} 陆对应 Beta({a},{b})。")
 an_rows = [["后验均值", round(a / (a + b), 6)],
            ["后验众数", round((a - 1) / (a + b - 2), 6)],
            ["后验标准差", round(math.sqrt(a * b / ((a + b) ** 2 * (a + b + 1))), 6)],
@@ -154,6 +157,27 @@ write_csv(RES / "06_误判后验对照_python.csv",
           ["p", "误判率", "记录为水的概率", "相容路径数", "无误判后验", "含误判后验"], rows6)
 print("同一观测下，允许误判后的后验：", [num(x) for x in mis_posterior])
 print("端点重新获得支持，是因为含误判模型的似然不再为零；此处先验一直等权。")
+
+# %% 7) Beta 读图：三种累计阶段的密度坐标
+beta_cases = [("平坦先验", 1, 1), ("1水1陆", 2, 2), ("6水3陆", a, b)]
+rows7 = []
+for label, shape_a, shape_b in beta_cases:
+    for p in np.linspace(0, 1, 201):
+        density = beta_dist.pdf(p, shape_a, shape_b)
+        rows7.append([label, shape_a, shape_b, p, density])
+write_csv(RES / "07_Beta读图_python.csv", ["阶段", "a", "b", "p", "密度"], rows7)
+
+# %% 8) 两候选手算：独立教学设定，不是前面那组数据的后验
+candidate_p = np.array([0.25, 0.75])
+candidate_weight = np.array([0.5, 0.5])
+toy_mean = np.sum(candidate_p * candidate_weight)
+rows8 = [
+    ["逐个候选预测再平均", toy_mean, np.sum(candidate_weight * candidate_p**2)],
+    ["先平均再预测", toy_mean, toy_mean**2]
+]
+write_csv(RES / "08_两候选预测_python.csv", ["算法", "下一次是水", "两次都是水"], rows8)
+print("两候选预测：", rows8)
+print("两次取点共用同一个未知 p；先平方再平均，得到 0.3125，而非 0.25。")
 
 # ============================================================
 # 配图：01、02 两张对照图（R 版是主图，这里只做同内容对照）

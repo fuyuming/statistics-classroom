@@ -1,12 +1,12 @@
 % ============================================================
-% 精读 02｜数路径（MATLAB 版，与 R 版、Python 版逐位一致）
+% 精读 02｜数路径（MATLAB 版，与 R 版、Python 版按数值容差核对）
 % 对应：McElreath 2023 第 02 讲 Garden of Forking Data；教材第 2 章
 % 用法： 在 MATLAB 里直接运行本脚本（或 在代码文件夹执行 matlab -batch "counting_paths"）
 % ============================================================
 clear; clc;
 % 根据脚本自身位置定位项目，解压到任意文件夹均可运行。
 root = fileparts(fileparts(mfilename('fullpath')));
-OUT = fullfile(root, '文章配图'); RES = fullfile(root, '运行结果');
+OUT = fullfile(root, '文章配图_v3'); RES = fullfile(root, '运行结果');
 if ~exist(OUT, 'dir'), mkdir(OUT); end
 if ~exist(RES, 'dir'), mkdir(RES); end
 set(0, 'defaultAxesFontName', 'PingFang SC');   % 中文字体（Windows 换 Microsoft YaHei）
@@ -67,7 +67,10 @@ fclose(fid);
 % ------------------------------------------------------------
 % 3) 解析解 Beta(W+1, L+1)
 % ------------------------------------------------------------
+% 平坦先验 Beta(1,1)；每次水和陆分别增加对应形状参数。
+% betapdf 返回密度高度，betainv 返回累计面积对应的横轴位置。
 a = W + 1; b = L + 1;
+fprintf('从 Beta(1,1) 起步，%d 水 %d 陆对应 Beta(%d,%d)。\n', W, L, a, b);
 anName = {'后验均值', '后验众数', '后验标准差', '89% 区间下', '89% 区间上'};
 anVal  = [a/(a+b), (a-1)/(a+b-2), sqrt(a*b/((a+b)^2*(a+b+1))), betainv(0.055, a, b), betainv(0.945, a, b)];
 fid = fopen(fullfile(RES, '03_解析后验对照_matlab.csv'), 'w', 'n', 'UTF-8');
@@ -137,6 +140,34 @@ fclose(fid);
 fprintf('含误判后验 = %s\n', mat2str(misPosterior', 6));
 disp('端点重新获得支持，是因为含误判模型的似然不再为零；此处先验一直等权。');
 
+%% 7) Beta 读图：曲线坐标与形状参数
+betaLabels = {'平坦先验', '1水1陆', '6水3陆'};
+betaShapes = [1 1; 2 2; a b];
+betaGrid = linspace(0, 1, 201);
+fid = fopen(fullfile(RES, '07_Beta读图_matlab.csv'), 'w', 'n', 'UTF-8');
+fprintf(fid, '"阶段","a","b","p","密度"\n');
+for j = 1:3
+    density = betapdf(betaGrid, betaShapes(j,1), betaShapes(j,2));
+    for i = 1:numel(betaGrid)
+        fprintf(fid, '"%s",%s,%s,%s,%s\n', betaLabels{j}, ...
+            numFmt(betaShapes(j,1)), numFmt(betaShapes(j,2)), ...
+            numFmt(betaGrid(i)), numFmt(density(i)));
+    end
+end
+fclose(fid);
+
+%% 8) 两候选预测：这是独立教学设定
+candidateP = [0.25, 0.75];
+candidateWeight = [0.5, 0.5];
+toyMean = sum(candidateP .* candidateWeight);
+toyTwo = sum(candidateWeight .* candidateP.^2);
+fid = fopen(fullfile(RES, '08_两候选预测_matlab.csv'), 'w', 'n', 'UTF-8');
+fprintf(fid, '"算法","下一次是水","两次都是水"\n');
+fprintf(fid, '"逐个候选预测再平均",%s,%s\n', numFmt(toyMean), numFmt(toyTwo));
+fprintf(fid, '"先平均再预测",%s,%s\n', numFmt(toyMean), numFmt(toyMean^2));
+fclose(fid);
+fprintf('先平方再平均 = %.4f；先平均再平方 = %.4f。\n', toyTwo, toyMean^2);
+
 % ============================================================
 % 配图：06、07 两张对照图（R 版是主图）
 % ============================================================
@@ -168,7 +199,7 @@ close(f);
 
 % ------------------------------------------------------------
 function s = numFmt(x)
-% 按 R 的习惯打印数字：6 位小数后去掉多余的 0，保证三语言 CSV 逐位一致
+% 按 R 的习惯打印数字：6 位小数后去掉多余的 0，统一 CSV 的输出格式；数值差异按容差核对
     s = sprintf('%.6f', round(x, 6));
     s = regexprep(s, '0+$', '');
     s = regexprep(s, '\.$', '');

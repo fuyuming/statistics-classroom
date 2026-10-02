@@ -2,8 +2,8 @@
 # 精读 02｜数路径：贝叶斯推断为什么可以先不背公式
 # 对应：McElreath 公开课 2023 第 02 讲 Garden of Forking Data；教材第 2 章
 # 用法： Rscript 代码/篇02_数路径.R
-# 约定：确定性部分（路径计数、网格、解析 Beta、beta-二项预测）三语言逐位一致；
-#       随机模拟部分只求形状一致（本篇不出现随机数，图 1–5 全部是确定性计算）。
+# 约定：本篇全部为确定性教学计算，无随机模拟；三语言按数值容差核对。
+# 新增 Beta 密度在六位小数舍入边界允许末位差 0.000001，详见 VALIDATION.md。
 # ============================================================
 
 suppressPackageStartupMessages({
@@ -19,7 +19,7 @@ source_files <- unlist(lapply(sys.frames(), function(x) x$ofile))
 cli <- sub("^--file=", "", commandArgs(FALSE)[grepl("^--file=", commandArgs(FALSE))])
 script_file <- if (length(source_files)) tail(source_files, 1) else cli
 root <- if (length(script_file)) dirname(dirname(normalizePath(script_file))) else getwd()
-OUT <- file.path(root, "文章配图")
+OUT <- file.path(root, "文章配图_v3")
 RES <- file.path(root, "运行结果")
 dir.create(OUT, showWarnings = FALSE); dir.create(RES, showWarnings = FALSE)
 
@@ -81,7 +81,7 @@ g_flat <- grid_post(prior_flat); g_exp <- grid_post(prior_exp); g_step <- grid_p
 summ <- function(g, name) {
   lo <- g$p[which(cumsum(g$post) >= 0.055)[1]]
   hi <- g$p[which(cumsum(g$post) >= 0.945)[1]]
-  # 统一精度：三语言写出的 CSV 要逐位一致，所以这里把网格点也钉到 6 位小数
+  # 统一精度：三语言采用相同输出精度，这里把网格点保留到 6 位小数
   tibble(先验 = name,
          后验均值 = round(sum(g$p * g$post), 6),
          最大点 = round(g$p[which.max(g$post)], 6),
@@ -98,7 +98,11 @@ write.csv(tab_grid, file.path(RES, "02_三种先验下的后验汇总.csv"), row
 # ------------------------------------------------------------
 # 3) 解析解：Beta(W+1, L+1) 与网格结果的对照
 # ------------------------------------------------------------
+# 平坦先验是 Beta(1,1)。一次水乘一个 p，一次陆乘一个 (1-p)。
+# Beta(a,b) 的幂次是 a-1、b-1，因此 6 水 3 陆对应 Beta(7,4)。
 a <- W + 1; b <- L + 1
+cat("为什么是 Beta？平坦先验 Beta(1,1)，加上水和陆的次数，参数成为", a, b, "。\n")
+cat("dbeta 返回密度高度；qbeta 返回累计面积达到指定比例时的横轴位置。\n")
 an <- tibble(
   指标 = c("后验均值", "后验众数", "后验标准差", "89% 区间下", "89% 区间上"),
   解析值 = c(a / (a + b), (a - 1) / (a + b - 2),
@@ -111,7 +115,7 @@ write.csv(an, file.path(RES, "03_解析后验对照.csv"), row.names = FALSE)
 
 # ------------------------------------------------------------
 # 4) 从后验到预测：下一次取点、以及未来两次取点
-#    beta-二项分布是确定性的，所以三语言可以逐位一致
+#    这里采用确定性预测计算，三语言的结果可以按数值容差核对
 # ------------------------------------------------------------
 pred_next <- a / (a + b)                                  # 下一次取到水的概率
 k <- 0:2
@@ -167,6 +171,31 @@ write.csv(mutate(mis_post, across(everything(), ~round(.x, 6))),
           file.path(RES, "06_误判后验对照.csv"), row.names = FALSE)
 print(mis_post)
 cat("端点重新获得支持，是因为含误判模型的似然不再为零；此处先验一直等权。\n")
+
+# 7) Beta 读图：先画出三个累计阶段，不用分布名字代替理解
+# 总面积均为 1，图上某一点的高度不是该点的概率。
+beta_cases <- tibble(阶段 = c("平坦先验", "1水1陆", "6水3陆"),
+                     a = c(1, 2, a), b = c(1, 2, b))
+beta_read <- bind_rows(lapply(seq_len(nrow(beta_cases)), function(i) {
+  p <- seq(0, 1, length.out = 201)
+  tibble(阶段 = beta_cases$阶段[i], a = beta_cases$a[i], b = beta_cases$b[i],
+         p = p, 密度 = dbeta(p, beta_cases$a[i], beta_cases$b[i]))
+}))
+write.csv(mutate(beta_read, across(where(is.numeric), ~round(.x, 6))),
+          file.path(RES, "07_Beta读图.csv"), row.names = FALSE)
+
+# 8) 两候选手算：这是独立教学设定，不是 6 水 3 陆的后验
+candidate_p <- c(0.25, 0.75)
+candidate_weight <- c(0.5, 0.5)
+toy_mean <- sum(candidate_p * candidate_weight)
+toy_prediction <- tibble(
+  算法 = c("逐个候选预测再平均", "先平均再预测"),
+  下一次是水 = c(sum(candidate_weight * candidate_p), toy_mean),
+  两次都是水 = c(sum(candidate_weight * candidate_p^2), toy_mean^2)
+)
+write.csv(toy_prediction, file.path(RES, "08_两候选预测.csv"), row.names = FALSE)
+print(toy_prediction)
+cat("预测两次时，0.3125 与 0.25 不同：先平方再平均，不等于先平均再平方。\n")
 
 # ============================================================
 # 图 1｜分岔路径计数（确定性）
@@ -250,7 +279,7 @@ p4a <- ggplot(post_curve, aes(p, 密度)) +
            label = paste0("下一次取到水的概率\n", round(a / (a + b), 3)),
            family = font_family, size = 3.4, colour = "#c1462c", hjust = -0.05) +
   scale_x_continuous(limits = c(0, 1)) +
-  labs(title = "后验：Beta(7, 4)", x = "水面比例 p", y = "后验密度") +
+  labs(title = "6 水 3 陆后的水面比例分布", x = "水面比例 p", y = "后验密度") +
   theme(plot.title = element_text(size = 12))
 
 pred_long <- pred2 %>%
@@ -290,3 +319,27 @@ save_fig("05-误分类路径计数.png", p5, 8.6, 4.5)
 
 cat("\nR 版本:", R.version.string, "\n")
 cat("全部完成。\n")
+
+# 图3（文件编号08）：Beta 来历与面积；使用相同坐标尺度逐层阅读。
+stage_labels <- c("起点：还没有看数据\nBeta(1, 1)",
+                  "累计看到 1 水 1 陆\nBeta(2, 2)",
+                  paste0("累计看到 ", W, " 水 ", L, " 陆\nBeta(", a, ", ", b, ")"))
+beta_read$阶段图 <- factor(beta_read$阶段, levels = beta_cases$阶段, labels = stage_labels)
+ci_bounds <- qbeta(c(0.055, 0.945), a, b)
+shade_p <- seq(ci_bounds[1], ci_bounds[2], length.out = 201)
+shade <- tibble(p = shade_p, 密度 = dbeta(shade_p, a, b),
+                阶段图 = factor(stage_labels[3], levels = stage_labels))
+p_beta <- ggplot(beta_read, aes(p, 密度)) +
+  geom_area(data = shade, fill = "#167d80", alpha = 0.22) +
+  geom_line(colour = "#167d80", linewidth = 1.1) +
+  facet_wrap(~阶段图, ncol = 1) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
+  scale_y_continuous(limits = c(0, 3.1), breaks = 0:3) +
+  labs(title = "数完路径，为什么得到一条 Beta 曲线？",
+       subtitle = "同样宽的范围，面积越大，后验概率越大；每幅图总面积均为 1",
+       x = "候选水面比例 p", y = "密度：概率在附近有多集中",
+       caption = "最下图阴影：89% 后验概率；左右各留下 5.5%\n平坦先验、独立均匀取点、水陆无误判") +
+  theme(strip.text = element_text(size = 12, face = "bold"),
+        plot.caption = element_text(hjust = 0, size = 10),
+        panel.spacing = grid::unit(0.7, "lines"))
+save_fig("08-Beta从哪里来.png", p_beta, 7.5, 9)
