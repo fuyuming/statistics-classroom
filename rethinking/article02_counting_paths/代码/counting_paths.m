@@ -157,6 +157,8 @@ end
 fclose(fid);
 
 %% 8) 两候选预测：这是独立教学设定
+% 袋子A装1蓝3黄，袋子B装3蓝1黄；随机选一个袋子，之后两次都从同一袋抽。
+% 每次抽完放回。未知的是选中了哪袋，不是把两袋改造成蓝黄各半的一袋。
 candidateP = [0.25, 0.75];
 candidateWeight = [0.5, 0.5];
 toyMean = sum(candidateP .* candidateWeight);

@@ -168,6 +168,8 @@ for label, shape_a, shape_b in beta_cases:
 write_csv(RES / "07_Beta读图_python.csv", ["阶段", "a", "b", "p", "密度"], rows7)
 
 # %% 8) 两候选手算：独立教学设定，不是前面那组数据的后验
+# 袋子A装1蓝3黄，袋子B装3蓝1黄；随机选一个袋子，之后两次都从同一袋抽。
+# 每次抽完放回。未知的是选中了哪袋，不是把两袋改造成蓝黄各半的一袋。
 candidate_p = np.array([0.25, 0.75])
 candidate_weight = np.array([0.5, 0.5])
 toy_mean = np.sum(candidate_p * candidate_weight)
