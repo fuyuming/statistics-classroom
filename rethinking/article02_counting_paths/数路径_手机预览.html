@@ -68,9 +68,19 @@ posterior  &lt;- likelihood * prior / sum(likelihood * prior)</code></pre>
 <p>Beta 的密度、均值及 R 函数说明：<a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Beta.html" target="_blank" rel="noopener">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Beta.html</a></p>
 <blockquote><p><strong>想核对计算的读者，可以再看这一小步。</strong></p><p>本例的 Beta 后验能直接用公式和相应函数计算，因此可以检查 20 点网格近似。两种算法的均值只差约 0.000019，但 89% 等尾区间下端分别约为 0.421 和 0.400，相差约 0.021。均值接近，不代表区间也一样准。加密网格改善的是计算近似，没有替这 9 次观测增加信息。</p></blockquote>
 <h2>六、换一个起点，结论会变多少？</h2>
-<p>刚才提到从 Beta(2,2) 起步会得到另一条后验。那么先验到底能影响多少？现在换三种起点来比较。<strong>以下三个数都是同一组 20 点网格上的结果</strong>，数据完全不变：</p>
-<table><thead><tr><th>先验</th><th>后验均值（约）</th><th>后验最大的网格点</th></tr></thead><tbody><tr><td>平坦先验（每个候选一样重）</td><td>0.636</td><td>0.684</td></tr><tr><td>随 p 离 0.5 的距离指数衰减（见图4）</td><td>0.586</td><td>0.526</td></tr><tr><td>p&lt;0.5 时权重为 0（只认 0.5 以上）</td><td>0.681</td><td>0.684</td></tr></tbody></table>
+<p>刚才提到从 Beta(2,2) 起步会得到另一条后验。那么先验到底能影响多少？现在换三种起点来比较。先把它们写成公式，表格里的数字才有办法复算。</p>
+<p>我们在 0 到 1 之间取 20 个候选比例 pᵢ。对每个候选，先验权重分别设为：</p>
+<ul><li><strong>平坦先验</strong>：π(pᵢ)=1。每个候选一开始一样重；</li><li><strong>靠近 0.5 的先验</strong>：π(pᵢ)=exp(−5|pᵢ−0.5|)。离 0.5 越远，权重按指数下降；</li><li><strong>只认 0.5 以上</strong>：π(pᵢ)=I(pᵢ≥0.5)，其中 I(·) 是指示函数，条件成立时取 1，不成立时取 0。</li></ul>
+<p>看到 6 次水、3 次陆后，每个候选的未归一化后验权重是：</p>
+<blockquote><p>后验权重ᵢ ∝ π(pᵢ) × pᵢ⁶ × (1−pᵢ)³。</p></blockquote>
+<p>最后把 20 个权重除以它们的总和，让它们加起来等于 1。<strong>以下三个数都是同一组 20 点网格上的结果</strong>，数据完全不变：</p>
+<table><thead><tr><th>先验</th><th>后验均值（约）</th><th>后验最大的网格点</th></tr></thead><tbody><tr><td>π(pᵢ)=1（平坦先验）</td><td>0.636</td><td>0.684</td></tr><tr><td>π(pᵢ)=exp(−5|pᵢ−0.5|)（靠近 0.5）</td><td>0.586</td><td>0.526</td></tr><tr><td>π(pᵢ)=I(pᵢ≥0.5)（只认 0.5 以上）</td><td>0.681</td><td>0.684</td></tr></tbody></table>
 <p>这里最大的网格点约为 0.684，因为这 20 个候选里没有恰好等于 2/3 的点。把网格加密，才能更细地定位连续曲线的峰顶。</p>
+<p><strong>这张表不是手填的。</strong> 三套脚本都在同一个位置实现了上面的公式：先生成 20 个候选 <code>p</code>，再计算 <code>p^6 * (1-p)^3</code>，乘上先验权重，最后除以总和。对应文件是：</p>
+<ul><li>R：<code>代码/篇02_数路径.R</code>，搜索 <code>prior_flat</code>、<code>prior_exp</code>、<code>prior_step</code>；</li><li>Python：<code>代码/篇02_数路径.py</code>，搜索 <code>priors</code> 和 <code>grid_post</code>；</li><li>MATLAB：<code>代码/counting_paths.m</code>，搜索 <code>priors</code> 和 <code>pGrid</code>。</li></ul>
+<p>在文章目录下运行 R 版本：</p>
+<pre><code>Rscript 代码/篇02_数路径.R</code></pre>
+<p>Python 和 MATLAB 的完整运行方式、依赖和输出文件见同目录的 <code>README.md</code>。运行后，结果会写入 <code>运行结果/02_三种先验下的后验汇总.csv</code>；三种语言使用同一公式和同一组 20 个网格点。</p>
 <p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE_v3/03-%E6%8D%A2%E5%85%88%E9%AA%8C%E5%90%8E%E7%9A%84%E5%90%8E%E9%AA%8C.png" alt="图4｜换先验后的后验"></p>
 <p><em>图4｜同一份观测（9 次里 6 次是水），三种先验给出的三条后验。灰：平坦先验；青：压在 0.5 附近的先验；红：只认 0.5 以上的先验。用配套脚本生成。</em></p>
 <p>先验集中在 0.5 附近，就会把后验往那里拉；如果先排除了 0.5 以下的区域，留下的后验平均值就会更高。<strong>先验是模型的一部分，要说明它依据什么，也要看看换成其他合理起点后，结论会不会明显改变。</strong></p>
