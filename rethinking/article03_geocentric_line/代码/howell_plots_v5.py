@@ -79,7 +79,7 @@ for yy,lo,hi,col,label in [(1,at160[2],at160[3],TEAL,'平均体重'),(0,at160[4]
 ax.set_yticks([0,1],['新个体','平均体重']); ax.set_xlabel('身高 160 厘米时的体重（千克）',fontsize=12); ax.spines['left'].set_visible(False)
 fig.text(.10,.075,'宽区间包含两层不确定性：平均线在哪里 ＋ 个人偏离多少。',fontsize=12,color=INK)
 fig.text(.10,.025,'同一 Howell1 模型  ·  α、β、σ 均未知  ·  低差异数值积分',fontsize=11,color=TEAL)
-save(fig,'05-平均与个人预测区间.png')
+save(fig,'06-平均与个人预测区间.png')
 print('generated five figures; beta=',mb,'160cm=',at160)
 
 # 07 两种计算的边际后验，密度面积约为1；quap 保留联合协方差。
@@ -94,4 +94,4 @@ for i,(label,unit) in enumerate([('α：平均身高处的平均体重','千克'
     ax.set_ylabel('密度',fontsize=11)
     ax.set_xlabel(unit,fontsize=11)
 fig.text(.10,.055,'前两项几乎重合；σ 的网格后验略向右偏。',fontsize=13,color=INK)
-save(fig,'07-网格与quap后验对照.png')
+save(fig,'05-网格与quap后验对照.png')
