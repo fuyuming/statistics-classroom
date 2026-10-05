@@ -20,7 +20,7 @@ ZIP：https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.z
 
 作者脚本：https://github.com/rmcelreath/stat_rethinking_2023/blob/main/scripts/03_howell_new_weight_model.r
 
-定位 `m_adults`，而非同文件后面的男女分组或多项式模型。使用 352 位年龄≥18岁的 Howell1 成年人；共享 CSV 已按身高排序，字段为 height（厘米）、height_c（中心化厘米）、weight（千克），来源由旧 R 数据导出步骤记录。CSV 数值保留六位小数。
+定位 `m_adults`，而非同文件后面的男女分组或多项式模型。使用 352 位年龄≥18岁的 Howell1 成年人；共享 CSV 已按身高排序，字段为 height（厘米）、height_c（中心化厘米）、weight（千克），数据来自 rethinking 包的 Howell1，筛选 age≥18 后导出；CSV 数值保留六位小数。
 
 给定身高和参数，观测条件独立：
 
