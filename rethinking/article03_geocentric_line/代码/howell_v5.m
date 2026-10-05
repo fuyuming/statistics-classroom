@@ -1,3 +1,6 @@
+% 绘图：末尾自动调用 howell_plots_v5.m，创建并保留六个 Figure。
+% 01平均关系、02残差、03条件正态、04先验/后验直线、05网格/二次近似、06预测区间。
+% 在 MATLAB 点击 Run 后查看 Figure 窗口，PNG 同时保存到 运行结果/v5/MATLAB_figures/。
 %% 精读03 v5：同一个模型的网格与二次近似
 % 在 MATLAB 打开本文件并 Run。仅使用基础 MATLAB，不需要统计工具箱。
 % MATLAB 实现二次近似原理；真正的 rethinking::quap 见同目录 R 脚本。
@@ -34,6 +37,9 @@ result = table(parameter,gridmean,t',sqrt(diag(V)),'VariableNames',{'parameter',
 writetable(result,fullfile(out,'MATLAB_comparison.csv'));
 disp(result);
 disp('斜率描述群体关联；sigma 也有后验分布，没有被固定。');
+% 原生 MATLAB Figure：窗口保留，同时导出 PNG。
+addpath(fileparts(mfilename('fullpath')));
+howell_plots_v5(root,D,A,B,S,w,gridmean,t,V);
 % 练习：把每维101改成151，检查结果是否稳定，注意组合数随三次方增加。
 function v=neglog(t,n,sy,sx,sxx,sxy,syy)
  a=t(1); b=t(2); s=t(3);

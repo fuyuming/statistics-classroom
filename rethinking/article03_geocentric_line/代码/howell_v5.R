@@ -1,6 +1,10 @@
+# 绘图：计算结束后自动调用 howell_plots_v5.R，画出六张原生 R 图。
+# 01平均关系、02残差、03条件正态、04先验/后验直线、05网格/quap、06预测区间。
+# RStudio：打开本课 Rproj，Source 本脚本；在 Plots 面板用前后箭头浏览。
+# PNG 同时保存到 运行结果/v5/R_figures/；Rscript 非交互运行只保存文件。
 # 精读03 v5：同一个作者模型，网格与 quap 两种计算。
 # 打开本课 Rproj 后 Source；或 Rscript 代码/howell_v5.R。
-# Howell1 的共享 CSV 已随项目提供；依赖 rethinking。
+# Howell1 的共享 CSV 已随项目提供；依赖 rethinking、systemfonts、ragg。
 library(rethinking)
 args_all <- commandArgs(FALSE)
 file_arg <- grep('^--file=', args_all, value=TRUE)
@@ -49,3 +53,7 @@ intervals <- data.frame(quantity=c('mean_at_160','new_person_at_160'),mean=c(mea
 write.csv(intervals,file.path(out,'R_quap_simulation_160.csv'),row.names=FALSE)
 cat('斜率描述群体关联；新人区间比平均体重区间宽。随机模拟区间与正文数值可能略有差异。\n')
 writeLines(c(R.version.string,paste('rethinking',packageVersion('rethinking'))),file.path(out,'R_versions.txt'))
+
+
+# 4. 原生 R 图：RStudio Plots 面板可用前后箭头浏览；同时保存 PNG。
+source(file.path(root, '代码/howell_plots_v5.R'), local=TRUE)

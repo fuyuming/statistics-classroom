@@ -10,11 +10,25 @@ ZIP：https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.z
 
 下载解压后进入 `rethinking/article03_geocentric_line`。
 
-- RStudio：打开 `一条直线.Rproj`，打开 `代码/howell_v5.R`，点击 Source。依赖 `rethinking`，安装以作者 README 为准：https://github.com/rmcelreath/rethinking 。本脚本使用 quap，不需要运行 Stan 采样。
+- RStudio：打开 `一条直线.Rproj`，打开 `代码/howell_v5.R`，点击 Source。依赖 `rethinking`、`systemfonts`、`ragg`；后两个可运行 `install.packages(c("systemfonts", "ragg"))` 安装。rethinking 安装以作者 README 为准：https://github.com/rmcelreath/rethinking 。本脚本使用 quap，不需要运行 Stan 采样。
 - Spyder：打开本课文件夹项目，打开 `代码/howell_v5.py`，F5。实际解释器需要 numpy、scipy、matplotlib（命令行也可 `python 代码/howell_v5.py`）。它自动调用同目录 `howell_plots_v5.py`；两个文件都要保留。完整网格检查需几百 MB 内存。
 - MATLAB：打开本课目录，将其设为 Current Folder，打开 `代码/howell_v5.m`，Run。仅基础 MATLAB，不需要统计工具箱。
 
 要复现全部资料，可先运行 R，再运行 Python，最后运行 MATLAB。Python 不依赖 R 才能计算；如果存在本次 R 输出，会核对后优先使用真实 quap 的均值和协方差。
+
+## 运行以后在哪里看图
+
+三套入口都会自动调用同目录的绘图文件，绘制六张原生统计图：平均关系、个体残差、条件正态、先验与后验直线、两种算法的后验对照、平均与个人预测区间。主脚本与同语言的 `howell_plots_v5` 文件必须一起下载。
+
+| 环境 | 运行方式与图形位置 | PNG 保存位置 |
+|---|---|---|
+| RStudio | 打开本课 Rproj，Source `howell_v5.R`；Plots 面板前后箭头查看各图 | `运行结果/v5/R_figures/` |
+| Spyder | F5 运行 `howell_v5.py`；Plots 面板或当前 Matplotlib GUI 图窗 | `文章配图_v5/` |
+| MATLAB | Run `howell_v5.m`；六个 Figure 保持打开 | `运行结果/v5/MATLAB_figures/` |
+
+Python 不再保存后立即关闭图片，末尾执行 `plt.show()`；不强制使用无窗口的 Agg 后端。Spyder 如果只保存、不显示，检查 Preferences → IPython console → Graphics 的 Backend，选择 Inline（Plots 面板）或 Automatic（窗口），更改后重启内核。Rscript 非交互运行只保存 PNG；终端中没有图形后端时，Python 也只保存文件。MATLAB 的批处理进程结束后窗口会随进程退出，桌面 Run 则保留窗口。
+
+R/MATLAB 图由各自新算出的参数原生绘制，不是打开 Python 图片。它们的第6图使用联合二次近似的随机预测；Python 公众号第6图使用网格积分，所以区间可能略有差异，图内已注明算法。三套图题、坐标和图例均使用中文。脚本从实际已安装的字体中选择苹方、微软雅黑、黑体或思源黑体等；缺少中文字体时会明确提示安装 Noto Sans CJK SC，不静默回退到缺字字体。R 导出采用 ragg，交互显示沿用 RStudio 图形设备；MATLAB 对每张图的坐标与文字显式设置字体。
 
 ## 模型与作者对应
 

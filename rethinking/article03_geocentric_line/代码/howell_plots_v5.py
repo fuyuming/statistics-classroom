@@ -7,7 +7,12 @@ ma,mb,sigma=means
 at160=grid[grid[:,0]==160][0]
 a=samples[:,0]; b=samples[:,1]
 post=np.full(len(a),1/len(a))
-font=next((v for v in ['PingFang SC','Microsoft YaHei','Noto Sans CJK SC'] if v in {q.name for q in font_manager.fontManager.ttflist}), 'DejaVu Sans')
+font_candidates=['PingFang SC','Microsoft YaHei','SimHei','Noto Sans CJK SC','Source Han Sans SC','WenQuanYi Micro Hei','Heiti SC']
+installed_fonts={q.name for q in font_manager.fontManager.ttflist}
+font=next((v for v in font_candidates if v in installed_fonts),None)
+if font is None:
+    raise RuntimeError('未找到中文字体，请安装 Noto Sans CJK SC，重启 Spyder 内核后再运行。')
+print('中文绘图字体：',font)
 plt.rcParams.update({'font.family':font,'font.size':15,'axes.unicode_minus':False,'axes.labelsize':15,'xtick.labelsize':13,'ytick.labelsize':13,'savefig.facecolor':'#faf8f3'})
 BG='#faf8f3'; INK='#193c46'; TEAL='#167e83'; ORANGE='#ca6841'; PALE='#cce3df'; GRAY='#91a5a6'
 def base(num,title,sub):
@@ -26,7 +31,8 @@ def footer(fig,text):
     fig.text(.10,.075,text,fontsize=13,color=INK,linespacing=1.6)
     fig.text(.10,.025,'明哥的微生物世界  ·  Howell1 成年人  ·  三参数网格与 quap 对照',fontsize=10,color=TEAL)
 def save(fig,name):
-    fig.savefig(OUT/name,dpi=200); plt.close(fig)
+    fig.savefig(OUT/name,dpi=200)
+    # 保留 Figure，让 Spyder 的 Plots 面板或 GUI 后端显示它。
 # 01 全部真实点 + 斜率的几何含义
 fig=base('01','一条线，说的是平均关系','一个点是一位成年人；点不必落在线上。')
 ax=axis(fig,[.12,.23,.82,.55]); ax.scatter(h,y,s=24,color=GRAY,alpha=.65,edgecolor='none')
@@ -80,7 +86,7 @@ ax.set_yticks([0,1],['新个体','平均体重']); ax.set_xlabel('身高 160 厘
 fig.text(.10,.075,'宽区间包含两层不确定性：平均线在哪里 ＋ 个人偏离多少。',fontsize=12,color=INK)
 fig.text(.10,.025,'同一 Howell1 模型  ·  α、β、σ 均未知  ·  低差异数值积分',fontsize=11,color=TEAL)
 save(fig,'06-平均与个人预测区间.png')
-print('generated five figures; beta=',mb,'160cm=',at160)
+
 
 # 07 两种计算的边际后验，密度面积约为1；quap 保留联合协方差。
 fig=base('05','同一个模型，两种计算','实线：三维网格；虚线：quap 的正态近似。')
@@ -95,3 +101,7 @@ for i,(label,unit) in enumerate([('α：平均身高处的平均体重','千克'
     ax.set_xlabel(unit,fontsize=11)
 fig.text(.10,.055,'前两项几乎重合；σ 的网格后验略向右偏。',fontsize=13,color=INK)
 save(fig,'05-网格与quap后验对照.png')
+
+# 沿用用户当前后端；不强制切换 Agg，也不关闭图窗。
+print('六张统计图已保存；交互环境中显示在 Plots 面板或图窗。')
+plt.show()

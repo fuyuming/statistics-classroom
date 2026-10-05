@@ -2,6 +2,10 @@
 Spyder 打开后 F5，或 python 代码/howell_v5.py。依赖 numpy/scipy/matplotlib。
 Python 的 quadratic 是同原理实现，不冒称调用了 R 的 quap。
 先运行 R 可额外核对真实 quap；没有 R 也能独立生成全部图表。
+绘图：末尾自动调用 howell_plots_v5.py，生成并显示六张 Matplotlib 图。
+01平均关系、02残差、03条件正态、04先验/后验直线、05网格/quap、06预测区间。
+Spyder F5：在 Plots 面板或当前GUI后端的图窗中查看；脚本不强制更换后端。
+PNG 同时保存到 文章配图_v5/。命令行无图形后端时只能保存图片。
 """
 # %% 共享数据：每一行是一位成年人，身高厘米、体重千克。
 from pathlib import Path

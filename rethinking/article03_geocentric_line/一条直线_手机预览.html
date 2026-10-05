@@ -113,7 +113,7 @@
 )</code></pre>
 <p>代码里的 a、b 对应正文的 α、β；Hbar 是平均身高。<code>start</code> 只是让优化程序从哪里开始找，不是先验，也没有把参数固定在那里。完整脚本已经包含数据读取、网格计算与输出步骤，不需要自己拼接这段代码。</p>
 <p>第一次运行，先核对斜率约 0.6287。第二次把每维网格从 101 加密到 151，观察候选组合多了多少、结果改变多少。先让计算可复现，再尝试改变模型。</p>
-<p>运行后，到 <code>运行结果/v5/</code> 查看参数对照表和预测区间，到 <code>文章配图_v5/</code> 查看配图。</p>
+<p>三套脚本运行后都会绘制六张图：RStudio 在 Plots 面板翻看，Spyder 在 Plots 面板或图窗查看，MATLAB 在 Figure 窗口查看。图片也会自动保存，具体目录见 README。参数对照表和预测区间保存在 <code>运行结果/v5/</code>。</p>
 <p>完整项目与运行说明：</p>
 <p><a href="https://github.com/fuyuming/statistics-classroom/tree/main/rethinking/article03_geocentric_line" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom/tree/main/rethinking/article03_geocentric_line</a></p>
 <p>整库 ZIP 下载后，进入 <code>rethinking/article03_geocentric_line</code>：</p>
