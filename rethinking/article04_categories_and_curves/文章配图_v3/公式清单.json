@@ -1,0 +1,109 @@
+[
+  {
+    "file": "公式-01-分类模型.png",
+    "title": "每组一个平均体重",
+    "latex": [
+      "W_i\\mid\\alpha,\\sigma,S_i\\sim\\mathrm{Normal}(\\mu_i,\\sigma)",
+      "\\mu_i=\\alpha_{S_i}"
+    ]
+  },
+  {
+    "file": "公式-02-分类先验.png",
+    "title": "计算前，先写清参数的范围与权重",
+    "latex": [
+      "\\alpha_j\\sim\\mathrm{Normal}(60,10),\\quad j=1,2",
+      "\\sigma\\sim\\mathrm{Uniform}(0,10)"
+    ]
+  },
+  {
+    "file": "公式-03-组均值差.png",
+    "title": "同一套后验参数，直接相减",
+    "latex": [
+      "\\Delta^{(s)}=\\alpha_2^{(s)}-\\alpha_1^{(s)}"
+    ]
+  },
+  {
+    "file": "公式-04-新个体差.png",
+    "title": "预测新个体，还要加入组内差异",
+    "latex": [
+      "W_{\\mathrm{new},j}^{(s)}\\sim\\mathrm{Normal}(\\alpha_j^{(s)},\\sigma^{(s)})",
+      "\\Delta_{\\mathrm{new}}^{(s)}=W_{\\mathrm{new},2}^{(s)}-W_{\\mathrm{new},1}^{(s)}"
+    ]
+  },
+  {
+    "file": "公式-05-分组直线.png",
+    "title": "同一身高处，每组一条平均线",
+    "latex": [
+      "W_i\\mid\\alpha,\\beta,\\sigma,H_i,S_i\\sim\\mathrm{Normal}(\\mu_i,\\sigma)",
+      "\\mu_i=\\alpha_{S_i}+\\beta_{S_i}(H_i-\\bar H)"
+    ]
+  },
+  {
+    "file": "公式-06-分组直线先验.png",
+    "title": "采用 PPT 第59页的先验",
+    "latex": [
+      "\\alpha_j\\sim\\mathrm{Normal}(60,10),\\quad j=1,2",
+      "\\beta_j\\sim\\mathrm{Uniform}(0,1),\\quad j=1,2",
+      "\\sigma\\sim\\mathrm{Uniform}(0,10)"
+    ]
+  },
+  {
+    "file": "公式-07-同身高对比.png",
+    "title": "与 PPT 第61页一致：女性减男性",
+    "latex": [
+      "\\Delta(h)=\\mu_1(h)-\\mu_2(h)",
+      "=(\\alpha_1-\\alpha_2)+(\\beta_1-\\beta_2)(h-\\bar H)"
+    ]
+  },
+  {
+    "file": "公式-08-模拟生成规则.png",
+    "title": "PPT 第21—23页：先生成身高，再生成体重",
+    "latex": [
+      "H\\mid S=1\\sim\\mathrm{Normal}(150,5)",
+      "H\\mid S=2\\sim\\mathrm{Normal}(160,5)",
+      "W\\mid H,S\\sim\\mathrm{Normal}(a_S+b_SH,5)"
+    ]
+  },
+  {
+    "file": "公式-09-样条模型.png",
+    "title": "用年龄预测身高：局部形状乘权重再相加",
+    "latex": [
+      "H_i\\mid\\alpha_0,w,\\sigma,A_i\\sim\\mathrm{Normal}(\\mu_i,\\sigma)",
+      "\\mu_i=\\alpha_0+\\sum_{k=1}^{K}w_kB_k(A_i)"
+    ]
+  },
+  {
+    "file": "公式-10-样条先验.png",
+    "title": "年龄—身高模型：课程配套脚本的设定",
+    "latex": [
+      "\\alpha_0\\sim\\mathrm{Normal}(120,1)",
+      "w_k\\sim\\mathrm{Normal}(0,25),\\quad k=1,\\ldots,23",
+      "\\log\\sigma\\sim\\mathrm{Normal}(0,0.5)"
+    ]
+  },
+  {
+    "file": "公式-11-已知总效应.png",
+    "title": "教学世界里，平均体重差已知",
+    "latex": [
+      "\\mathrm{E}(W\\mid S=1)=0+0.5\\times150=75",
+      "\\mathrm{E}(W\\mid S=2)=0+0.6\\times160=96",
+      "\\Delta_{\\mathrm{total}}=96-75=21\\ \\mathrm{kg}"
+    ]
+  },
+  {
+    "file": "公式-12-多项式.png",
+    "title": "PPT 第67页：增加平方项，允许弯曲",
+    "latex": [
+      "\\mu_i=\\alpha+\\beta_1x_i+\\beta_2x_i^2"
+    ]
+  },
+  {
+    "file": "公式-13-联合模型身高部分.png",
+    "title": "PPT 第97页：给体重模型补上身高模型",
+    "latex": [
+      "H_i\\mid S_i,\\eta,\\tau\\sim\\mathrm{Normal}(\\eta_{S_i},\\tau)",
+      "\\eta_j\\sim\\mathrm{Normal}(160,10),\\quad j=1,2",
+      "\\tau\\sim\\mathrm{Uniform}(0,10)"
+    ]
+  }
+]
