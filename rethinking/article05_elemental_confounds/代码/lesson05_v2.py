@@ -16,7 +16,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 d = np.genfromtxt(ROOT / '数据/v2/WaffleDivorce.csv', delimiter=',', names=True, encoding='utf-8')
 raw = np.column_stack([d['Divorce'], d['Marriage'], d['MedianAgeMarriage']])
 print('前5行：离婚率、结婚率、结婚年龄中位数\n', raw[:5])
-# ddof=1：采用样本标准差，分母是人数减1；与R的scale一致。
+# ddof=1：采用样本标准差，分母是观测数减1；与R的scale一致。
 standard = (raw - raw.mean(axis=0)) / raw.std(axis=0, ddof=1)
 y = standard[:, 0]
 X = np.column_stack([np.ones(len(y)), standard[:, 1:]])
@@ -30,6 +30,9 @@ def objective(theta):
     if sigma <= 0:
         return np.inf
     residual = y - X @ beta
+    # 去掉不依赖参数的常数后，负对数后验分成四项：
+    # n*log(sigma)及残差平方项来自正态似然；beta项来自正态先验；
+    # 最后的sigma来自速率为1的指数先验。优化整个式子得到MAP。
     return len(y)*np.log(sigma) + np.sum(residual**2)/(2*sigma**2) + np.sum((beta/prior_sd)**2)/2 + sigma
 fit = minimize(objective, [0, 0, -0.5, 0.8], method='BFGS', options={'gtol': 1e-6})
 if not fit.success:
@@ -44,6 +47,8 @@ H[:3,:3] = X.T @ X / sigma**2 + np.diag(1/prior_sd**2)
 H[:3,3] = 2*X.T @ residual / sigma**3
 H[3,:3] = H[:3,3]
 H[3,3] = -len(y)/sigma**2 + 3*np.sum(residual**2)/sigma**4
+# 逆Hessian是联合正态近似的协方差；不是只输出一组最优参数。
+# 此处theta既是MAP，也用作近似分布的均值；没有进行MCMC。
 cov = np.linalg.inv(H)
 sd = np.sqrt(np.diag(cov))
 # 中间89%的区间，两端各留5.5%。
@@ -83,6 +88,7 @@ for model in range(1,5):
             col=2 if group<3 else 4
             val=(group-1)%2
             sub=r[r[:,col]==val]
+        # 分组后重新归一化，得到组内条件概率；0/1变量的方差是E(X)*(1-E(X))。
         w=sub[:,5]/sub[:,5].sum()
         x=sub[:,1]; yy=sub[:,3]
         ex=np.sum(w*x); ey=np.sum(w*yy)

@@ -5,6 +5,7 @@
 ## 打开哪里、结果在哪里
 
 - RStudio：打开 `精读05_v2.Rproj`，打开 `代码/lesson05_v2.R`，Source整个文件。需作者的rethinking及其依赖、systemfonts、ragg。运行后Plots面板有两张中文图；输出在 `运行结果/v2/R/`。
+- R tidyverse版：打开 `代码/lesson05_tidyverse_v2.R` 并Source。除原R依赖外，需要dplyr、tidyr、readr、ggplot2，可用 `install.packages(c("dplyr","tidyr","readr","ggplot2"))` 安装。仍使用rethinking::quap；两张ggplot图在Plots显示，输出到 `运行结果/v2/R_tidyverse/`。不需要先运行R原版。
 - Spyder：在所用Python环境安装 `requirements_v2.txt` 所列numpy、scipy、matplotlib。打开 `代码/lesson05_v2.py`，F5运行。输出在 `运行结果/v2/Python/`，共四张图。使用环境默认图形后端；可在Plots面板或自动/Qt后端窗口查看。无显示服务时只能保存图。
 - MATLAB：打开 `代码/lesson05_v2.m`，按Run。通过脚本位置定位数据，不必手工设置路径；基础MATLAB即可。两张Figure保持打开，结果在 `运行结果/v2/MATLAB/`。
 
@@ -37,3 +38,9 @@ posterior.csv行序：alpha、beta_M、beta_A、sigma；列是近似后验均值
 项目：https://github.com/fuyuming/statistics-classroom/tree/main/rethinking/article05_elemental_confounds
 
 数据口径补充：Marriage与Divorce为2009年ACS数据，MedianAgeMarriage为2005—2010年指标；共49州及哥伦比亚特区，缺内华达州。`数据/v2/WaffleDivorce_地区说明.csv`保留地名供读者查阅，不改变计算脚本使用的三列输入。
+
+## 批注与阅读顺序
+
+先读数据字段与标准化，再看似然、先验和参数顺序；随后读取posterior.csv中的均值、标准差及89%区间。R调用quap，Python/MATLAB的目标函数逐项标明负对数似然与先验，逆Hessian保留联合后验协方差。四种结构随后独立枚举，注释说明每行联合概率、分组归一化与相关计算。
+
+R tidyverse版使用readr/dplyr/tidyr整理数据、计算条件相关，以ggplot2绘图；posterior.csv与原版字段一致，另有带参数名的posterior_named.csv便于阅读。两个R版本均输出相同模型和枚举数值。

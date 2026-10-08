@@ -1,6 +1,8 @@
 # 精读05 v2：RStudio打开精读05_v2.Rproj，再Source本文件。
 # 作者PPT31页的quap模型；输入已附，无须先跑其他语言。
 # 二元结构精确枚举，区别于PPT中1000次随机模拟的频数。
+# 第一部分对应正文二至四：真实婚姻数据的贝叶斯回归。
+# 第二部分对应四种因果结构：已知生成规则下的概率计算，不需要拟合后验。
 library(rethinking)
 # Source时使用脚本位置；项目根目录中运行也可。
 source_path <- tryCatch(sys.frame(1)$ofile, error=function(e) NULL)
@@ -14,9 +16,16 @@ d <- read.csv(file.path(root,"数据/v2/WaffleDivorce.csv"))
 print(head(d))
 # standardize减均值除样本标准差，与PPT一致。
 dat <- list(D=standardize(d$Divorce), M=standardize(d$Marriage), A=standardize(d$MedianAgeMarriage))
+# D：离婚率，M：结婚率，A：结婚年龄，三者均已标准化。
+# 似然 D ~ Normal(mu,sigma)：描述同一条件均值周围的数据波动。
+# mu中的bM比较结婚年龄相同时的结婚率差异，bA反过来比较。
+# a、bM、bA的正态先验约束合理尺度；sigma的指数先验只支持正数。
+# quap寻找后验峰值，再用峰顶曲率给出联合正态近似；不是MCMC抽样。
 fit <- quap(alist(D ~ dnorm(mu,sigma), mu <- a+bM*M+bA*A,
                  a ~ dnorm(0,0.2), bM ~ dnorm(0,0.5), bA ~ dnorm(0,0.5),
                  sigma ~ dexp(1)), data=dat, start=list(a=0,bM=0,bA=-0.5,sigma=0.8))
+# 近似分布以峰值为中心：此处mean是近似后验均值。
+# vcov保留参数间协方差，区间同时反映先验与数据的信息。
 means <- coef(fit)[c("a","bM","bA","sigma")]
 cv <- vcov(fit)[names(means),names(means)]
 sds <- sqrt(diag(cv))
@@ -27,6 +36,9 @@ print(result)
 cat("bM是在年龄相同条件下的斜率；因果解释仍依赖图和模型假设。\n")
 # 给出所有0/1组合，而不是用随机次数估计概率。
 bern <- function(value,p) ifelse(value==1,p,1-p)
+# model：1叉、2管、3对撞、4中间变量的后代。
+# 前三种的A只是独立占位变量，乘0.5后求和即可消去。
+# 每一行的概率沿箭头相乘，全部行加总为1。
 rows <- expand.grid(model=1:4,X=0:1,Z=0:1,Y=0:1,A=0:1)
 rows$probability <- 0
 for(i in seq_len(nrow(rows))) {
@@ -46,6 +58,7 @@ for(m in 1:4) for(g in 0:4) {
   col <- if(g<3) "Z" else "A"
   sub <- sub[sub[[col]]==(g-1)%%2,]
  }
+# 分组后除以组内总概率，得到条件概率；据此计算E(XY)-E(X)E(Y)。
  w <- sub$probability/sum(sub$probability)
  ex <- sum(w*sub$X); ey <- sum(w*sub$Y)
  corr <- (sum(w*sub$X*sub$Y)-ex*ey)/sqrt(ex*(1-ex)*ey*(1-ey))
