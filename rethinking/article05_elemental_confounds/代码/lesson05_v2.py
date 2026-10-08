@@ -14,12 +14,19 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / '运行结果/v2/Python'
 OUT.mkdir(parents=True, exist_ok=True)
 d = np.genfromtxt(ROOT / '数据/v2/WaffleDivorce.csv', delimiter=',', names=True, encoding='utf-8')
+# 列顺序决定后续模型：Divorce离婚率、Marriage结婚率（均为每千名成年人）、
+# MedianAgeMarriage结婚年龄中位数（岁）；每行一个州或特区。
+# 换数据先核对这三个字段、单位和缺失值。
 raw = np.column_stack([d['Divorce'], d['Marriage'], d['MedianAgeMarriage']])
 print('前5行：离婚率、结婚率、结婚年龄中位数\n', raw[:5])
 # ddof=1：采用样本标准差，分母是观测数减1；与R的scale一致。
 standard = (raw - raw.mean(axis=0)) / raw.std(axis=0, ddof=1)
 y = standard[:, 0]
+# 这里X是设计矩阵（不是后文因果图中的二元X）：三列是常数1、M、A。
+# 常数列乘截距；另两列乘各自斜率。y是标准化离婚率。
 X = np.column_stack([np.ones(len(y)), standard[:, 1:]])
+# 先验怎么填：依次是alpha、beta_M、beta_A的标准差，不能填方差。
+# 这里三者先验均值都为0；sigma的指数先验另写在objective最后一项中。
 prior_sd = np.array([0.2, 0.5, 0.5])
 
 # %% 2. 后验：似然乘先验；在峰顶附近作二次近似
@@ -34,6 +41,10 @@ def objective(theta):
     # n*log(sigma)及残差平方项来自正态似然；beta项来自正态先验；
     # 最后的sigma来自速率为1的指数先验。优化整个式子得到MAP。
     return len(y)*np.log(sigma) + np.sum(residual**2)/(2*sigma**2) + np.sum((beta/prior_sd)**2)/2 + sigma
+# [0,0,-0.5,0.8]是优化初值，顺序alpha/beta_M/beta_A/sigma；sigma须为正。
+# 初值不是先验，修改先验尺度应改prior_sd。若要改指数先验速率lambda，
+# 负对数后验最后一项需改为lambda*sigma（与参数无关的常数可略）。
+# 本例解析Hessian与零均值正态/指数先验配套，换分布需重新推导，不能只改标签。
 fit = minimize(objective, [0, 0, -0.5, 0.8], method='BFGS', options={'gtol': 1e-6})
 if not fit.success:
     raise RuntimeError(fit.message)
@@ -52,10 +63,16 @@ H[3,3] = -len(y)/sigma**2 + 3*np.sum(residual**2)/sigma**4
 cov = np.linalg.inv(H)
 sd = np.sqrt(np.diag(cov))
 # 中间89%的区间，两端各留5.5%。
+# 区间参数：中央概率c使用(1+c)/2分位点；89%填0.945，95%填0.975。
+# 修改覆盖概率时须同步输出列名、图注及所有使用z89的绘图说明。
 z89 = norm.ppf(0.945)
 summary = np.column_stack([theta, sd, theta-z89*sd, theta+z89*sd])
 np.savetxt(OUT/'posterior.csv', summary, delimiter=',', header='mean,sd,lower89,upper89', comments='')
 np.savetxt(OUT/'covariance.csv', cov, delimiter=',')
+# 读posterior.csv：mean是近似后验均值，sd是参数的后验标准差。
+# sigma的mean约0.785描述数据剩余波动，sigma的sd描述对该波动大小的不确定性。
+# beta_M约-0.065，89%区间约[-0.306,0.176]，方向仍不确定，不等于证明作用为0。
+# beta_A约-0.614：固定M时，A增加1个标准差，平均D降低0.614个标准差。
 print('行顺序 alpha, beta_M, beta_A, sigma；列 mean,sd,lower89,upper89\n', summary)
 print('beta_M：年龄相同、结婚率增加1个标准差时，平均离婚率的变化。')
 
@@ -63,6 +80,9 @@ print('beta_M：年龄相同、结婚率增加1个标准差时，平均离婚率
 # 0和1只是状态标签。伯努利概率：状态是1取p，是0取1-p。
 def bern(value, probability):
     return probability if value == 1 else 1-probability
+# 此处四个字母都是二元状态，A不再指结婚年龄，X不再指前面的设计矩阵。
+# 0.1+0.8*z在z=0/1时分别给出0.1/0.9的概率。
+# 枚举的是可能数据状态，概率已知；这与网格近似未知参数的后验是两回事。
 rows = []
 for model in range(1,5):
     for x,z,yv,a in itertools.product([0,1], repeat=4):
@@ -94,11 +114,15 @@ for model in range(1,5):
         ex=np.sum(w*x); ey=np.sum(w*yy)
         corr=(np.sum(w*x*yy)-ex*ey)/np.sqrt(ex*(1-ex)*ey*(1-ey))
         answers.append([model,group,corr])
+# 练习只改后代模型最后的bern(a,.1+.8*z)为bern(a,.5)。
+# 这让A不再携带Z的信息：固定A后的相关应从约0.390回到全体的0.640。
 answers=np.array(answers)
 np.savetxt(OUT/'associations.csv', answers, delimiter=',', header='model,group,correlation', comments='')
 print('理论相关：模型1叉、2管、3对撞、4中间变量的后代；组0全体、1/2按Z、3/4按A\n',answers)
 
 # 原书171页：有真菌少长3，无真菌平均长5。
+# 每行依次为处理状态、真菌概率、平均增长。无真菌长5，有真菌长2，
+# 用各状态概率加权得到3.5和4.7；差1.2是理论期望，不是后验拟合结果。
 plant = np.array([[0,.5,(1-.5)*5+.5*2],[1,.1,(1-.1)*5+.1*2]])
 np.savetxt(OUT/'plant_expectation.csv',plant,delimiter=',',header='treatment,fungus_probability,mean_growth',comments='')
 print('植物总效应（期望）：',plant[1,2]-plant[0,2])
@@ -129,6 +153,9 @@ save(fig,'02-先验均值线.png')
 fig,ax=plt.subplots(figsize=(8,4.5),facecolor=bg)
 xs=np.linspace(-3.5,3.5,500)
 # 平均变化的后验与新增两个独立残差后的预测差别，后者作后验混合。
+# 从联合正态近似抽10000组参数，保留协方差；这是近似后验抽样，不是MCMC。
+# 两个独立预测残差相减，方差相加为2*sigma²，因此下面标准差用sqrt(2)*sigma。
+# 青色线看平均变化的不确定性；赭色线还包含未来观测的随机波动。
 draws=rng.multivariate_normal(theta,cov,size=10000)
 draws=draws[draws[:,3]>0]
 predictive=np.mean(norm.pdf(xs[:,None],draws[:,1],np.sqrt(2)*draws[:,3]),axis=1)

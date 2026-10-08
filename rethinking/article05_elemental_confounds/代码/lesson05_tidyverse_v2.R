@@ -18,6 +18,9 @@ root <- if (!is.null(source_path)) dirname(dirname(normalizePath(source_path))) 
 out <- file.path(root,"运行结果/v2/R_tidyverse")
 dir.create(out,recursive=TRUE,showWarnings=FALSE)
 d <- read_csv(file.path(root,"数据/v2/WaffleDivorce.csv"), show_col_types=FALSE)
+# 先读数据：每行一个州或特区；Divorce、Marriage单位为每千名成年人，
+# MedianAgeMarriage是结婚年龄中位数（岁）。本项目CSV列名应保持一致。
+# 换数据时先核对列名、单位与缺失值，不能把个体记录直接套入本例解释。
 print(head(d))
 # standardize减均值除样本标准差，与PPT一致。
 # transmute只保留模型要用的三列，并把数据字段映射为公式符号。
@@ -28,6 +31,11 @@ dat <- d |> transmute(D=standardize(Divorce), M=standardize(Marriage),
 # mu中的bM比较结婚年龄相同时的结婚率差异，bA反过来比较。
 # a、bM、bA的正态先验约束合理尺度；sigma的指数先验只支持正数。
 # quap寻找后验峰值，再用峰顶曲率给出联合正态近似；不是MCMC抽样。
+# 参数怎么填：dnorm(均值,标准差)，不是填方差；0.2和0.5对应标准化尺度。
+# dexp(1)的1是速率，均值为1/速率；不能把它理解为固定sigma=1。
+# data=dat把公式中的D/M/A与数据对应。start只是优化起点，
+# 依次给a、bM、bA、sigma初值；sigma必须为正，初值不决定先验均值。
+# 调整先验应改dnorm/dexp中的参数，并重新检查先验预测；不要只改start。
 fit <- quap(alist(D ~ dnorm(mu,sigma), mu <- a+bM*M+bA*A,
                  a ~ dnorm(0,0.2), bM ~ dnorm(0,0.5), bA ~ dnorm(0,0.5),
                  sigma ~ dexp(1)), data=dat, start=list(a=0,bM=0,bA=-0.5,sigma=0.8))
@@ -36,14 +44,25 @@ fit <- quap(alist(D ~ dnorm(mu,sigma), mu <- a+bM*M+bA*A,
 means <- coef(fit)[c("a","bM","bA","sigma")]
 cv <- vcov(fit)[names(means),names(means)]
 sds <- sqrt(diag(cv))
+# 区间怎么填：中央概率为c时，上分位点是(1+c)/2。
+# 本例c=0.89，所以填0.945；若改95%，填0.975，并同步改列名和图注。
 q <- qnorm(.945) # 中间89%，两端各5.5%
 result <- tibble(parameter=names(means), mean=unname(means), sd=unname(sds)) |>
  mutate(lower89=mean-q*sd, upper89=mean+q*sd)
 write_csv(select(result,-parameter),file.path(out,"posterior.csv"))
 write_csv(result,file.path(out,"posterior_named.csv"))
+# 结果怎么看：posterior.csv四行依次为a、bM、bA、sigma，sd是参数的后验标准差。
+# 其中sigma本身是数据的残差标准差；sigma那一行的sd是对sigma估计的不确定性。
+# bM约-0.065，89%区间约[-0.306,0.176]：年龄相同后，方向仍不确定；
+# 区间跨0不证明作用为0。bA约-0.614，表示每增加1个年龄标准差，
+# 平均离婚率降低约0.614个离婚率标准差，前提是结婚率相同。
 print(result)
 cat("bM是在年龄相同条件下的斜率；因果解释仍依赖图和模型假设。\n")
 # 给出所有0/1组合，而不是用随机次数估计概率。
+# 下面切换到已知概率的教学模型，X/Y/Z/A是0或1状态；这里的A不是结婚年龄。
+# bern(value,p)的p填“该变量为1的概率”，应在0到1之间。
+# 0.1+0.8*z：z=0时概率0.1，z=1时概率0.9；乘法来自生成规则的条件独立。
+# 这只是枚举所有数据状态，不是在参数网格上近似后验。
 bern <- function(value,p) ifelse(value==1,p,1-p)
 # model：1叉、2管、3对撞、4中间变量的后代。
 # 前三种的A只是独立占位变量，乘0.5后求和即可消去。
@@ -66,8 +85,16 @@ answers <- crossing(rows, group=0:4) |>
  transmute(model,group,correlation=(exy-ex*ey)/sqrt(ex*(1-ex)*ey*(1-ey)))
 stopifnot(all(abs((rows |> group_by(model) |> summarise(p=sum(probability)))$p-1)<1e-12))
 write_csv(rows,file.path(out,"joint.csv"))
+# 枚举输出怎么看：model=1/2/3/4分别为叉/管/对撞/后代。
+# group=0全体、1固定Z=0、2固定Z=1、3固定A=0、4固定A=1。
+# 后代模型全体相关约0.64，固定Z后为0，固定A后约0.390。
+# 练习：只把后代模型最后的bern(A,0.1+0.8*Z)概率改成0.5
+# （原版变量名是小写a、z）；固定A后的相关应回到0.64，其余机制保持不变。
 write_csv(answers,file.path(out,"associations.csv"))
 # 原书171页生成规则的期望计算，不是一次样本拟合。
+# 植物参数：treatment的0/1分别是不处理/处理；0.5和0.1是出现真菌的概率。
+# 5与2是无真菌/有真菌时的平均增长。按两种状态的概率加权，
+# 得到3.5与4.7，两者之差1.2是生成规则给出的理论总效应。
 plant <- tibble(treatment=0:1,fungus_probability=c(.5,.1)) |>
  mutate(mean_growth=(1-fungus_probability)*5+fungus_probability*2)
 write_csv(plant,file.path(out,"plant_expectation.csv"))
@@ -81,6 +108,8 @@ fonts <- unique(system_fonts()$family)
 font <- intersect(c("PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Heiti SC"),fonts)[1]
 if(is.na(font)) stop("请安装Noto Sans CJK SC中文字体。")
 style <- theme_minimal(base_family=font,base_size=13)
+# 图怎么读：点是近似后验均值，横线是89%后验区间，竖虚线为零。
+# 区间宽度反映参数不确定性，不是地区之间的离婚率波动。
 model_plot <- result |> filter(parameter %in% c("bM","bA")) |>
  mutate(label=if_else(parameter=="bM","结婚率","结婚年龄")) |>
  ggplot(aes(x=mean,y=label)) +

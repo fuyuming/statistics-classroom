@@ -44,3 +44,5 @@ posterior.csv行序：alpha、beta_M、beta_A、sigma；列是近似后验均值
 先读数据字段与标准化，再看似然、先验和参数顺序；随后读取posterior.csv中的均值、标准差及89%区间。R调用quap，Python/MATLAB的目标函数逐项标明负对数似然与先验，逆Hessian保留联合后验协方差。四种结构随后独立枚举，注释说明每行联合概率、分组归一化与相关计算。
 
 R tidyverse版使用readr/dplyr/tidyr整理数据、计算条件相关，以ggplot2绘图；posterior.csv与原版字段一致，另有带参数名的posterior_named.csv便于阅读。两个R版本均输出相同模型和枚举数值。
+
+课堂批注已放到相应代码旁：数据字段及单位、先验标准差与指数速率如何填写、优化初值与先验的区别、89%区间如何修改、结果如何对应正文、二元概率练习改哪一处。婚姻模型使用quap/二次近似；状态枚举不属于参数网格近似。
