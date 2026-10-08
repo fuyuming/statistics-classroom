@@ -1,6 +1,7 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>回归里多加一个变量，为什么反而会错？｜Statistical Rethinking 精读05</title><style>*{box-sizing:border-box}body{margin:0;background:#f1f4f3;color:#27343a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:720px;margin:24px auto;padding:32px 36px 56px;background:#fff;border-top:5px solid #167d80}.brand{display:flex;align-items:center;gap:12px;color:#167d80;font-size:14px;letter-spacing:.04em}.brand img{width:48px;height:48px;border-radius:50%}h1{font-size:30px;line-height:1.45;color:#142e41;margin:26px 0 20px}h2{font-size:22px;line-height:1.5;color:#163d48;border-left:4px solid #198c8b;padding-left:13px;margin:42px 0 20px}h3{font-size:19px;line-height:1.55;color:#163d48;margin:30px 0 14px}p{font-size:17px;line-height:1.95;margin:19px 0;text-align:justify}strong{color:#15696a;font-weight:650}blockquote{margin:20px 0 30px;padding:10px 18px;background:#f0f7f6;border-left:2px solid #6da6a0}blockquote p{font-size:14px;line-height:1.9;margin:8px 0;color:#53666c}a{color:#167d80;text-decoration:none;border-bottom:1px solid #bbd8d4}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;background:#f2f7f6;color:#15696a;padding:1px 5px;border-radius:4px}pre{background:#f7faf9;border:1px solid #e4ecea;border-radius:6px;padding:12px 14px;overflow-x:auto}pre code{background:none;padding:0;font-size:14px;line-height:1.7}div.formula{background:#f7faf9;border-left:3px solid #6da6a0;padding:12px 16px;margin:20px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:17px;color:#15696a;text-align:center;line-height:1.9}ul,ol{font-size:17px;line-height:1.95;margin:18px 0;padding-left:26px}li{margin:8px 0}table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px}th,td{border-bottom:1px solid #e4ecea;padding:9px 10px;text-align:left;line-height:1.7}th{background:#f0f7f6;color:#15696a;font-weight:650}footer{border-top:1px solid #dfe8e6;margin-top:36px;padding-top:16px;font-size:12px;color:#758787;line-height:1.8}@media(max-width:600px){body{background:#fff}main{margin:0;padding:24px 22px 40px;border-top-width:4px}h1{font-size:27px}h2{font-size:21px}h3{font-size:18px}p,ul,ol{font-size:16px;line-height:1.95}table{font-size:14px}}main > p img{display:block;width:100%;height:auto;margin:24px 0 8px;border:1px solid #e4ecea}main > p:has(img){margin:25px -12px 4px}main > p:has(img) a{border:0;display:block}main > p > em:only-child{display:block;font-size:13px;line-height:1.8;font-style:normal;color:#657a7d;text-align:left;margin:0 0 28px}@media(max-width:600px){main > p:has(img){margin-left:-12px;margin-right:-12px}}a{overflow-wrap:anywhere}table{display:block;overflow-x:auto}blockquote p{font-size:16px}hr{border:0;border-top:1px solid #dfe8e6;margin:30px 0}</style></head><body><main><div class="brand"><img src="../%E8%B4%A6%E5%8F%B7%E8%A7%86%E8%A7%89/%E6%98%8E%E5%93%A5%E7%9A%84%E5%BE%AE%E7%94%9F%E7%89%A9%E4%B8%96%E7%95%8C_%E5%A4%B4%E5%83%8F_v1.png" alt="账号头像">明哥的微生物世界 · 统计课堂</div><h1>回归里多加一个变量，为什么反而会错？｜Statistical Rethinking 精读05</h1><p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE_v2/00-%E5%B0%81%E9%9D%A2-%E6%A8%AA%E7%89%88.png" alt="精读05封面"></p>
 <blockquote><p>明哥的微生物世界 · Statistical Rethinking 精读 05</p><p>摘要：结婚率高的地方，为什么离婚率也高？抗真菌处理明明帮助植物生长，为什么加一个变量后，看起来却没用了？跟着作者第五讲，弄清“控制变量”究竟改变了什么。</p></blockquote>
 <p>大家好，我是明哥。</p>
+<p>正文配有可顺着运行的R短代码，完整整理在<a href="%E4%BB%A3%E7%A0%81/lesson05_readalong_v2.R" target="_blank" rel="noopener">正文跟读脚本</a>。数据、依赖与其他语言版本见文末。</p>
 <p>上一课，我们比较了同一份数据里的两个问题：两组总体差多少，以及身高相同时还差多少。两种比较保留的信息不同，答案自然也不同。</p>
 <p>这一课再往前走一步：<strong>放进回归模型的变量，究竟是在帮我们消除干扰，还是在制造新的误解？</strong></p>
 <p>作者开场放了几张看起来很有关系的图：重金属乐队与幸福程度、华夫饼店与离婚率。图上两个量一起变化，很容易让人想出一个故事。但故事说得通，还不够。</p>
@@ -26,6 +27,15 @@
 <p>在相同Z的人中比较，X不同，Y的比例却一样。原先82%与18%的差异，全部来自两批人的Z构成不同。</p>
 <p><strong>这一例告诉我们：估计X对Y的作用时，要避免把共同原因造成的差异算到X头上。</strong> 在这套已知规则里，控制Z清除了混杂，留下的作用为0；实际研究中也可能同时存在X对Y的作用，调整后还会留下关联。不能只凭“调整后变小了”，就认定第三个变量是混杂因素，还要有支持箭头方向的知识。</p>
 <p>下一节把这三个字母换成作者的真实数据：X换成结婚率，Y换成离婚率，Z换成结婚年龄。我们要检查，结婚率与离婚率的关联，是否也混入了这个共同原因。</p>
+<p>用R核对刚才的分组比较。下面各向量按“Z=0、Z=1”排列，分别数出X=1和X=0时的总人数与Y=1人数。</p>
+<pre><code>n_x1 &lt;- c(10, 90)   # 两个Z组内，X=1的总人数
+n_x0 &lt;- c(90, 10)   # 两个Z组内，X=0的总人数
+y1_x1 &lt;- c(1, 81)   # 其中Y=1的人数
+y1_x0 &lt;- c(9, 9)
+c(全体X1 = sum(y1_x1) / sum(n_x1),
+  全体X0 = sum(y1_x0) / sum(n_x0)) # 0.82与0.18
+cbind(Z = 0:1, X1组 = y1_x1/n_x1, X0组 = y1_x0/n_x0)</code></pre>
+<p>最后的两列在Z=0时都是0.1，在Z=1时都是0.9。对比整体与分组结果，才能看见共同原因混入了什么。</p>
 <h2>二、结婚率与离婚率：年龄怎样混进比较？（第16—25页）</h2>
 <p>数据名叫 <strong>WaffleDivorce</strong>，随作者的rethinking包提供。本节使用其中的婚姻统计。</p>
 <p><strong>每行对应一个州或特区，共49个州和哥伦比亚特区，50行，缺少内华达州。</strong> 下文统称“地区”。</p>
@@ -42,6 +52,13 @@
 <p><em>公式1｜把原始数值换成“距平均值多少个标准差”。横线表示样本均值，s为样本标准差；M、D、A分别按各自的均值与标准差换算。</em></p>
 <p>公式1中，x是某个州或特区的原值，带横线的x和s分别是这50个地区对应指标的样本均值与样本标准差。本文数据的结婚率均值约20.11、标准差3.80；离婚率标准差约1.82；结婚年龄标准差约1.24岁。</p>
 <p>标准化后，模型里“结婚率增加1”，指的是原尺度上每千名成年人对应的人数增加约3.80；“结婚年龄增加1”，指增加约1.24岁。预测离婚率的变化，则以1.82为一个单位。</p>
+<p>对应的R准备步骤如下。在解压后的项目根目录运行，三个变量各自标准化。</p>
+<pre><code>d &lt;- read.csv(&quot;数据/v2/WaffleDivorce.csv&quot;)
+head(d, 3)  # 先核对原始数值
+zscore &lt;- function(x) as.numeric(scale(x))
+dat &lt;- list(D = zscore(d$Divorce),
+            M = zscore(d$Marriage),
+            A = zscore(d$MedianAgeMarriage))</code></pre>
 <h2>三、模型里的每一项，到底在说什么？（第22—32页）</h2>
 <p>上一节确定了要在结婚年龄相近的地区之间比较。这里把这项要求写进模型：同时加入结婚率M和结婚年龄A，用公式2描述这50个州或特区的离婚率。</p>
 <p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE_v2/%E5%85%AC%E5%BC%8F02-%E5%A9%9A%E5%A7%BB%E6%A8%A1%E5%9E%8B.png" alt="公式2｜婚姻与离婚的回归模型"></p>
@@ -81,15 +98,28 @@
 <p>图4中，结婚年龄相同以后，结婚率斜率靠近0，后验中仍容纳正、负两种方向。<strong>在这套模型与数据下，加入结婚年龄后，结婚率原先的正关联已大幅减弱，剩余关系的方向仍有不确定性。</strong></p>
 <p>图4中另一条斜率βA约为−0.614。它回答的是：<strong>模型把两个州的结婚率设为相同，如果其中一个州的结婚年龄中位数高1.24岁，预测的平均离婚率差多少？</strong> 答案是低0.614个离婚率标准差；乘回原来的1.82，约低每千名成年人1.12。</p>
 <p>这些斜率描述州际关系。进一步作因果解释，需要图2的方向成立，并处理其他共同原因。</p>
+<p>把公式2和公式3放进R，就是下面的模型。<code>dnorm</code>的第二项填标准差，<code>dexp</code>填速率；<code>start</code>是计算的起点。</p>
+<pre><code>library(rethinking)
+fit &lt;- quap(
+  alist(D ~ dnorm(mu, sigma),
+        mu &lt;- a + bM*M + bA*A,
+        a ~ dnorm(0, 0.2),
+        bM ~ dnorm(0, 0.5), bA ~ dnorm(0, 0.5),
+        sigma ~ dexp(1)),
+  data = dat,
+  start = list(a=0, bM=0, bA=-0.5, sigma=0.8)
+)
+precis(fit, prob = 0.89) # 查看均值、SD和89%区间，重点看bM、bA</code></pre>
 <h2>四、作者为什么还要“模拟一次干预”？（第33—38页）</h2>
-<p>前面的回归已经给出相同结婚年龄下的比较。在这个简单加法模型中，变化一个单位的平均效应恰好等于斜率；以后遇到曲线或交互作用，效应就可能由多个参数共同决定。作者因此在这里演示更通用的做法，把因果问题写成一次模拟：<strong>假如主动把结婚率从平均水平提高一个标准差，会怎样？</strong></p>
+<p>先回答一个读模型的问题：<strong>βM到底表示什么？</strong> 固定结婚年龄，把结婚率提高一个标准差，模型预测的平均离婚率就改变βM个标准差。下面把两次预测写出来，是为了看清这个含义。</p>
 <p>不能直接拿原数据里结婚率高、低的两批地区相减，因为两批地区的结婚年龄可能也不同。</p>
 <p>先想象同一个地区的两种情境。两次都保留同样的结婚年龄，模型参数也完全相同，只把结婚率改掉：</p>
 <ul><li>情境一：结婚率设为样本平均水平，约每千名成年人20.11，标准化后的M=0。</li><li>情境二：结婚率在此基础上提高一个标准差，约每千名成年人23.91，标准化后的M=1。</li></ul>
 <p><strong>这里的0和1是换算后的数值；比较的是同一个地区在两个设定下的模型预测。</strong></p>
 <p>回看公式2，预测均值由三部分相加：基准α、结婚率项βM乘M、年龄项βA乘A。两种情境的基准和年龄项都相同，只有结婚率项从“βM乘0”变成“βM乘1”，所以两次预测均值相差βM。</p>
 <p>例如，暂用前面拟合出的均值βM≈−0.065演示，两种情境的预测均值就相差−0.065个离婚率标准差。乘回1.82，约为每千名成年人减少0.12。这个数只是示范；实际计算要用多组后验参数，才能保留估计的不确定性。</p>
-<p>作者把这种“在模型中主动给M设值”的操作记为 <code>do(M)</code>。通常图2里的A会影响M；现在M由我们直接指定，便不再通过A生成，所以图上去掉A→M。A对D的关系仍然保留。<strong>保留同一个A，是为了让两次预测的差只来自改变M。</strong></p>
+<p>这一步首先解释了回归系数。要进一步把这个差解释成“主动改变结婚率的作用”，还需要图2的因果假设成立、共同原因得到充分处理。单凭相减，不能完成这一步判断。</p>
+<p>在这套因果假设下，作者把主动给M设值记为 <code>do(M)</code>。通常图2里的A会影响M；现在M由我们直接指定，便不再通过A生成，所以图上去掉A→M。A对D的关系仍然保留。<strong>保留同一个A，是为了让两次预测的差只来自改变M。</strong></p>
 <p>在每一组后验参数下，都做一次上述比较。换一组参数，再比较一次，便得到许多可能的均值差。公式5把每次相减的过程写了出来：</p>
 <p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE_v2/%E5%85%AC%E5%BC%8F05-%E5%9D%87%E5%80%BC%E5%B7%AE.png" alt="公式5｜同一年龄下的平均变化"></p>
 <p><em>公式5｜固定相同结婚年龄a，将标准化结婚率从0改为1，模型预测均值的差为βM。这里比较均值，尚未加入两次预测各自的随机残差。</em></p>
@@ -97,7 +127,24 @@
 <p>PPT第34—37页的代码还做了额外一步：在两种情境里分别加入随机残差，再将两个模拟结果相减。这不仅包含参数不确定性，还包含两次预测结果各自的波动，所以分布更宽。图5把它与平均变化的后验放在一起，显示两者回答的问题不同。</p>
 <p><img src="%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C/v2/Python/03-%E5%B9%B2%E9%A2%84%E6%AF%94%E8%BE%83.png" alt="图5｜平均变化与预测结果之差"></p>
 <p><em>图5｜青色为βM的近似后验，赭色为两次独立预测结果之差的分布。后者按联合后验抽样后混合计算，包含两次独立残差；两边面积都为1。</em></p>
-<p><strong>配套脚本怎样对应这一段？</strong> Python脚本在“把do(M)展开为两次计算”处，逐行计算同一年龄下的<code>mu_before</code>和<code>mu_after</code>，再相减得到<code>mean_change</code>，并保存为<code>intervention_pairs.csv</code>。图5的赭色曲线直接计算两次独立预测之差的正态密度，再按后验抽样平均；它与作者反复生成两次观测值再相减针对同一个分布。R原版、tidyverse版和MATLAB版提供前面的后验拟合，本段的两情境演示与图5放在Python版。</p>
+<p>R代码把刚才的比较写在下面。<code>post</code>的每一行是一组后验参数；<code>age_same</code>为这一行抽取一个年龄，两种情境共用这个年龄。</p>
+<pre><code>set.seed(20261009)
+post &lt;- extract.samples(fit, n = 10000) # 从quap近似后验抽样
+post &lt;- post[post$sigma &gt; 0, ]          # sigma必须为正
+age_same &lt;- sample(dat$A, nrow(post), replace = TRUE)
+mu0 &lt;- with(post, a + bM * 0 + bA * age_same)
+mu1 &lt;- with(post, a + bM * 1 + bA * age_same)
+delta_mean &lt;- mu1 - mu0
+all.equal(delta_mean, post$bM)         # TRUE：核对斜率含义
+quantile(delta_mean, c(0.055, 0.5, 0.945))</code></pre>
+<p>最后一行查看均值差的后验中位数及89%区间。接着，作者为两种情境分别生成一个可能观测值，再比较它们：</p>
+<pre><code>D0 &lt;- rnorm(nrow(post), mean = mu0, sd = post$sigma)
+D1 &lt;- rnorm(nrow(post), mean = mu1, sd = post$sigma)
+delta_observed &lt;- D1 - D0
+c(均值差的后验SD = sd(delta_mean),
+  两次观测之差的SD = sd(delta_observed))</code></pre>
+<p>两次观测各有随机波动，所以第二个标准差通常更大，对应图5较宽的赭色曲线。这两段现已加入R原版和tidyverse版；Python也展开了两次均值计算，图5则用正态密度的后验混合画出平滑曲线。MATLAB版仍提供前面的后验拟合。</p>
+<p>本例中，均值差恰好等于βM，所以先解释斜率就能看懂计算。作者进一步演示干预模拟，是为了后面遇到曲线或交互作用时，仍能通过“设定两种情境、预测、相减”计算目标效应。</p>
 <h2>五、抗真菌处理有效，为什么加入“真菌”后却看不出来？（第40—51页）</h2>
 <p>先不换数据，只换问题。前面问结婚率M对离婚率D的作用，结婚年龄A是共同原因，所以模型加入A。</p>
 <p>现在改问：<strong>结婚年龄A对离婚率D的总作用有多大？</strong> 再看图2，除了A直接指向D，还有“A影响M、M再影响D”这条路。此时，M处在作用传递的中间；若把M固定住，这条路上的变化就不再计入年龄的总作用。</p>
@@ -119,6 +166,13 @@
 <p>所以，下面两句话回答的是不同问题：</p>
 <ul><li><strong>处理有没有用？</strong> 有。在这套模拟规则下，它减少真菌，使平均增长提高1.2。这叫总效应。</li><li><strong>除了减少真菌，处理还有别的促生长作用吗？</strong> 没有。这是作者预先设定的机制，直接效应为0。</li></ul>
 <p>“直接效应为0”不能解释成“处理无效”。如果我们关心抗真菌处理对生长的总体帮助，就不能把控制真菌后的处理系数当成全部答案。</p>
+<p>用R分别计算整组的平均增长和相同真菌状态内的差：</p>
+<pre><code>p_fungus &lt;- c(不处理 = 0.5, 处理 = 0.1)
+mean_growth &lt;- (1-p_fungus)*5 + p_fungus*2
+mean_growth                       # 3.5、4.7
+unname(mean_growth[2]-mean_growth[1]) # 总效应1.2
+c(无真菌时 = 5-5, 有真菌时 = 2-2)     # 两组内的差都为0</code></pre>
+<p>前一个差回答处理的总体帮助，后两个差回答真菌状态相同时是否还有额外帮助。</p>
 <h2>六、只看获资助的申请，为什么会得到不同结论？（第52—65页）</h2>
 <p>前两个例子中，控制第三个变量都让关联减弱，但含义不同：控制共同原因去掉了混杂，控制中间变量拿掉了部分作用。接下来，作者用基金申请说明第三种可能：<strong>原本没有关联，筛选后反而出现了关联。</strong></p>
 <p>每份申请分别评价两件事：研究是否新颖，方案是否可信。假设在全部申请中，两项评价互不相关；而新颖、可信，都有助于获得资助。</p>
@@ -133,12 +187,23 @@
 <p><strong>再只看获资助的申请。</strong> 新颖性低的只剩110份，其中90份可信度高，占81.8%；新颖性高的剩180份，其中90份可信度高，占50%。</p>
 <p>于是，在获资助者中，反而是新颖性低的那组，可信度高的比例更大。</p>
 <p>原因就在表的第一行：<strong>两项都低的申请被淘汰得最多。新颖性低却能留下来的，更多是靠可信度高；新颖性高的，则两种可信度都有较多机会留下来。</strong> 筛选改变了样本构成，负关联由此出现。它的方向和强弱取决于具体筛选规则。</p>
+<p>把基金表里的数放进R，比较筛选前后“可信度高”的比例：</p>
+<pre><code># 四项依次为：低低、低高、高低、高高（新颖性在前）
+all_n &lt;- c(100, 100, 100, 100)
+funded_n &lt;- all_n * c(0.2, 0.9, 0.9, 0.9)
+trust_rate &lt;- function(n) {
+  c(新颖性低 = n[2]/sum(n[1:2]),
+    新颖性高 = n[4]/sum(n[3:4]))
+}
+rbind(全部申请 = trust_rate(all_n),
+      获资助者 = trust_rate(funded_n))</code></pre>
+<p>第一行是0.5与0.5；第二行是约0.818与0.5。代码只改变是否经过资助筛选，关联便随之改变。</p>
 <h3>图8：婚姻状态怎样制造“越老越不幸福”？</h3>
 <p>基金例子中，筛选发生在拿到样本之前，我们只看见获资助者。下一例则保留了完整人群，却在回归里加入了不该控制的变量。两种做法都可能在共同结果上形成筛选。</p>
-<p>作者随后问：年龄会不会影响幸福程度？他构造的模拟有三条关键规则：每个人的幸福程度一生不变；较幸福的人每年更容易结婚；年纪越大，累积的结婚机会越多。模拟中结婚后保持已婚。</p>
+<p>作者随后问：年龄会不会影响幸福程度？他构造的模拟有三条关键规则：每个人的幸福程度一生不变；幸福程度较高的人，在每一年里结婚的概率都更高；年纪越大，累积的结婚机会越多。模拟中结婚后保持已婚。</p>
 <p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE_v2/05-%E5%B9%B8%E7%A6%8F.png" alt="图8｜婚姻状态改变了比较对象"></p>
 <p><em>图8｜按PPT第63—65页及原书第177—179页重绘。青色框中的年龄与幸福程度共同影响赭色框中的婚姻状态。按已婚／未婚分组，或在回归中加入婚姻状态，都会在这个共同结果上作条件化。</em></p>
-<p>先看<strong>已婚者</strong>。年轻人结婚的机会还少，已经结婚的更偏向那些每年容易结婚、幸福程度较高的人。年龄较大的人经历了更多次结婚机会，幸福程度较低的人也有更多时间进入已婚组。因此，年长的已婚组会容纳更多幸福程度较低的人，平均值随之降低。</p>
+<p>先看<strong>已婚者</strong>。在这个模拟里，幸福程度较高的人往往更早结婚。因此，年轻的已婚者中，幸福程度较高的人占比较大。随着年龄增长，原先还没结婚、幸福程度较低的人也陆续结婚，进入已婚组。年长已婚者的平均幸福程度因此可能低于年轻已婚者。</p>
 <p>再看<strong>未婚者</strong>。年轻时，幸福程度高、低的人都可能尚未结婚；随着时间过去，较幸福的人更容易结婚、离开未婚组。年长的未婚组中，幸福程度较低的人就占了更大比例。</p>
 <p>两组都出现了“年龄越大，平均幸福程度越低”。但模拟已经规定，每个人的幸福程度从未改变。<strong>变化的是不同年龄下，谁进入已婚组、谁留在未婚组。</strong></p>
 <p>这与基金例子是同一种结构：按一个共同结果分组，两个原因便可能在组内产生关联。在回归里加入婚姻状态，也是在进行这样的组内比较。</p>
@@ -158,6 +223,17 @@
 <p>因此，选调整变量时，要追问它记录的是什么。<strong>一个变量即使不在处理到结果的那条路径上，也可能因为记录了中间变量的信息而改变处理系数。</strong></p>
 <p>后代也可以提供有用的信息。作者随后举出另一张图：共同原因U没有被直接测到，但它影响了两个可测指标A、B。这两个指标便可能帮助我们了解U。在足够的测量信息和模型假设下，可以把U作为未直接观测的变量建模，尝试处理它造成的混杂。</p>
 <p>所以，遇到一项间接测量，要先问：<strong>它记录的是共同原因、中间变量，还是筛选结果？</strong> 它的用途取决于这个位置。</p>
+<p>用一段模拟检查图10的方向。每个随机抽取分别进行；<code>0.1+0.8*Z</code>在Z=0时为0.1，在Z=1时为0.9。</p>
+<pre><code>set.seed(20261009)
+n_sim &lt;- 100000
+X &lt;- rbinom(n_sim, 1, 0.5)
+Z &lt;- rbinom(n_sim, 1, 0.1+0.8*X)
+Y &lt;- rbinom(n_sim, 1, 0.1+0.8*Z)
+A &lt;- rbinom(n_sim, 1, 0.1+0.8*Z)
+c(全体 = cor(X,Y),
+  固定Z = cor(X[Z==0],Y[Z==0]),
+  固定A = cor(X[A==0],Y[A==0]))</code></pre>
+<p>结果应接近0.64、0、0.39。图10用精确枚举，所以上面随机模拟不会逐位相同。试着只把最后一行生成A的概率改成0.5，再看第三个相关系数。</p>
 <h2>八、回归前，先说清楚想保留哪条路（第72页）</h2>
 <p>作者最后用祖辈、父母、孙辈的例子提醒我们：一个节点在不同路径上，可以扮演不同角色。看图11中的父母变量P。</p>
 <p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE_v2/07-%E7%A5%96%E8%BE%88.png" alt="图11｜父母变量的两种角色"></p>

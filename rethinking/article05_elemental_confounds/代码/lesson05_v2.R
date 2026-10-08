@@ -151,3 +151,22 @@ for(name in c("model","descendant")) {
  fun()
  dev.off()
 }
+
+# ④ 从斜率含义到两种情境的预测 ----------------------------------
+# 同一行参数与年龄用于两种情境；均值差用于解释bM，观测差另加随机波动。
+set.seed(20261009)
+post <- extract.samples(fit, n = 10000)
+post <- post[post$sigma > 0, ]
+age_same <- sample(dat$A, nrow(post), replace = TRUE)
+mu0 <- with(post, a + bM * 0 + bA * age_same)
+mu1 <- with(post, a + bM * 1 + bA * age_same)
+delta_mean <- mu1 - mu0
+stopifnot(isTRUE(all.equal(delta_mean, post$bM)))
+D0 <- rnorm(nrow(post), mean = mu0, sd = post$sigma)
+D1 <- rnorm(nrow(post), mean = mu1, sd = post$sigma)
+delta_observed <- D1 - D0
+print(quantile(delta_mean, c(0.055, 0.5, 0.945)))
+print(c(均值差的后验SD=sd(delta_mean), 两次观测之差的SD=sd(delta_observed)))
+write.csv(data.frame(age_standardized=age_same,mu_M0=mu0,mu_M1=mu1,
+                    mean_change=delta_mean,observed_change=delta_observed),
+          file.path(out,"intervention_pairs.csv"),row.names=FALSE)
