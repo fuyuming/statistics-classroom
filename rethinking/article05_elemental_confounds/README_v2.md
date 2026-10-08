@@ -15,7 +15,7 @@
 ## 计算范围
 
 1. WaffleDivorce婚姻模型：严格采用PPT31页的标准化、Normal(0,0.2)截距、Normal(0,0.5)斜率、Exponential(1)残差标准差先验。Normal第二项为标准差。三语言均保留sigma不确定性和联合协方差。R调用quap，Python/MATLAB优化后验并计算解析Hessian作二次近似，不是网格、MCMC或调用R。
-2. 四种结构：按PPT13、43、55、69页给定概率，独立精确枚举所有0/1组合。前三种里的A为独立无关占位变量；第四种A是中介Z的后代。joint.csv概率总和逐模型为1，非真实观测数据。
+2. 四种结构：按PPT13、43、55、69页给定概率，独立精确枚举所有0/1组合。前三种里的A为独立无关占位变量；第四种A是中间变量Z的后代。joint.csv概率总和逐模型为1，非真实观测数据。
 3. plant_expectation.csv：原书171页生成规则给出的平均增长3.5、4.7及总效应1.2；没有声称重跑原书全部植物后验模型。
 4. Python额外绘制先验条件均值线与干预对比。干预预测差图用联合后验抽样混合两个独立残差的差；分布比beta_M后验宽，不是已识别的个体反事实效应分布。
 5. 基金、年龄幸福、祖辈例子为文章中的原课机制讲解，不声称本项目复现其全部随机模拟或后验拟合。
@@ -24,7 +24,7 @@
 
 数据/v2/WaffleDivorce.csv从作者rethinking包导出三列，50个地区，每行一个地区。Divorce离婚率（每千名成年人）、Marriage结婚率（教材每千名成年人率）、MedianAgeMarriage结婚年龄中位数（岁）。按原课忽略测量误差建模；没有缺失值。不涉及华夫饼店数，也没有混用总店数与人均店数。
 
-posterior.csv行序：alpha、beta_M、beta_A、sigma；列是近似后验均值、标准差、89%区间端点。associations.csv的model：1叉、2管、3对撞、4中介的后代；group：0全体、1固定Z=0、2固定Z=1、3固定A=0、4固定A=1。correlation是理论相关。
+posterior.csv行序：alpha、beta_M、beta_A、sigma；列是近似后验均值、标准差、89%区间端点。associations.csv的model：1叉、2管、3对撞、4中间变量的后代；group：0全体、1固定Z=0、2固定Z=1、3固定A=0、4固定A=1。correlation是理论相关。
 
 先验图的M固定在0，两边用同一批标准正态数缩放；不是完整先验预测数据。干预图使用固定种子20261008。后验数值与验证范围见VALIDATION_v2.md。
 

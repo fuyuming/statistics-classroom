@@ -67,7 +67,7 @@ for model in range(1,5):
             w = .5 * bern(z,.1+.8*x) * bern(yv,.1+.8*z) * .5
         elif model == 3: # 对撞：X、Y独立，任一为1都会提高Z=1的概率
             w = .25 * bern(z,.9 if x+yv>0 else .2) * .5
-        else: # 中介的后代A：90%机会与Z一致
+        else: # 中间变量的后代A：90%机会与Z一致
             w = .5 * bern(z,.1+.8*x) * bern(yv,.1+.8*z) * bern(a,.1+.8*z)
         rows.append([model,x,z,yv,a,w])
 rows = np.array(rows)
@@ -90,7 +90,7 @@ for model in range(1,5):
         answers.append([model,group,corr])
 answers=np.array(answers)
 np.savetxt(OUT/'associations.csv', answers, delimiter=',', header='model,group,correlation', comments='')
-print('理论相关：模型1叉、2管、3对撞、4中介的后代；组0全体、1/2按Z、3/4按A\n',answers)
+print('理论相关：模型1叉、2管、3对撞、4中间变量的后代；组0全体、1/2按Z、3/4按A\n',answers)
 
 # 原书171页：有真菌少长3，无真菌平均长5。
 plant = np.array([[0,.5,(1-.5)*5+.5*2],[1,.1,(1-.1)*5+.1*2]])
@@ -132,8 +132,8 @@ ax.set(xlabel='离婚率变化（标准差单位）',ylabel='概率密度',title
 save(fig,'03-干预比较.png')
 fig,ax=plt.subplots(figsize=(8,4.5),facecolor=bg)
 selected=answers[(answers[:,0]==4)&np.isin(answers[:,1],[0,1,3])]
-ax.bar(['全体','直接固定中介 Z','固定后代 A'],selected[:,2],color=[colors[0],colors[1],colors[0]])
-ax.set(ylim=(0,.75),ylabel='X与Y的理论相关',title='看后代的值，会间接获得中介的信息')
+ax.bar(['全体','直接固定中间变量 Z','固定后代 A'],selected[:,2],color=[colors[0],colors[1],colors[0]])
+ax.set(ylim=(0,.75),ylabel='X与Y的理论相关',title='看后代的值，会间接获得中间变量的信息')
 for i,v in enumerate(selected[:,2]):ax.text(i,v+.025,f'{v:.3f}',ha='center')
 save(fig,'04-后代.png')
 plt.show()

@@ -76,7 +76,7 @@ plot_model <- function() {
 plot_descendant <- function() {
  par(family=font)
  vals <- answers$correlation[answers$model==4 & answers$group %in% c(0,1,3)]
- barplot(vals,names.arg=c("全体","固定中介Z","固定后代A"),ylim=c(0,.75),col="#167e83",ylab="理论相关",main="后代携带中介的信息")
+ barplot(vals,names.arg=c("全体","固定中间变量Z","固定后代A"),ylim=c(0,.75),col="#167e83",ylab="理论相关",main="后代携带中间变量的信息")
 }
 for(name in c("model","descendant")) {
  fun <- get(paste0("plot_",name))
