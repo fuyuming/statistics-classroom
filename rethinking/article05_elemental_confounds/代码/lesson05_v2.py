@@ -167,7 +167,27 @@ xs=np.linspace(-3.5,3.5,500)
 # 青色线看平均变化的不确定性；赭色线还包含未来观测的随机波动。
 draws=rng.multivariate_normal(theta,cov,size=10000)
 draws=draws[draws[:,3]>0]
-predictive=np.mean(norm.pdf(xs[:,None],draws[:,1],np.sqrt(2)*draws[:,3]),axis=1)
+# 【把do(M)展开为两次计算】每行用同一组参数、同一个年龄，只改变M。
+# 从观测年龄中有放回抽取，保留本数据的年龄构成；独立种子便于复算。
+intervention_rng = np.random.default_rng(20261009)
+age_same = intervention_rng.choice(standard[:, 2], size=len(draws), replace=True)
+M_before = 0.0  # 标准化结婚率0：原始均值约20.11/千名成年人
+M_after = 1.0   # 标准化结婚率1：原始均值加1个SD，约23.91/千名成年人
+baseline = draws[:, 0] + draws[:, 2] * age_same  # alpha + beta_A*A，两次共用
+mu_before = baseline + draws[:, 1] * M_before
+mu_after = baseline + draws[:, 1] * M_after
+mean_change = mu_after - mu_before
+# 把M的差改成其他值时，均值差应为beta_M乘这个差；这里等于beta_M。
+assert np.allclose(mean_change, draws[:, 1] * (M_after-M_before))
+# PPT还分别生成两次观测值，各加一个独立正态残差。
+# 正态差的密度可直接计算：均值为mean_change，SD为sqrt(2)*sigma。
+# 图5用密度平均得到平滑曲线，与反复模拟两次观测再相减针对同一分布。
+np.savetxt(OUT/'intervention_pairs.csv',
+           np.column_stack([age_same, mu_before, mu_after, mean_change]), delimiter=',',
+           header='age_standardized,mu_M0,mu_M1,mean_change', comments='')
+print('同一年龄下两种情境的前5行：年龄、M=0均值、M=1均值、均值差\n',
+      np.column_stack([age_same, mu_before, mu_after, mean_change])[:5])
+predictive=np.mean(norm.pdf(xs[:,None],mean_change,np.sqrt(2)*draws[:,3]),axis=1)
 ax.plot(xs,norm.pdf(xs,theta[1],sd[1]),label='平均变化的不确定性',color=colors[0])
 ax.plot(xs,predictive,label='两次独立预测结果之差',color=colors[1])
 ax.set(xlabel='离婚率变化（标准差单位）',ylabel='概率密度',title='预测结果的差，比平均变化更分散');ax.legend()

@@ -1,4 +1,4 @@
-# 精读05｜多控制一个变量，为什么反而会错？
+# 精读05｜回归里多加一个变量，为什么反而会错？
 
 先完整下载并解压项目，不要只下载单个脚本。数据已附，每种语言可以独立运行。
 
@@ -46,3 +46,5 @@ posterior.csv行序：alpha、beta_M、beta_A、sigma；列是近似后验均值
 R tidyverse版使用readr/dplyr/tidyr整理数据、计算条件相关，以ggplot2绘图；posterior.csv与原版字段一致，另有带参数名的posterior_named.csv便于阅读。两个R版本均输出相同模型和枚举数值。
 
 课堂批注已放到相应代码旁：数据字段及单位、先验标准差与指数速率如何填写、优化初值与先验的区别、89%区间如何修改、结果如何对应正文、二元概率练习改哪一处。婚姻模型使用quap/二次近似；状态枚举不属于参数网格近似。
+
+Python干预演示：定位“把do(M)展开为两次计算”，M_before=0、M_after=1为标准化尺度，age_same与参数在两次计算中共用。intervention_pairs.csv列出年龄、两次预测均值及其差。R/tidyverse/MATLAB不包含这项扩展示例。
