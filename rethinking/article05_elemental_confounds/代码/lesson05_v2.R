@@ -1,3 +1,10 @@
+# 【课堂问题】结婚率较高的地区，离婚率也较高。这种关联是否混入了结婚年龄的影响？
+# 【数据】作者WaffleDivorce数据，49州和哥伦比亚特区，共50行。
+# 【计算思路】①统一尺度；②写出似然与先验；③近似联合后验；④解释相同年龄下的斜率。
+# 【第二个问题】为什么控制第三个变量，有时消除关联，有时反而制造关联？
+# 【核对办法】按四种结构的生成规则枚举0/1状态，比较全体与分组后的相关。
+# 建议先运行第一部分并读后验结果，再进入第二部分；数值输出和图形要结合当前问题阅读。
+
 # 精读05 v2：RStudio打开精读05_v2.Rproj，再Source本文件。
 # 作者PPT31页的quap模型；输入已附，无须先跑其他语言。
 # 二元结构精确枚举，区别于PPT中1000次随机模拟的频数。
@@ -29,14 +36,26 @@ dat <- list(D=standardize(d$Divorce), M=standardize(d$Marriage), A=standardize(d
 # data=dat把公式中的D/M/A与数据对应。start只是优化起点，
 # 依次给a、bM、bA、sigma初值；sigma必须为正，初值不决定先验均值。
 # 调整先验应改dnorm/dexp中的参数，并重新检查先验预测；不要只改start。
-fit <- quap(alist(D ~ dnorm(mu,sigma), mu <- a+bM*M+bA*A,
-                 a ~ dnorm(0,0.2), bM ~ dnorm(0,0.5), bA ~ dnorm(0,0.5),
-                 sigma ~ dexp(1)), data=dat, start=list(a=0,bM=0,bA=-0.5,sigma=0.8))
+# ① 写出模型：D的波动与其条件均值分别放在两行 --------------------
+fit <- quap(
+  alist(
+    D ~ dnorm(mu, sigma),       # 似然：mu为各地区均值，sigma为剩余波动
+    mu <- a + bM*M + bA*A,      # 固定A后，bM描述M变化对应的平均D变化
+    a ~ dnorm(0, 0.2),          # 截距先验：均值0，标准差0.2
+    bM ~ dnorm(0, 0.5),         # 结婚率斜率先验：均值0，标准差0.5
+    bA ~ dnorm(0, 0.5),         # 结婚年龄斜率先验：同样尺度
+    sigma ~ dexp(1)             # 指数先验：速率1，sigma仍是未知参数
+  ),
+  data = dat,                  # 使用上面整理好的D、M、A
+  start = list(a=0, bM=0, bA=-0.5, sigma=0.8)  # 优化从这里开始
+)
+
+# ② 从联合后验近似中提取均值与不确定性 --------------------------
 # 近似分布以峰值为中心：此处mean是近似后验均值。
 # vcov保留参数间协方差，区间同时反映先验与数据的信息。
 means <- coef(fit)[c("a","bM","bA","sigma")]
 cv <- vcov(fit)[names(means),names(means)]
-sds <- sqrt(diag(cv))
+sds <- sqrt(diag(cv))  # 对角线是各参数的后验方差，开平方得到后验SD
 # 区间怎么填：中央概率为c时，上分位点是(1+c)/2。
 # 本例c=0.89，所以填0.945；若改95%，填0.975，并同步改列名和图注。
 q <- qnorm(.945) # 中间89%，两端各5.5%
@@ -47,13 +66,14 @@ write.csv(result,file.path(out,"posterior.csv"),row.names=FALSE)
 # bM约-0.065，89%区间约[-0.306,0.176]：年龄相同后，方向仍不确定；
 # 区间跨0不证明作用为0。bA约-0.614，表示每增加1个年龄标准差，
 # 平均离婚率降低约0.614个离婚率标准差，前提是结婚率相同。
-print(result)
+print(result)  # 先看bM的区间，再看bA；对应正文图4
 cat("bM是在年龄相同条件下的斜率；因果解释仍依赖图和模型假设。\n")
 # 给出所有0/1组合，而不是用随机次数估计概率。
 # 下面切换到已知概率的教学模型，X/Y/Z/A是0或1状态；这里的A不是结婚年龄。
 # bern(value,p)的p填“该变量为1的概率”，应在0到1之间。
 # 0.1+0.8*z：z=0时概率0.1，z=1时概率0.9；乘法来自生成规则的条件独立。
 # 这只是枚举所有数据状态，不是在参数网格上近似后验。
+# ③ 切换问题：生成规则已知，比较不同分组下的关联 ----------------
 bern <- function(value,p) ifelse(value==1,p,1-p)
 # model：1叉、2管、3对撞、4中间变量的后代。
 # 前三种的A只是独立占位变量，乘0.5后求和即可消去。
@@ -61,7 +81,10 @@ bern <- function(value,p) ifelse(value==1,p,1-p)
 rows <- expand.grid(model=1:4,X=0:1,Z=0:1,Y=0:1,A=0:1)
 rows$probability <- 0
 for(i in seq_len(nrow(rows))) {
- x <- rows$X[i]; z <- rows$Z[i]; y <- rows$Y[i]; a <- rows$A[i]
+ x <- rows$X[i]  # 第i行组合中的X状态
+ z <- rows$Z[i]
+ y <- rows$Y[i]
+ a <- rows$A[i]
  m <- rows$model[i]
  w <- switch(m,
   .5*bern(x,.1+.8*z)*bern(y,.1+.8*z)*.5,
@@ -79,7 +102,8 @@ for(m in 1:4) for(g in 0:4) {
  }
 # 分组后除以组内总概率，得到条件概率；据此计算E(XY)-E(X)E(Y)。
  w <- sub$probability/sum(sub$probability)
- ex <- sum(w*sub$X); ey <- sum(w*sub$Y)
+ ex <- sum(w*sub$X)  # 当前组内X=1的概率
+ ey <- sum(w*sub$Y)  # 当前组内Y=1的概率
  corr <- (sum(w*sub$X*sub$Y)-ex*ey)/sqrt(ex*(1-ex)*ey*(1-ey))
  answers <- rbind(answers,data.frame(model=m,group=g,correlation=corr))
 }

@@ -1,3 +1,10 @@
+# 【课堂问题】结婚率较高的地区，离婚率也较高。这种关联是否混入了结婚年龄的影响？
+# 【数据】作者WaffleDivorce数据，49州和哥伦比亚特区，共50行。
+# 【计算思路】①统一尺度；②写出似然与先验；③近似联合后验；④解释相同年龄下的斜率。
+# 【第二个问题】为什么控制第三个变量，有时消除关联，有时反而制造关联？
+# 【核对办法】按四种结构的生成规则枚举0/1状态，比较全体与分组后的相关。
+# 建议先运行第一部分并读后验结果，再进入第二部分；数值输出和图形要结合当前问题阅读。
+
 """精读05：按作者2023年第05讲计算。Python / Spyder 中按 F5。
 输入：rethinking包的WaffleDivorce；输出：运行结果/v2/Python，四张原生中文图。
 主模型先验与PPT31页一致；二次近似不等于调用R quap。二元例子精确枚举，非抽样。
@@ -48,9 +55,9 @@ def objective(theta):
 fit = minimize(objective, [0, 0, -0.5, 0.8], method='BFGS', options={'gtol': 1e-6})
 if not fit.success:
     raise RuntimeError(fit.message)
-theta = fit.x
-beta = theta[:3]
-sigma = theta[3]
+theta = fit.x  # 后验峰值：四参数的联合近似以此为中心
+beta = theta[:3]  # alpha、beta_M、beta_A，Python索引从0开始
+sigma = theta[3]  # 第4个参数为残差标准差
 residual = y - X @ beta
 # Hessian：峰顶曲率决定近似后验的宽度，也保留参数间的相关性。
 H = np.zeros((4,4))
@@ -60,12 +67,13 @@ H[3,:3] = H[:3,3]
 H[3,3] = -len(y)/sigma**2 + 3*np.sum(residual**2)/sigma**4
 # 逆Hessian是联合正态近似的协方差；不是只输出一组最优参数。
 # 此处theta既是MAP，也用作近似分布的均值；没有进行MCMC。
-cov = np.linalg.inv(H)
+cov = np.linalg.inv(H)  # 方差在对角线，非对角线保留参数间协方差
 sd = np.sqrt(np.diag(cov))
 # 中间89%的区间，两端各留5.5%。
 # 区间参数：中央概率c使用(1+c)/2分位点；89%填0.945，95%填0.975。
 # 修改覆盖概率时须同步输出列名、图注及所有使用z89的绘图说明。
 z89 = norm.ppf(0.945)
+# 【结果核对】四行依次对应四参数，四列依次为均值、SD、下限、上限。
 summary = np.column_stack([theta, sd, theta-z89*sd, theta+z89*sd])
 np.savetxt(OUT/'posterior.csv', summary, delimiter=',', header='mean,sd,lower89,upper89', comments='')
 np.savetxt(OUT/'covariance.csv', cov, delimiter=',')
@@ -111,7 +119,8 @@ for model in range(1,5):
         # 分组后重新归一化，得到组内条件概率；0/1变量的方差是E(X)*(1-E(X))。
         w=sub[:,5]/sub[:,5].sum()
         x=sub[:,1]; yy=sub[:,3]
-        ex=np.sum(w*x); ey=np.sum(w*yy)
+        ex=np.sum(w*x)  # 组内X=1的概率
+        ey=np.sum(w*yy)  # 组内Y=1的概率
         corr=(np.sum(w*x*yy)-ex*ey)/np.sqrt(ex*(1-ex)*ey*(1-ey))
         answers.append([model,group,corr])
 # 练习只改后代模型最后的bern(a,.1+.8*z)为bern(a,.5)。

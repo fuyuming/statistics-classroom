@@ -1,3 +1,10 @@
+% 【课堂问题】结婚率较高的地区，离婚率也较高。这种关联是否混入了结婚年龄的影响？
+% 【数据】作者WaffleDivorce数据，49州和哥伦比亚特区，共50行。
+% 【计算思路】①统一尺度；②写出似然与先验；③近似联合后验；④解释相同年龄下的斜率。
+% 【第二个问题】为什么控制第三个变量，有时消除关联，有时反而制造关联？
+% 【核对办法】按四种结构的生成规则枚举0/1状态，比较全体与分组后的相关。
+% 建议先运行第一部分并读后验结果，再进入第二部分；数值输出和图形要结合当前问题阅读。
+
 %% 精读05 v2：MATLAB打开本文件并Run，无额外工具箱。
 % 与PPT31页相同模型；用fminsearch寻找后验峰值，解析Hessian作二次近似。
 % 数据一行一个地区。两张中文Figure保留，并保存PNG。
@@ -26,7 +33,8 @@ options = optimset('MaxFunEvals',20000,'MaxIter',10000,'TolX',1e-10,'TolFun',1e-
 % MaxIter/MaxFunEvals是优化上限，不是后验抽样次数；这里没有MCMC或网格遍历。
 [t,~,flag] = fminsearch(objective,[0;0;-.5;.8],options);
 assert(flag>0,'后验优化未收敛');
-r = Y-X*t(1:3); sig=t(4);
+r = Y-X*t(1:3);  % 每个地区的观测值减模型均值
+sig=t(4);       % 第4个参数：残差标准差
 H=zeros(4);
 H(1:3,1:3)=X'*X/sig^2+diag(1./ps.^2);
 H(1:3,4)=2*X'*r/sig^3;
@@ -34,10 +42,12 @@ H(4,1:3)=H(1:3,4)';
 H(4,4)=-length(Y)/sig^2+3*sum(r.^2)/sig^4;
 % 逆Hessian保存联合后验的近似协方差，峰值t用作近似均值。
 % 这是贝叶斯二次近似，未使用MCMC，也没有把sigma当已知常数。
-cv=H\eye(4); sd=sqrt(diag(cv));
+cv=H\eye(4);          % 求逆Hessian，得到联合近似协方差
+sd=sqrt(diag(cv));     % 对角线开平方，得到各参数的后验SD
 % 中央89%区间用0.945分位点；erfinv在基础MATLAB中换算标准正态分位数。
 % 改95%时使用0.975，并同步列名、图注。
 q=sqrt(2)*erfinv(2*.945-1);
+% 【结果核对】矩阵每行一个参数，列依次为均值、SD、下限、上限。
 result=[t,sd,t-q*sd,t+q*sd];
 writetable(array2table(result,'VariableNames',{'mean','sd','lower89','upper89'}),fullfile(out,'posterior.csv'));
 % 结果四行是alpha/beta_M/beta_A/sigma，四列是均值、后验标准差、区间下限/上限。
@@ -84,7 +94,8 @@ for m=1:4
   end
   % 筛选后重新归一化，得到组内条件概率，再算相关。
   w=sub(:,6)/sum(sub(:,6));
-  ex=sum(w.*sub(:,2)); ey=sum(w.*sub(:,4));
+  ex=sum(w.*sub(:,2));  % 当前组内X=1的概率
+  ey=sum(w.*sub(:,4));  % 当前组内Y=1的概率
   corr=(sum(w.*sub(:,2).*sub(:,4))-ex*ey)/sqrt(ex*(1-ex)*ey*(1-ey));
   answers=[answers;m,g,corr];
  end
