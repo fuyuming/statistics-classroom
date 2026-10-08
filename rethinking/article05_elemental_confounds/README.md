@@ -22,7 +22,7 @@
 
 ## 输入与输出字段
 
-数据/v2/WaffleDivorce.csv从作者rethinking包导出三列，50个地区，每行一个地区。Divorce离婚率、Marriage结婚率（教材每千人口率）、MedianAgeMarriage结婚年龄中位数（岁）。按原课忽略测量误差建模；没有缺失值。不涉及华夫饼店数，也没有混用总店数与人均店数。
+数据/v2/WaffleDivorce.csv从作者rethinking包导出三列，50个地区，每行一个地区。Divorce离婚率（每千名成年人）、Marriage结婚率（教材每千名成年人率）、MedianAgeMarriage结婚年龄中位数（岁）。按原课忽略测量误差建模；没有缺失值。不涉及华夫饼店数，也没有混用总店数与人均店数。
 
 posterior.csv行序：alpha、beta_M、beta_A、sigma；列是近似后验均值、标准差、89%区间端点。associations.csv的model：1叉、2管、3对撞、4中介的后代；group：0全体、1固定Z=0、2固定Z=1、3固定A=0、4固定A=1。correlation是理论相关。
 
@@ -35,3 +35,5 @@ posterior.csv行序：alpha、beta_M、beta_A、sigma；列是近似后验均值
 原课：https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-05
 作者包与安装说明：https://github.com/rmcelreath/rethinking
 项目：https://github.com/fuyuming/statistics-classroom/tree/main/rethinking/article05_elemental_confounds
+
+数据口径补充：Marriage与Divorce为2009年ACS数据，MedianAgeMarriage为2005—2010年指标；共49州及哥伦比亚特区，缺内华达州。`数据/v2/WaffleDivorce_地区说明.csv`保留地名供读者查阅，不改变计算脚本使用的三列输入。

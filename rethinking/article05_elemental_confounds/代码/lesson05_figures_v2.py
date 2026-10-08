@@ -30,9 +30,10 @@ formulas={
  '公式01-标准化.png':[r'$x_{\mathrm{std}}=\frac{x-\bar{x}}{s_x}$'],
  '公式02-婚姻模型.png':[r'$D_i\sim\mathrm{Normal}(\mu_i,\sigma)$',r'$\mu_i=\alpha+\beta_M M_i+\beta_A A_i$'],
  '公式03-先验.png':[r'$\alpha\sim\mathrm{Normal}(0,0.2)$',r'$\beta_M,\beta_A\sim\mathrm{Normal}(0,0.5)$',r'$\sigma\sim\mathrm{Exponential}(1)$'],
- '公式04-均值差.png':[r'$\mu(M=1,A=a)-\mu(M=0,A=a)=\beta_M$']}
+ '公式04-指数先验.png':[r'$p(\sigma\mid\lambda)=\lambda e^{-\lambda\sigma},\quad \sigma>0$',r'$E[\sigma]=\frac{1}{\lambda},\quad \lambda=1\Rightarrow E[\sigma]=1$'],
+ '公式05-均值差.png':[r'$\mu(M=1,A=a)-\mu(M=0,A=a)=\beta_M$']}
 for name,lines in formulas.items():
  fig=plt.figure(figsize=(8,1.0+len(lines)*.65),facecolor=bg)
  for i,line in enumerate(lines):fig.text(.5,1-(i+1)/(len(lines)+1),line,ha='center',va='center',fontsize=24,color=ink)
  fig.savefig(OUT/name,dpi=200,facecolor=bg,bbox_inches='tight',pad_inches=.25);plt.close(fig)
-print('7张因果图、4张公式图片已导出。')
+print('7张因果图、5张公式图片已导出。')
