@@ -1,0 +1,9 @@
+R与Python的21个理论指标最大绝对差：4.44e-16
+R：joint_pairs.csv 2091行，最大绝对差1.01e-16
+R：difference_pmf.csv 389行，最大绝对差1.01e-16
+R：single_distribution.csv 314行，最大绝对差5e-16
+MATLAB与Python的21个理论指标最大绝对差：2.69e-15
+MATLAB：joint_pairs.csv 2091行，最大绝对差7.01e-16
+MATLAB：difference_pmf.csv 389行，最大绝对差7.98e-16
+MATLAB：single_distribution.csv 314行，最大绝对差6.88e-15
+HTML静态检查：4张正文图与1张头像的相对引用全部存在；未完成浏览器视觉检查（file://被工具安全策略阻止）。

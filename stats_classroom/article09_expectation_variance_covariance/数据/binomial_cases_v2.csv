@@ -1,0 +1,5 @@
+case,n,p
+small,10,0.1
+larger,100,0.1
+rare,100,0.01
+balanced,100,0.5
