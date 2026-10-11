@@ -1,0 +1,9 @@
+name,value
+W,7.0
+U,1.0
+mean_W,10.5
+var_W,5.25
+p_exact,0.2
+var_tied,5.1
+p_tied,0.3
+p_normal_cc,0.19043026382552397
