@@ -6,9 +6,9 @@
 
 ## 下载后运行
 
-解压完整仓库，进入`stats_classroom/article09_expectation_variance_covariance`，保留文件层级。
+解压完整仓库，进入`stats_classroom/article08_expectation`，保留文件层级。
 
-- **R**：打开`统计课堂09.Rproj` → 打开`代码/moments.R` → Source完整运行。只用基础R，无需安装包。
+- **R**：打开`统计课堂08.Rproj` → 打开`代码/moments.R` → Source完整运行。只用基础R，无需安装包。
 - **Python**：Spyder“项目→新建项目→现有目录”选择本篇目录；打开`代码/moments.py`，F5完整运行。依赖见requirements.txt，应安装在Spyder实际使用的解释器环境中。主脚本调用`plot_moments.py`生成新增中文配图。
 - **MATLAB**：Current Folder（当前文件夹）切到本篇目录，打开`代码/moments.m`并Run。只用基础MATLAB，无需统计工具箱。工具栏“设置路径”管理函数搜索路径，不等于设置工作目录。
 

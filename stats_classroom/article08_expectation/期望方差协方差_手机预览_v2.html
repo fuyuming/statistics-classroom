@@ -217,9 +217,9 @@
 <table><thead><tr><th>课堂对象</th><th>模型下的精确结论</th><th>何时需要近似</th></tr></thead><tbody><tr><td>0、1结果Y</td><td>E(Y) = p，Var(Y) = p(1−p)</td><td>单个Y不会因抽样人数增多而变正态</td></tr><tr><td>样本率p̂</td><td>二项计数除以n；E = p，Var = p(1−p)/n</td><td>标准化后，由中心极限定理联系到N(0,1)</td></tr><tr><td>独立两组率差D</td><td>联合二项枚举；均值相减，方差相加</td><td>各组具备适当条件，再近似为正态</td></tr><tr><td>独立正态线性组合</td><td>仍为正态；方差按系数平方相加</td><td>原变量仅近似正态时，组合也需作近似理解</td></tr><tr><td>独立卡方之和</td><td>仍为卡方，自由度相加</td><td>Q的标准化方向若仅渐近正态，卡方结论也只是渐近的</td></tr><tr><td>二分类Q</td><td>Q = Z²</td><td>Z近似标准正态时，Q近似χ²(1)</td></tr><tr><td>k分类Q</td><td>固定正确模型下E(Q) = k−1</td><td>联合极限与总数约束给出渐近χ²(k−1)</td></tr></tbody></table>
 <p>本篇配套R、Python和MATLAB脚本，先算二项精确概率，再算正态近似与连续性校正；接着枚举两组的2091种计数组合，最后核对分类频数的协方差与Q。控制台按“问题—结果—解释”输出。无需三种语言都学，任选一种即可。</p>
 <p>可以先自己回答三个问题：为什么样本率的方差最终除以n？为什么n = 100、p = 0.01仍可能不适合正态近似？为什么两组率差的方差要先写出协方差项？如果这三步能说明白，后面再学区间估计与检验，就有了可以接续的基础。</p>
-<p>本篇配套资料：<a href="https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article09_expectation_variance_covariance" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article09_expectation_variance_covariance</a></p>
+<p>本篇配套资料：<a href="https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article08_expectation" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article08_expectation</a></p>
 <p>完整仓库下载：<a href="https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip</a></p>
-<p>下载解压后进入article09目录，按README运行<code>代码/moments_v2.R</code>、<code>代码/moments_v2.py</code>或<code>代码/moments_v2.m</code>。旧版脚本保留供对照。所有输入均是教学模型或教学计数，不含真实学生个人资料。</p>
+<p>下载解压后进入article08_expectation目录，按README运行<code>代码/moments_v2.R</code>、<code>代码/moments_v2.py</code>或<code>代码/moments_v2.m</code>。旧版脚本保留供对照。所有输入均是教学模型或教学计数，不含真实学生个人资料。</p>
 <p>延伸阅读：二项分布的正态近似与连续性校正，Penn State STAT 414，第28课：<a href="https://online.stat.psu.edu/stat414/Lesson28" target="_blank" rel="noopener">https://online.stat.psu.edu/stat414/Lesson28</a></p>
 <p>这篇想补上的，是我在课堂上省略的连接：<strong>从观察怎样产生，到统计量怎样构造；从运算性质，到抽样分布；最后才是用哪一种分布做近似。</strong></p>
 <p>这里是“明哥的微生物世界”。我们继续把统计课堂里没讲透的地方，慢慢讲清楚。</p><footer>明哥的微生物世界 · 统计课堂 09</footer></main></body></html>

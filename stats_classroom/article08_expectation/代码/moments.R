@@ -1,5 +1,5 @@
 # 统计课堂08：精确分布、正态近似、率差与Q。只用基础R。
-# 打开统计课堂09.Rproj，再Source完整文件；所有文本保存为UTF-8。
+# 打开统计课堂08.Rproj，再Source完整文件；所有文本保存为UTF-8。
 args <- commandArgs(FALSE)
 file_arg <- sub('^--file=', '', args[grepl('^--file=',args)])
 source_file <- tryCatch(sys.frame(1)$ofile,error=function(e) NULL)
