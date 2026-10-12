@@ -223,9 +223,35 @@
 <p>对于课堂的四类等概率模型，可以直接构造三个比较：</p>
 <blockquote><p><img alt="Z₁ = (O₁−O₂)/√40" src="文章配图/公式_v3/ce7d38d7144c7b95.png" style="display:inline-block;width:88.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>；</p><p><img alt="Z₂ = (O₃−O₄)/√40" src="文章配图/公式_v3/c89a1e546ed9b081.png" style="display:inline-block;width:88.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>；</p><p><img alt="Z₃ = (O₁+O₂−O₃−O₄)/√80" src="文章配图/公式_v3/11f7e88e5c5afdc7.png" style="display:inline-block;width:147.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>。</p></blockquote>
 <p>前两个分别比较A与B、C与D；第三个比较前两类合计与后两类合计。各分子的期望都是0。</p>
-<p>为什么分母分别是<img alt="√40" src="文章配图/公式_v3/51a970498b74f3a5.png" style="display:inline-block;width:37.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>、<img alt="√40" src="文章配图/公式_v3/51a970498b74f3a5.png" style="display:inline-block;width:37.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>、<img alt="√80" src="文章配图/公式_v3/364410fb891be520.png" style="display:inline-block;width:37.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>？第一项可以直接用协方差算：</p>
-<blockquote><p>Var(O₁−O₂) = 15+15−2 × (−5) = 40。</p></blockquote>
-<p>第三项令A = O₁+O₂，则A是概率0.5、次数80的二项计数；它的分子等于2A−80，方差为4 × 80 × 0.5 × 0.5 = 80。因此三个Z的方差都等于1。</p>
+<p>为什么前两个比较量除以<img alt="√40" src="文章配图/公式_v3/51a970498b74f3a5.png" style="display:inline-block;width:37.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>，第三个却除以<img alt="√80" src="文章配图/公式_v3/364410fb891be520.png" style="display:inline-block;width:37.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>？这三个分母，分别是对应分子的标准差。我们逐个计算。</p>
+<p><strong>先算前两个比较量。</strong> 前面已经得到每类人数的期望为20、方差为15，任意两类人数的协方差为−5。因此：</p>
+<blockquote><p>E(O₁−O₂) = E(O₁)−E(O₂) = 20−20 = 0；</p><p>Var(O₁−O₂) = Var(O₁)+Var(O₂)−2Cov(O₁,O₂)</p><p>= 15+15−2 × (−5) = 40。</p></blockquote>
+<p>第二个分子O₃−O₄的计算完全对应：期望为20−20 = 0，方差为15+15−2 × (−5) = 40。把它们分别除以标准差<img alt="√40" src="文章配图/公式_v3/51a970498b74f3a5.png" style="display:inline-block;width:37.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>，方差就变成40/40 = 1，期望仍为0。</p>
+<p><strong>第三个比较量多了一次“合并类别”，下面分五步算。</strong></p>
+<p><strong>第一步：把选A或B的人数合并，记为M。</strong></p>
+<blockquote><p>M = O₁+O₂。</p></blockquote>
+<p>M表示前两个选项的总人数。这里另用M作记号，避免把“人数”与选项A混淆。对每个人来说，“是否选A或B”只有两种结果：是，记1；否，记0。</p>
+<p><strong>第二步：确定M的分布，求它的期望与方差。</strong></p>
+<p>每个人只能选一个选项，因此“选A”与“选B”互斥。在本例四类等概率的假设下：</p>
+<blockquote><p>P(选A或B) = P(选A)+P(选B) = 0.25+0.25 = 0.5。</p></blockquote>
+<p>80个人独立作答，所以M是80个独立、成功概率都为0.5的0、1变量之和。根据二项分布的定义：</p>
+<blockquote><p>M ∼ B(80,0.5)。</p><p>E(M) = 80 × 0.5 = 40；</p><p>Var(M) = 80 × 0.5 × (1−0.5) = 20。</p></blockquote>
+<p>这里二项分布的“成功”只是指“选A或B”，不表示答对。</p>
+<p><strong>第三步：用M改写第三个比较量的分子。</strong></p>
+<p>80个人中，选A或B的有M人，剩下选C或D的就有80−M人。于是：</p>
+<blockquote><p>O₁+O₂−O₃−O₄</p><p>= (O₁+O₂)−(O₃+O₄)</p><p>= M−(80−M)</p><p>= M−80+M</p><p><strong>= 2M−80。</strong></p></blockquote>
+<p>例如本次选A或B的有14+18 = 32人，选C或D的有22+26 = 48人，两边人数之差为32−48 = −16；代入2M−80，也得到2 × 32−80 = −16。这只是核对本次取值，下面的期望和方差则描述反复抽样时的波动。</p>
+<p><strong>第四步：计算这个分子的期望与方差。</strong></p>
+<p>期望使用线性性：</p>
+<blockquote><p>E(2M−80) = 2E(M)−80 = 2 × 40−80 = 0。</p></blockquote>
+<p>方差使用Var(aX+c) = a²Var(X)：减去常数80不改变方差，乘以2会使方差乘以2²。因此：</p>
+<blockquote><p>Var(2M−80) = 2²Var(M)</p><p>= 4 × 20</p><p><strong>= 80。</strong></p></blockquote>
+<p>也可以把Var(M)的计算一并代入，写成4 × 80 × 0.5 × 0.5 = 80。这里第一个4来自系数2的平方；后面的80 × 0.5 × 0.5才是M的方差。</p>
+<p><strong>第五步：除以分子的标准差，得到Z₃。</strong></p>
+<p>第三个分子的方差是80，所以标准差是<img alt="√80" src="文章配图/公式_v3/364410fb891be520.png" style="display:inline-block;width:37.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>。它的期望已经为0，因此：</p>
+<blockquote><p><img alt="Z₃ = (2M−80)/√80" src="文章配图/公式_v3/a80dad3ca81b0bd2.png" style="display:inline-block;width:91.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>。</p><p>E(Z₃) = E(2M−80)/<img alt="√80" src="文章配图/公式_v3/364410fb891be520.png" style="display:inline-block;width:37.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/> = 0；</p><p>Var(Z₃) = Var(2M−80)/80 = 80/80 = 1。</p></blockquote>
+<p>计算最后一行时，除以<img alt="√80" src="文章配图/公式_v3/364410fb891be520.png" style="display:inline-block;width:37.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>相当于乘一个常数，方差要乘这个常数的平方，也就是除以80。</p>
+<p>这样，三个比较量的分母都有了出处：前两个分子的方差为40，分别除以<img alt="√40" src="文章配图/公式_v3/51a970498b74f3a5.png" style="display:inline-block;width:37.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>；第三个分子的方差为80，除以<img alt="√80" src="文章配图/公式_v3/364410fb891be520.png" style="display:inline-block;width:37.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>。三个Z因此都具有均值0、方差1。<strong>这些均值和方差是精确结果；仅有这两个数字，还不能说Z服从标准正态分布，正态近似需要后面的大样本论证。</strong></p>
 <p>再检查共同波动，例如：</p>
 <blockquote><p>Cov(O₁−O₂, O₃−O₄)</p><p>= Cov(O₁,O₃)−Cov(O₁,O₄)</p><p>−Cov(O₂,O₃)+Cov(O₂,O₄)</p><p>= −5+5+5−5 = 0。</p></blockquote>
 <p>用同样的逐项展开方法，也能得到另外两对协方差为0。此时我们有了三个<strong>均值为0、方差为1、两两不相关</strong>的比较量。</p>
