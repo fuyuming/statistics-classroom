@@ -6,7 +6,7 @@ from math import gcd
 import numpy as np
 import pandas as pd
 from scipy.stats import binom, norm
-from plot_moments import make_plots, make_reference_plots
+from plot_expectation_variance_covariance import make_plots, make_reference_plots
 root = Path(__file__).resolve().parents[1]
 out = root/'运行结果'/'v2'/'Python'
 out.mkdir(parents=True, exist_ok=True)

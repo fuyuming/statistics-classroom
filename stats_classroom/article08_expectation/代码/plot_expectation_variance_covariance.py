@@ -1,4 +1,4 @@
-"""统计课堂08：理论概率配图；计算入口为moments.py。"""
+"""统计课堂08：理论概率配图；计算入口为expectation_variance_covariance.py。"""
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt

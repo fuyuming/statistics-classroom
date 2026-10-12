@@ -8,11 +8,11 @@
 
 解压完整仓库，进入`stats_classroom/article08_expectation`，保留文件层级。
 
-- **R**：打开`统计课堂08.Rproj` → 打开`代码/moments.R` → Source完整运行。只用基础R，无需安装包。
-- **Python**：Spyder“项目→新建项目→现有目录”选择本篇目录；打开`代码/moments.py`，F5完整运行。依赖见requirements.txt，应安装在Spyder实际使用的解释器环境中。主脚本调用`plot_moments.py`生成新增中文配图。
-- **MATLAB**：Current Folder（当前文件夹）切到本篇目录，打开`代码/moments.m`并Run。只用基础MATLAB，无需统计工具箱。工具栏“设置路径”管理函数搜索路径，不等于设置工作目录。
+- **R**：打开`统计课堂08.Rproj` → 打开`代码/expectation_variance_covariance.R` → Source完整运行。只用基础R，无需安装包。
+- **Python**：Spyder“项目→新建项目→现有目录”选择本篇目录；打开`代码/expectation_variance_covariance.py`，F5完整运行。依赖见requirements.txt，应安装在Spyder实际使用的解释器环境中。主脚本调用`plot_expectation_variance_covariance.py`生成新增中文配图。
+- **MATLAB**：Current Folder（当前文件夹）切到本篇目录，打开`代码/expectation_variance_covariance.m`并Run。只用基础MATLAB，无需统计工具箱。工具栏“设置路径”管理函数搜索路径，不等于设置工作目录。
 
-命令行也可使用`Rscript 代码/moments.R`或`python 代码/moments.py`。主脚本自动定位自身文件与数据，建议完整运行，不要只粘贴中间几行。
+命令行也可使用`Rscript 代码/expectation_variance_covariance.R`或`python 代码/expectation_variance_covariance.py`。主脚本自动定位自身文件与数据，建议完整运行，不要只粘贴中间几行。
 
 ## 结果与对应问题
 
@@ -26,7 +26,7 @@
 
 Python产生`文章配图/v2_02_样本率与正态近似.png`与`v2_03_率差精确分布.png`及曲线坐标。图中正态曲线表示对应小区间的概率，不把密度误当概率。
 
-Python主脚本同时复现正文四张图；`plot_moments.py`是自动调用的绘图模块。Q图使用20,000次多项模型模拟；模拟不能代替渐近分布的证明。运行结果和配图沿用原路径，以保持文章链接可用。
+Python主脚本同时复现正文四张图；`plot_expectation_variance_covariance.py`是自动调用的绘图模块。Q图使用20,000次多项模型模拟；模拟不能代替渐近分布的证明。运行结果和配图沿用原路径，以保持文章链接可用。
 
 ## 输入与练习
 
