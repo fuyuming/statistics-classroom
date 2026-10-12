@@ -46,6 +46,6 @@ Python主脚本同时复现正文四张图；`plot_expectation_variance_covarian
 
 ## 版本与核验
 
-`VALIDATION_v2.md`记录本次实际运行、三语言数值对照与图文检查。旧`VALIDATION.md`记录v1。旧迭代脚本已移除，各语言只保留一个主入口；保留核验记录。
+各语言只保留一个当前主入口。最新运行核对情况见`修订说明_v3.md`；`VALIDATION.md`为早期核验记录。
 
 公众号没有自动发布。
