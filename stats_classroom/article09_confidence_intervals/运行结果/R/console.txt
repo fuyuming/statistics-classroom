@@ -1,0 +1,137 @@
+
+数据： birth_weight_g.csv 
+  group weight_g
+1     A      143
+2     A      142
+3     A      143
+4     A      137
+5     B      140
+6     B      142
+7     B      136
+8     B      138
+9     B      140
+
+数据： lead_ug_g.csv 
+  lead_ug_g
+1       4.2
+2       4.5
+3       3.6
+4       4.7
+5       4.0
+6       3.8
+7       3.7
+8       4.2
+
+数据： response_counts.csv 
+  events   n
+1     45 100
+
+数据： wheat_rust_counts.csv 
+    group events   n
+1 lowland    342 378
+2  upland    313 396
+
+数据： wheat_variance_summary.csv 
+  group  n sample_variance
+1     1 10          22.933
+2     2 10           2.933
+
+正在运行： 01_两个总体均数差.R 
+  group weight_g
+1     A      143
+2     A      142
+3     A      143
+4     A      137
+5     B      140
+6     B      142
+7     B      136
+8     B      138
+9     B      140
+             n1              n2          mean_A          mean_B           var_A 
+      4.0000000       5.0000000     141.2500000     139.2000000       8.2500000 
+          var_B pooled_variance              SE              df            t975 
+      5.2000000       6.5071429       1.7112026       7.0000000       2.3646243 
+解释：估计的是 A总体平均出生重减去B总体平均出生重。区间包含0，不能据此确定差异方向。
+  estimate      lower     upper conf_level unit
+1     2.05 -1.9963511 6.0963511       0.95    g
+文件已保存至： [项目目录]/运行结果/R 
+
+正在运行： 02_一个总体率.R 
+  events   n
+1     45 100
+         item count at_least_5
+1     n*p_hat    45       TRUE
+2 n*(1-p_hat)    55       TRUE
+      events    nonevents         phat           SE         z975 
+45.000000000 55.000000000  0.450000000  0.049749372  1.959963985 
+           method      lower      upper
+1            Wald 0.35249302 0.54750698
+2          Wilson 0.35614538 0.54755397
+3 Clopper-Pearson 0.35032023 0.55271981
+解释：两个端点乘100后是百分比；本例Wald区间是正态近似结果。
+  estimate      lower      upper conf_level                unit
+1     0.45 0.35249302 0.54750698       0.95 proportion (0 to 1)
+文件已保存至： [项目目录]/运行结果/R 
+
+正在运行： 03_两个总体率差.R 
+    group events   n
+1 lowland    342 378
+2  upland    313 396
+           item count at_least_5
+1     n1*p1_hat   342       TRUE
+2 n1*(1-p1_hat)    36       TRUE
+3     n2*p2_hat   313       TRUE
+4 n2*(1-p2_hat)    83       TRUE
+         p1          p2  difference          SE 
+0.904761905 0.790404040 0.114357864 0.025422517 
+   events1 nonevents1    events2 nonevents2 
+       342         36        313         83 
+ CI99_lower  CI99_upper 
+0.048873801 0.179841928 
+解释：差值及区间乘100，单位为百分点，不是相对增加的百分比。
+    estimate       lower      upper conf_level                  unit
+1 0.11435786 0.064530647 0.16418508       0.95 proportion difference
+文件已保存至： [项目目录]/运行结果/R 
+
+正在运行： 04_一个总体方差.R 
+  lead_ug_g
+1       4.2
+2       4.5
+3       3.6
+4       4.7
+5       4.0
+6       3.8
+7       3.7
+8       4.2
+
+	Shapiro-Wilk normality test
+
+data:  x
+W = 0.953421, p-value = 0.74561
+
+Shapiro-Wilk P>0.05只能说明本次未检出明显偏离，不能证明正态；n=8时检验能力有限。
+          n        s_sq          df        q025        q975 
+ 8.00000000  0.14982143  7.00000000  1.68986918 16.01276427 
+  SD_lower   SD_upper 
+0.25591918 0.78778815 
+解释：这是总体方差区间，不是平均铅浓度区间，也不是95%土样的取值范围。
+    estimate       lower      upper conf_level     unit
+1 0.14982143 0.065494626 0.62061017       0.95 (ug/g)^2
+文件已保存至： [项目目录]/运行结果/R 
+
+正在运行： 05_两个总体方差比.R 
+  group  n sample_variance
+1     1 10          22.933
+2     2 10           2.933
+     ratio        df1        df2       f025       f975 
+7.81895670 9.00000000 9.00000000 0.24838585 4.02599416 
+解释：这是方差之比；若要比较标准差之比，应把估计值与区间端点开平方。
+   estimate     lower     upper conf_level                      unit
+1 7.8189567 1.9421182 31.479074       0.95 variance ratio (unitless)
+文件已保存至： [项目目录]/运行结果/R 
+
+正在运行： 06_重复抽样看覆盖率.R 
+         rounds        coverage true_difference 
+       1000.000           0.957           2.000 
+蓝线覆盖固定真值，红线未覆盖。每轮重新取样并重新计算区间。
+表格和PNG保存在： [项目目录]/运行结果/R 
