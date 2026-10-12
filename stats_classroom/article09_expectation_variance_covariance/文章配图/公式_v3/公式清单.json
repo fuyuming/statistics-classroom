@@ -1,0 +1,21 @@
+{
+  "656c2dfb4de1a01c.png": "\\mathrm{SE}(\\hat p)=\\sqrt{\\frac{p(1-p)}{n}}",
+  "4f16076382b44bf4.png": "\\sqrt{p(1-p)}",
+  "5dd7664af404a64a.png": "\\sqrt{n}",
+  "9c40348b4f389df5.png": "Z_n=\\frac{\\hat p-p}{\\sqrt{p(1-p)/n}}\\ \\longrightarrow\\ N(0,1)",
+  "d1ddc655f39cd977.png": "Z_n=\\frac{X/n-p}{\\sqrt{p(1-p)/n}}",
+  "c32f95ea6cfb9482.png": "\\frac{(X-np)/n}{\\sqrt{np(1-p)}/n}",
+  "e884c057f179d8b5.png": "\\frac{X-np}{\\sqrt{np(1-p)}}",
+  "99c6520f02b56952.png": "\\mathrm{SE}(D)=\\sqrt{0.00845}\\approx0.091924",
+  "92bc09c503c6ccad.png": "Z=\\frac{D-(p_1-p_2)}{\\sqrt{\\frac{p_1(1-p_1)}{n_1}+\\frac{p_2(1-p_2)}{n_2}}}",
+  "5b2ffd135210f195.png": "\\sqrt{\\frac{\\hat p(1-\\hat p)}{n}}",
+  "f0818c4f309ddeda.png": "\\sqrt{\\frac{\\hat p_1(1-\\hat p_1)}{n_1}+\\frac{\\hat p_2(1-\\hat p_2)}{n_2}}",
+  "16ff255332a3d4f4.png": "\\frac{O_j-np_j}{\\sqrt{np_j}}",
+  "3068fa2e6e301cb9.png": "-\\sqrt{p_jp_\\ell}",
+  "ce7d38d7144c7b95.png": "Z_1=\\frac{O_1-O_2}{\\sqrt{40}}",
+  "c89a1e546ed9b081.png": "Z_2=\\frac{O_3-O_4}{\\sqrt{40}}",
+  "11f7e88e5c5afdc7.png": "Z_3=\\frac{O_1+O_2-O_3-O_4}{\\sqrt{80}}",
+  "51a970498b74f3a5.png": "\\sqrt{40}",
+  "364410fb891be520.png": "\\sqrt{80}",
+  "e11f6ffbb0a73bb8.png": "\\sqrt{n/2}"
+}

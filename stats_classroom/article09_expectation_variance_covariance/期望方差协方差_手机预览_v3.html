@@ -1,4 +1,5 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>样本率为什么近似正态？把率差公式里省略的步骤补回来</title><style>*{box-sizing:border-box}body{margin:0;background:#f1f4f3;color:#27343a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:720px;margin:24px auto;padding:32px 36px 56px;background:#fff;border-top:5px solid #167d80}.brand{display:flex;align-items:center;gap:12px;color:#167d80;font-size:14px;letter-spacing:.04em}.brand img{width:48px;height:48px;border-radius:50%}h1{font-size:30px;line-height:1.45;color:#142e41;margin:26px 0 20px}h2{font-size:22px;line-height:1.5;color:#163d48;border-left:4px solid #198c8b;padding-left:13px;margin:42px 0 20px}h3{font-size:19px;line-height:1.55;color:#163d48;margin:30px 0 14px}p{font-size:17px;line-height:1.95;margin:19px 0;text-align:justify}strong{color:#15696a;font-weight:650}blockquote{margin:20px 0 30px;padding:10px 18px;background:#f0f7f6;border-left:2px solid #6da6a0}blockquote p{font-size:14px;line-height:1.9;margin:8px 0;color:#53666c}a{color:#167d80;text-decoration:none;border-bottom:1px solid #bbd8d4}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;background:#f2f7f6;color:#15696a;padding:1px 5px;border-radius:4px}pre{background:#f7faf9;border:1px solid #e4ecea;border-radius:6px;padding:12px 14px;overflow-x:auto}pre code{background:none;padding:0;font-size:14px;line-height:1.7}div.formula{background:#f7faf9;border-left:3px solid #6da6a0;padding:12px 16px;margin:20px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:17px;color:#15696a;text-align:center;line-height:1.9}ul,ol{font-size:17px;line-height:1.95;margin:18px 0;padding-left:26px}li{margin:8px 0}table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px}th,td{border-bottom:1px solid #e4ecea;padding:9px 10px;text-align:left;line-height:1.7}th{background:#f0f7f6;color:#15696a;font-weight:650}footer{border-top:1px solid #dfe8e6;margin-top:36px;padding-top:16px;font-size:12px;color:#758787;line-height:1.8}@media(max-width:600px){body{background:#fff}main{margin:0;padding:24px 22px 40px;border-top-width:4px}h1{font-size:27px}h2{font-size:21px}h3{font-size:18px}p,ul,ol{font-size:16px;line-height:1.95}table{font-size:14px}}main > p img{display:block;width:100%;height:auto;margin:24px 0 8px;border:1px solid #e4ecea}main > p:has(img){margin:25px -12px 4px}main > p:has(img) a{border:0;display:block}main > p > em:only-child{display:block;font-size:13px;line-height:1.8;font-style:normal;color:#657a7d;text-align:left;margin:0 0 28px}@media(max-width:600px){main > p:has(img){margin-left:-12px;margin-right:-12px}}a{overflow-wrap:anywhere}table{display:block;overflow-x:auto}blockquote p{font-size:16px}hr{border:0;border-top:1px solid #dfe8e6;margin:30px 0}</style></head><body><main><div class="brand"><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E8%B4%A6%E5%8F%B7%E5%A4%B4%E5%83%8F.png" alt="账号头像">明哥的微生物世界 · 统计课堂</div><h1>样本率为什么近似正态？把率差公式里省略的步骤补回来</h1><blockquote><p>明哥的微生物世界 · 统计课堂 09</p><p>摘要：从0、1结果出发，推到样本率、两个样本率之差，再走到分类统计量Q。把期望、方差、协方差的运算，以及“精确分布”与“大样本近似”之间缺少的几步补清楚。</p></blockquote>
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>样本率为什么近似正态？把率差公式里省略的步骤补回来</title><style>*{box-sizing:border-box}body{margin:0;background:#f1f4f3;color:#27343a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:720px;margin:24px auto;padding:32px 36px 56px;background:#fff;border-top:5px solid #167d80}.brand{display:flex;align-items:center;gap:12px;color:#167d80;font-size:14px;letter-spacing:.04em}.brand img{width:48px;height:48px;border-radius:50%}h1{font-size:30px;line-height:1.45;color:#142e41;margin:26px 0 20px}h2{font-size:22px;line-height:1.5;color:#163d48;border-left:4px solid #198c8b;padding-left:13px;margin:42px 0 20px}h3{font-size:19px;line-height:1.55;color:#163d48;margin:30px 0 14px}p{font-size:17px;line-height:1.95;margin:19px 0;text-align:justify}strong{color:#15696a;font-weight:650}blockquote{margin:20px 0 30px;padding:10px 18px;background:#f0f7f6;border-left:2px solid #6da6a0}blockquote p{font-size:14px;line-height:1.9;margin:8px 0;color:#53666c}a{color:#167d80;text-decoration:none;border-bottom:1px solid #bbd8d4}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;background:#f2f7f6;color:#15696a;padding:1px 5px;border-radius:4px}pre{background:#f7faf9;border:1px solid #e4ecea;border-radius:6px;padding:12px 14px;overflow-x:auto}pre code{background:none;padding:0;font-size:14px;line-height:1.7}div.formula{background:#f7faf9;border-left:3px solid #6da6a0;padding:12px 16px;margin:20px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:17px;color:#15696a;text-align:center;line-height:1.9}ul,ol{font-size:17px;line-height:1.95;margin:18px 0;padding-left:26px}li{margin:8px 0}table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px}th,td{border-bottom:1px solid #e4ecea;padding:9px 10px;text-align:left;line-height:1.7}th{background:#f0f7f6;color:#15696a;font-weight:650}footer{border-top:1px solid #dfe8e6;margin-top:36px;padding-top:16px;font-size:12px;color:#758787;line-height:1.8}@media(max-width:600px){body{background:#fff}main{margin:0;padding:24px 22px 40px;border-top-width:4px}h1{font-size:27px}h2{font-size:21px}h3{font-size:18px}p,ul,ol{font-size:16px;line-height:1.95}table{font-size:14px}}main > p img{display:block;width:100%;height:auto;margin:24px 0 8px;border:1px solid #e4ecea}main > p:has(img){margin:25px -12px 4px}main > p:has(img) a{border:0;display:block}main > p > em:only-child{display:block;font-size:13px;line-height:1.8;font-style:normal;color:#657a7d;text-align:left;margin:0 0 28px}@media(max-width:600px){main > p:has(img){margin-left:-12px;margin-right:-12px}}a{overflow-wrap:anywhere}table{display:block;overflow-x:auto}blockquote p{font-size:16px}hr{border:0;border-top:1px solid #dfe8e6;margin:30px 0}</style></head><body><main><div class="brand"><img alt="账号头像" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E8%B4%A6%E5%8F%B7%E5%A4%B4%E5%83%8F.png"/>明哥的微生物世界 · 统计课堂 08</div><h1>样本率为什么近似正态？把率差公式里省略的步骤补回来</h1><blockquote><p>明哥的微生物世界 · 统计课堂 08</p><p>摘要：从0、1结果出发，推到样本率、两个样本率之差，再走到分类统计量Q。把期望、方差、协方差的运算，以及“精确分布”与“大样本近似”之间缺少的几步补清楚。</p></blockquote>
 <p>大家好，我是明哥。</p>
 <p>第6次课讲到样本率之差和分类频数的统计量Q时，我有些地方讲得太快了。尤其是从“算出期望和方差”走到“可以用正态分布近似”，中间还有一段重要的道理，没有交代清楚。</p>
 <p>一个人是否答对某道题，结果只有0和1。为什么一组人答对的比例，在一定条件下却能用正态分布近似？两个组的比例相减，为什么方差反而相加？再往后，分类频数的平方偏差为什么会联系到卡方分布？</p>
@@ -43,7 +44,7 @@
 <blockquote><p><strong>Var(X−Y) = 2−2ρ。</strong></p></blockquote>
 <p>图1的横轴是相关系数ρ，纵轴是差值X−Y的方差。沿曲线从左向右看，相关性越偏向正，差值的方差越小。例如ρ = −0.8时，差值方差为3.6；ρ = 0时为2；ρ = 0.8时为0.4。</p>
 <p>这说明：<strong>两者常常同向变化时，做差可以抵消一部分共同波动；两者常常反向变化时，做差会放大波动。</strong> 所以，只知道X和Y各自的方差，还不足以确定X−Y的方差。</p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/01_%E5%8D%8F%E6%96%B9%E5%B7%AE%E4%B8%8E%E5%B7%AE%E5%80%BC.png" alt="协方差怎样影响差值的方差"></p>
+<p><img alt="协方差怎样影响差值的方差" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/01_%E5%8D%8F%E6%96%B9%E5%B7%AE%E4%B8%8E%E5%B7%AE%E5%80%BC.png"/></p>
 <p><em>图1｜协方差对差值方差的影响。固定两个变量的方差均为1，按Var(X−Y) = 2−2ρ绘制理论曲线；向右表示相关系数增大，向下表示差值的波动减小。</em></p>
 <p>若X与Y独立，在这里的有限二阶矩条件下，E(XY) = E(X)E(Y)，所以Cov(X,Y) = 0。差的方差才简化为：</p>
 <blockquote><p><strong>Var(X−Y) = Var(X)+Var(Y)。</strong></p></blockquote>
@@ -51,10 +52,11 @@
 <p>也可以用X−X检查自己有没有漏项：同一个变量减自己恒为0，其方差当然为0。公式给出Var(X)+Var(X)−2Cov(X,X) = 0，因为Cov(X,X) = Var(X)。如果误把两个X当成独立，就会算错。</p>
 <p>另一个常用性质是：Cov(aX+c,bY+d) = abCov(X,Y)。常数平移不改变协方差，两个系数分别提出。独立可以推出协方差为0，反过来通常不成立。</p>
 <p>把常用性质放在一起，便于后面逐项调用。以下假设所需的期望、方差存在，所有字母系数都是固定常数。</p>
-<table><thead><tr><th>对象</th><th>性质</th><th>使用时要注意什么</th></tr></thead><tbody><tr><td>常数的期望</td><td>E(c) = c</td><td>常数也可以看成不变的随机变量</td></tr><tr><td>期望的线性性</td><td>E(ΣaᵢXᵢ+c) = ΣaᵢE(Xᵢ)+c</td><td>无须独立；有限项求和</td></tr><tr><td>乘积的期望</td><td>E(XY) = E(X)E(Y)+Cov(X,Y)</td><td>不能无条件把乘积拆成两个期望</td></tr><tr><td>二阶矩</td><td>E(X²) = Var(X)+[E(X)]²</td><td>先平方再平均与先平均再平方不同</td></tr><tr><td>平移与缩放</td><td>Var(aX+c) = a²Var(X)；Var(c) = 0</td><td>系数平方，常数平移不改变波动</td></tr><tr><td>协方差的对称性</td><td>Cov(X,Y) = Cov(Y,X)</td><td>两个位置可以交换</td></tr><tr><td>自身与常数</td><td>Cov(X,X) = Var(X)；Cov(X,c) = 0</td><td>代回展开式可自查</td></tr><tr><td>协方差的可加性</td><td>Cov(X+Y,Z) = Cov(X,Z)+Cov(Y,Z)</td><td>无须独立；相减时保留负号</td></tr><tr><td>一般线性组合的方差</td><td>Var(ΣaᵢXᵢ) = Σaᵢ²Var(Xᵢ)+2Σᵢ＜ⱼaᵢaⱼCov(Xᵢ,Xⱼ)</td><td>后一项对所有不同变量的配对求和</td></tr></tbody></table>
-<p>协方差还可在两边都展开。例如Cov(aX+bY,cU+dV)，等于acCov(X,U)+adCov(X,V)+bcCov(Y,U)+bdCov(Y,V)。后面分类计数的推导就会用到它。</p>
+<blockquote><p><strong>期望的基本性质</strong></p><p><strong>常数：</strong> E(c) = c。</p><p><strong>线性性：</strong> E(ΣaᵢXᵢ+c) = ΣaᵢE(Xᵢ)+c。Σ表示把有限个项加起来；无论变量是否独立，都可以逐项取期望，常数系数原样提出。</p><p><strong>乘积：</strong> E(XY) = E(X)E(Y)+Cov(X,Y)。当协方差为0时，才可简化为两个期望的乘积；独立是保证这一点的充分条件。</p><p><strong>二阶矩：</strong> E(X²) = Var(X)+[E(X)]²。</p></blockquote>
+<blockquote><p><strong>方差的基本性质</strong></p><p><strong>常用计算公式：</strong> Var(X) = E(X²)−[E(X)]²。</p><p><strong>常数、平移与缩放：</strong> Var(c) = 0；Var(aX+c) = a²Var(X)。平移不改变波动，缩放后方差乘以系数的平方。</p><p><strong>两个变量：</strong> Var(aX+bY) = a²Var(X)+b²Var(Y)+2abCov(X,Y)。把b设为−1，就得到差值方差中的负协方差项。</p><p><strong>一般线性组合：</strong> 设S = a₁X₁+⋯+aₘXₘ，m是变量个数，aᵢ是固定系数，则：</p><p>Var(S) = Σᵢ₌₁ᵐ aᵢ²Var(Xᵢ) + 2Σᵢ＜ⱼ aᵢaⱼCov(Xᵢ,Xⱼ)。</p><p><strong>第一部分怎么加？</strong> 每个变量贡献一项“系数平方×自身方差”，共m项。</p><p><strong>第二部分怎么加？</strong> i＜j表示从这m个变量中，每次选两个不同变量，每对只写一次，共m(m−1)/2对。先将这两个变量的系数相乘，再乘它们的协方差，最后把所有配对项相加并乘2。</p><p><strong>为什么乘2？</strong> 展开[S−E(S)]²时，每一对交叉乘积会出现两次。例如X₁的偏差乘X₂的偏差，以及X₂的偏差乘X₁的偏差；两项相等，合并得到系数2。取期望后，偏差乘积就变成协方差。</p><p><strong>用三个变量展开看：</strong></p><p>Var(aX+bY+cZ) = a²Var(X)+b²Var(Y)+c²Var(Z)</p><p>+2abCov(X,Y)+2acCov(X,Z)+2bcCov(Y,Z)。</p><p>三对分别是(X,Y)、(X,Z)、(Y,Z)，没有遗漏，也没有重复。比如Var(X+Y−Z)中的三项协方差依次为+2Cov(X,Y)、−2Cov(X,Z)、−2Cov(Y,Z)；正负号由系数的乘积决定。</p><p><strong>什么时候只加方差？</strong> 当所有不同变量两两不相关时，协方差项全部为0，剩下Σaᵢ²Var(Xᵢ)。相互独立足以保证这一点；一般公式本身不要求独立，也不要求正态分布。</p></blockquote>
+<blockquote><p><strong>协方差的基本性质</strong></p><p><strong>对称性：</strong> Cov(X,Y) = Cov(Y,X)。</p><p><strong>自身与常数：</strong> Cov(X,X) = Var(X)；Cov(X,c) = 0。</p><p><strong>平移与缩放：</strong> Cov(aX+c,bY+d) = abCov(X,Y)。常数平移不影响协方差，两个位置上的系数分别提出。</p><p><strong>每一边都可以相加展开：</strong> Cov(X+Y,Z) = Cov(X,Z)+Cov(Y,Z)；Cov(X,U+V) = Cov(X,U)+Cov(X,V)。相减时保留对应负号，无须假设独立。</p><p><strong>双线性：两边同时展开。</strong> 第一个位置的每一项，都要与第二个位置的每一项配对：</p><p>Cov(aX+bY,cU+dV)</p><p>= acCov(X,U)+adCov(X,V)</p><p>+bcCov(Y,U)+bdCov(Y,V)。</p><p>左边有两项、右边有两项，因此得到2×2 = 4项。这里是“左边每项与右边每项配对”，不是前面方差公式中“不同变量每对只取一次”，所以不额外乘2。</p><p><strong>例如：</strong> Cov(X−Y,U+V) = Cov(X,U)+Cov(X,V)−Cov(Y,U)−Cov(Y,V)。后面分类计数的比较量，就按这条性质逐项展开。</p><p><strong>一般形式：</strong> Cov(ΣᵢaᵢXᵢ,ΣⱼbⱼYⱼ) = ΣᵢΣⱼaᵢbⱼCov(Xᵢ,Yⱼ)。两个求和号表示：第一个组合中的每项，都与第二个组合中的每项配对。两边包含同一个变量时，仍须保留Cov(X,X) = Var(X)。</p><p><strong>与独立性的关系：</strong> 独立可以推出协方差为0，协方差为0通常不能反推独立。</p></blockquote>
 <p>“不相关不等于独立”也可以看一个小例子：X以相同概率取−1、0、1，Y = X²。因为E(X) = E(X³) = 0，所以Cov(X,Y) = 0；但知道X，就完全知道Y，二者显然不是独立的。</p>
-<p>基础定义与性质可查阅CMU概率讲义：<a href="https://www.cs.cmu.edu/~mgormley/courses/ml-primer/probability.html" target="_blank" rel="noopener">https://www.cs.cmu.edu/~mgormley/courses/ml-primer/probability.html</a></p>
+<p>基础定义与性质可查阅CMU概率讲义：<a href="https://www.cs.cmu.edu/~mgormley/courses/ml-primer/probability.html" rel="noopener" target="_blank">https://www.cs.cmu.edu/~mgormley/courses/ml-primer/probability.html</a></p>
 <h2>四、样本率的精确分布：先数人数，再除以总人数</h2>
 <p>假设独立抽取n个人，每个人答对同一道题的概率都为p。令Yᵢ表示第i个人是否答对，答对人数记为X。</p>
 <blockquote><p>Yᵢ取0或1；X = Y₁+⋯+Yₙ；样本率 p̂ = X/n。</p></blockquote>
@@ -70,17 +72,17 @@
 <p>方差要多一步：不同人的结果独立，协方差为0，所以：</p>
 <blockquote><p>Var(X) = ΣVar(Yᵢ) = np(1−p)。</p><p>Var(p̂) = Var(X/n) = Var(X)/n²</p><p>= np(1−p)/n² = <strong>p(1−p)/n</strong>。</p></blockquote>
 <p>分母先出现n²，但分子本来就有一个n，约去之后只剩1/n。把方差开平方，得到样本率的标准误：</p>
-<blockquote><p><strong>SE(p̂) = √[p(1−p)/n]。</strong></p></blockquote>
-<p>单个人0、1结果的标准差为√[p(1−p)]；样本率的标准误比它小√n倍。标准误就是<strong>统计量在重复抽样中的标准差</strong>。</p>
+<blockquote><p><strong><img alt="SE(p̂) = √[p(1−p)/n]" src="文章配图/公式_v3/656c2dfb4de1a01c.png" style="display:inline-block;width:136.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>。</strong></p></blockquote>
+<p>单个人0、1结果的标准差为<img alt="√[p(1−p)]" src="文章配图/公式_v3/4f16076382b44bf4.png" style="display:inline-block;width:84.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>；样本率的标准误比它小<img alt="√n" src="文章配图/公式_v3/5dd7664af404a64a.png" style="display:inline-block;width:26.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>倍。标准误就是<strong>统计量在重复抽样中的标准差</strong>。</p>
 <p>到这里，二项分布、期望和方差都是模型下的精确结果。<strong>还没有用到“大样本”，也没有得到“正态分布”。</strong></p>
 <h2>五、为什么可以走到正态近似？关键在“平均数”</h2>
 <p>现在看清p̂的另一种写法：</p>
 <blockquote><p><strong>p̂ = (Y₁+⋯+Yₙ)/n。</strong></p></blockquote>
 <p>它就是n个0、1变量的样本平均数。这里可以应用中心极限定理：独立同分布、具有有限且非零方差的变量，其样本平均数减去总体均值，再除以自身的标准误，随样本量增大，分布趋近标准正态。</p>
 <p>固定0＜p＜1时，Yᵢ满足这些条件。因此：</p>
-<blockquote><p><strong>Zₙ = (p̂−p)/√[p(1−p)/n] → N(0,1)。</strong></p></blockquote>
+<blockquote><p><strong><img alt="Zₙ = (p̂−p)/√[p(1−p)/n] → N(0,1)" src="文章配图/公式_v3/9c40348b4f389df5.png" style="display:inline-block;width:211.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>。</strong></p></blockquote>
 <p>箭头表示分布趋近，不表示每一次抽样得到的数值都趋近某个正态随机数。把p̂ = X/n代入，逐步整理：</p>
-<blockquote><p>Zₙ = (X/n−p)/√[p(1−p)/n]</p><p>= [(X−np)/n] ÷ [√{np(1−p)}/n]</p><p>= <strong>(X−np)/√[np(1−p)]</strong>。</p></blockquote>
+<blockquote><p><img alt="Zₙ = (X/n−p)/√[p(1−p)/n]" src="文章配图/公式_v3/d1ddc655f39cd977.png" style="display:inline-block;width:113.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/></p><p>= <img alt="[(X−np)/n] ÷ [√{np(1−p)}/n]" src="文章配图/公式_v3/c32f95ea6cfb9482.png" style="display:inline-block;width:80.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/></p><p>= <strong><img alt="(X−np)/√[np(1−p)]" src="文章配图/公式_v3/e884c057f179d8b5.png" style="display:inline-block;width:68.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/></strong>。</p></blockquote>
 <p>原来，<strong>标准化样本率与标准化二项计数，得到的是同一个Z！</strong> 二项分布的正态近似与样本率的正态近似，正是同一件事在两种尺度下的表达。</p>
 <p>于是，在适当的大样本条件下，可以写：</p>
 <blockquote><p><strong>p̂ 近似服从 N(p, p(1−p)/n)。</strong></p></blockquote>
@@ -91,7 +93,7 @@
 <p>通常同时检查np与n(1−p)，也就是模型预期的答对人数和答错人数。教材常用两者至少达到5或10作为经验检查，这些数不是普遍精确的分界线。</p>
 <p>同样n = 100：p = 0.5时，预期50人答对、50人答错；p = 0.01时，却只有1人答对。后者的分布仍然明显偏斜。只记“n超过30就正态”，很容易用错。</p>
 <p>图2把这两种情况画出来：先在固定p时比较样本量的影响，再在相同样本量下比较不同p。重点看蓝色精确概率与橙色近似概率能否贴合。</p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/v2_02_%E6%A0%B7%E6%9C%AC%E7%8E%87%E4%B8%8E%E6%AD%A3%E6%80%81%E8%BF%91%E4%BC%BC.png" alt="样本率的精确分布与正态近似"></p>
+<p><img alt="样本率的精确分布与正态近似" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/v2_02_%E6%A0%B7%E6%9C%AC%E7%8E%87%E4%B8%8E%E6%AD%A3%E6%80%81%E8%BF%91%E4%BC%BC.png"/></p>
 <p><em>图2｜四个教学模型的精确二项概率（蓝色）与正态分布在对应小区间内的概率（橙色）。对取值x/n，橙线计算从(x−0.5)/n到(x+0.5)/n的正态概率，因此与蓝色比较的都是概率，不是把概率与密度直接叠在一起。上排固定p = 0.1，比较n = 10和100；下排固定n = 100，比较稀有事件p = 0.01与p = 0.5。图中横轴范围不同，用于看清各自分布。正态近似还可能分配少量概率到合理范围之外。</em></p>
 <h3>课堂的小样本例子：n = 10、p = 0.1</h3>
 <p>总体答对概率为0.1，抽10个人，求样本率至少0.3的概率，即至少3个人答对的概率：</p>
@@ -109,7 +111,7 @@
 <p>方差先保留协方差：</p>
 <blockquote><p>Var(D) = Var(p̂₁)+Var(p̂₂)−2Cov(p̂₁,p̂₂)。</p></blockquote>
 <p>两组独立，最后一项为0。于是：</p>
-<blockquote><p>Var(D) = p₁(1−p₁)/n₁ + p₂(1−p₂)/n₂</p><p>= 0.3 × 0.7/40 + 0.2 × 0.8/50</p><p>= 0.00525 + 0.00320 = <strong>0.00845</strong>。</p><p><strong>SE(D) = √0.00845 ≈ 0.091924，即9.19个百分点。</strong></p></blockquote>
+<blockquote><p>Var(D) = p₁(1−p₁)/n₁ + p₂(1−p₂)/n₂</p><p>= 0.3 × 0.7/40 + 0.2 × 0.8/50</p><p>= 0.00525 + 0.00320 = <strong>0.00845</strong>。</p><p><strong><img alt="SE(D) = √0.00845 ≈ 0.091924" src="文章配图/公式_v3/99c6520f02b56952.png" style="display:inline-block;width:256.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>，即9.19个百分点。</strong></p></blockquote>
 <p>两组都有抽样误差。相减后，独立的两份波动不会自动抵消；−1这个系数在方差里被平方，才出现方差相加。</p>
 <p>如果是同一批对象的前后结果，或者两个组之间存在相关性，就不能直接消掉协方差。<strong>是抽样设计决定能不能相加，不是看到两个率就自动相加。</strong></p>
 <h2>七、率差到底服从什么分布？先把精确分布算出来</h2>
@@ -133,7 +135,7 @@
 <h3>再走到率差的正态近似</h3>
 <p>各组样本率在适当条件下近似正态，两组又独立，因此它们的差可以近似正态。严格的大样本表述，可令两个样本量同时增大、保持适当的比例，各组总体概率固定在0与1之间。</p>
 <p>本例检查四个期望计数：12、28、10、40。它们支持尝试正态近似，近似是否足够好，还可与精确结果对照。</p>
-<blockquote><p><strong>D 近似服从 N(0.1, 0.00845)。</strong></p><p>Z = [D−(p₁−p₂)] / √[p₁(1−p₁)/n₁+p₂(1−p₂)/n₂]</p><p>近似服从N(0,1)。</p></blockquote>
+<blockquote><p><strong>D 近似服从 N(0.1, 0.00845)。</strong></p><p><img alt="Z = [D−(p₁−p₂)] / √[p₁(1−p₁)/n₁+p₂(1−p₂)/n₂]" src="文章配图/公式_v3/92bc09c503c6ccad.png" style="display:inline-block;width:149.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/></p><p>近似服从N(0,1)。</p></blockquote>
 <p>注意逻辑顺序：先由运算性质算出中心和方差，再由各组的中心极限定理与组间独立性得到正态近似。前一步不能替代后一步。</p>
 <p>用Φ表示标准正态分布的累积概率函数，即Φ(z) = P(Z ≤ z)。不做连续性校正时：</p>
 <blockquote><p>P(D ≥ 0.2) ≈ 1−Φ[(0.2−0.1)/0.091924]</p><p><strong>≈ 0.138329。</strong></p></blockquote>
@@ -143,11 +145,11 @@
 <table><thead><tr><th>方法</th><th>边界</th><th>P(D ≥ 0.2)的计算结果</th></tr></thead><tbody><tr><td>联合二项精确枚举</td><td>保留离散事件D ≥ 0.2</td><td>0.144336</td></tr><tr><td>正态近似</td><td>0.2</td><td>0.138329</td></tr><tr><td>正态近似并作格点校正</td><td>0.1975</td><td>0.144422</td></tr></tbody></table>
 <p>本例校正后的结果很接近精确值。这里的半格依据<strong>两个分母共同产生的取值网格</strong>，不能对任意两个样本率之差都随便减去0.5/n₁或0.5/n₂；极端边缘还可能有不可取的格点。</p>
 <p>图3左侧展示整个率差分布，右侧单独比较上表的尾概率。看整体形状，再看具体事件的概率误差，才能判断这种近似对当前问题是否合适。</p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/v2_03_%E7%8E%87%E5%B7%AE%E7%B2%BE%E7%A1%AE%E5%88%86%E5%B8%83.png" alt="率差的精确概率与正态近似"></p>
+<p><img alt="率差的精确概率与正态近似" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/v2_03_%E7%8E%87%E5%B7%AE%E7%B2%BE%E7%A1%AE%E5%88%86%E5%B8%83.png"/></p>
 <p><em>图3｜左图为两独立二项样本产生的率差精确分布，以及正态分布在宽0.005的小区间内的概率；右图对比“率差至少0.2”的三种计算结果。所有概率均为理论计算，未使用随机模拟。</em></p>
 <h3>总体p未知时，标准误怎么办？</h3>
 <p>上述例子给定p，适合看清抽样分布。实际资料通常只知道样本率，可用p̂代入估计标准误：</p>
-<blockquote><p>单组：估计SE = √[p̂(1−p̂)/n]；</p><p>独立两组：估计SE = √[p̂₁(1−p̂₁)/n₁+p̂₂(1−p̂₂)/n₂]。</p></blockquote>
+<blockquote><p>单组：估计SE = <img alt="√[p̂(1−p̂)/n]" src="文章配图/公式_v3/5b2ffd135210f195.png" style="display:inline-block;width:71.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>；</p><p>独立两组：估计SE = <img alt="√[p̂₁(1−p̂₁)/n₁+p̂₂(1−p̂₂)/n₂]" src="文章配图/公式_v3/f0818c4f309ddeda.png" style="display:inline-block;width:165.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>。</p></blockquote>
 <p>这是常用的代入估计，不会自动让小样本变得可靠。例如样本里没有一次事件，p̂ = 0，上式给出0，不表示真实总体概率已经毫无不确定性。检验“两总体率相等”时，还可能使用零假设下的合并率；不能把估计标准误与某一种检验公式混为一谈。</p>
 <h2>八、从样本率走到Q：同一个标准化误差的平方</h2>
 <p>前面推到的Z，恰好能接上课堂的二分类Q。把n个人分为答对、答错两类，观察频数是X与n−X，期望频数是np与n(1−p)。Pearson统计量为：</p>
@@ -183,15 +185,15 @@
 <p>可以马上自查：四个计数之和的方差，应是4 × 15 + 2 × 6 × (−5) = 0。这里6是四类之间不同配对的数量。协方差恰好抵消了各类方差，符合“总数固定为80”。</p>
 <h3>Q的分母为什么是期望频数，而不是每类的方差？</h3>
 <p>刚才二分类的推导解释了：Q的两项合起来，分母中的(1−p)才出现。四分类也需要整体理解。</p>
-<p>回到四类，也不能把每一项都当作一个独立标准正态变量的平方。令rj = (Oj−npj)/√(npj)，则：</p>
-<blockquote><p>Var(rj) = 1−pj，而不是1；</p><p>Cov(rj,rℓ) = −√(pjpℓ)，而不是0。</p></blockquote>
+<p>回到四类，也不能把每一项都当作一个独立标准正态变量的平方。令rj = <img alt="(Oj−npj)/√(npj)" src="文章配图/公式_v3/16ff255332a3d4f4.png" style="display:inline-block;width:47.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>，则：</p>
+<blockquote><p>Var(rj) = 1−pj，而不是1；</p><p>Cov(rj,rℓ) = <img alt="−√(pjpℓ)" src="文章配图/公式_v3/3068fa2e6e301cb9.png" style="display:inline-block;width:61.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>，而不是0。</p></blockquote>
 <p>本例各项方差为0.75，任意两项协方差为−0.25。若分别除以每类自己的方差15再相加，得到的是(4/3)Q，已经不是原来的Pearson Q，不能仍然拿同一个χ²(3)分布作参照。</p>
 <h3>四分类为什么能走到χ²(3)？把三个方向写出来</h3>
 <p>只说“总和固定，所以少一个自由度”还不够：它解释了少一个方向，却没说明剩下三个方向为什么具有合适的尺度。</p>
 <p>对于课堂的四类等概率模型，可以直接构造三个比较：</p>
-<blockquote><p>Z₁ = (O₁−O₂)/√40；</p><p>Z₂ = (O₃−O₄)/√40；</p><p>Z₃ = (O₁+O₂−O₃−O₄)/√80。</p></blockquote>
+<blockquote><p><img alt="Z₁ = (O₁−O₂)/√40" src="文章配图/公式_v3/ce7d38d7144c7b95.png" style="display:inline-block;width:88.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>；</p><p><img alt="Z₂ = (O₃−O₄)/√40" src="文章配图/公式_v3/c89a1e546ed9b081.png" style="display:inline-block;width:88.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>；</p><p><img alt="Z₃ = (O₁+O₂−O₃−O₄)/√80" src="文章配图/公式_v3/11f7e88e5c5afdc7.png" style="display:inline-block;width:147.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>。</p></blockquote>
 <p>前两个分别比较A与B、C与D；第三个比较前两类合计与后两类合计。各分子的期望都是0。</p>
-<p>为什么分母分别是√40、√40、√80？第一项可以直接用协方差算：</p>
+<p>为什么分母分别是<img alt="√40" src="文章配图/公式_v3/51a970498b74f3a5.png" style="display:inline-block;width:37.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>、<img alt="√40" src="文章配图/公式_v3/51a970498b74f3a5.png" style="display:inline-block;width:37.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>、<img alt="√80" src="文章配图/公式_v3/364410fb891be520.png" style="display:inline-block;width:37.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>？第一项可以直接用协方差算：</p>
 <blockquote><p>Var(O₁−O₂) = 15+15−2 × (−5) = 40。</p></blockquote>
 <p>第三项令A = O₁+O₂，则A是概率0.5、次数80的二项计数；它的分子等于2A−80，方差为4 × 80 × 0.5 × 0.5 = 80。因此三个Z的方差都等于1。</p>
 <p>再检查共同波动，例如：</p>
@@ -202,17 +204,17 @@
 <p>把两式相加，利用(a−b)²+(a+b)² = 2a²+2b²，得到Σdj²/20，也就是Q。因此，在总数为80时：</p>
 <blockquote><p><strong>Q = Z₁²+Z₂²+Z₃²。</strong></p></blockquote>
 <p>代入14、18、22、26，三个平方分别为0.4、0.4、3.2，加起来仍然等于4。</p>
-<p><strong>这里还差最后一个条件：不相关本身不等于独立。</strong> 当样本量增大、四个类别概率固定且均为0.25时，多项分布的中心极限定理使这三个标准化比较量联合趋近正态；上面的分母也相应写成√(n/2)、√(n/2)、√n。极限中协方差为0的联合正态分量相互独立，才得到三个独立标准正态的平方和。</p>
+<p><strong>这里还差最后一个条件：不相关本身不等于独立。</strong> 当样本量增大、四个类别概率固定且均为0.25时，多项分布的中心极限定理使这三个标准化比较量联合趋近正态；上面的分母也相应写成<img alt="√(n/2)" src="文章配图/公式_v3/e11f6ffbb0a73bb8.png" style="display:inline-block;width:43.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>、<img alt="√(n/2)" src="文章配图/公式_v3/e11f6ffbb0a73bb8.png" style="display:inline-block;width:43.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>、<img alt="√n" src="文章配图/公式_v3/5dd7664af404a64a.png" style="display:inline-block;width:26.00px;max-width:100%;height:auto;vertical-align:middle;margin:5px 3px;"/>。极限中协方差为0的联合正态分量相互独立，才得到三个独立标准正态的平方和。</p>
 <p>因此，四分类的Pearson Q具有<strong>渐近χ²(3)参照分布</strong>。有限样本下Q是离散的，不会精确等于连续的卡方分布。</p>
 <p>图4上半部分把三个比较方向对Q的贡献画出来，下半部分用重复抽样展示Q的分布与χ²(3)曲线的接近程度。前者核对代数关系，后者帮助理解分布近似。</p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/03_Q%E4%B8%8E%E4%B8%89%E4%B8%AA%E6%96%B9%E5%90%91.png" alt="Pearson Q与三个比较方向"></p>
+<p><img alt="Pearson Q与三个比较方向" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/03_Q%E4%B8%8E%E4%B8%89%E4%B8%AA%E6%96%B9%E5%90%91.png"/></p>
 <p><em>图4｜上图核对同一次观察的Q = 0.4+0.4+3.2 = 4；下图比较20,000次多项抽样的Q与χ²(3)密度。图中模拟使用n = 80、四类概率各0.25；模拟帮助观察近似，不构成证明。</em></p>
 <p>一般k类、各pj &gt; 0且概率事先给定时，也有类似的加权变换，保留k−1个有效方向，得到χ²(k−1)的大样本近似。上面的简单三式专用于四类等概率，不能原样套到任意类别概率。</p>
 <p>类别稀疏、期望频数很小时，近似可能不可靠；如果分类概率还用了同一批数据估计参数，自由度也不能直接照写k−1。</p>
 <p>还可以用期望做一个漂亮的核对：在概率事先给定且正确的多项模型下，</p>
 <blockquote><p>E(Q) = Σ E[(Oj−npj)²]/(npj)</p><p>= Σ Var(Oj)/(npj)</p><p>= Σ(1−pj) = <strong>k−1</strong>。</p></blockquote>
 <p>这个期望等式在有限样本下就成立，因为期望逐项相加不需要类别独立。但“均值等于k−1”单独并不能证明Q服从卡方分布，分布近似仍需要上面的联合极限论证。</p>
-<p>多项分布与Pearson统计量参考：Penn State STAT 504，第2课：<a href="https://online.stat.psu.edu/stat504/Lesson02" target="_blank" rel="noopener">https://online.stat.psu.edu/stat504/Lesson02</a></p>
+<p>多项分布与Pearson统计量参考：Penn State STAT 504，第2课：<a href="https://online.stat.psu.edu/stat504/Lesson02" rel="noopener" target="_blank">https://online.stat.psu.edu/stat504/Lesson02</a></p>
 <h2>十、把“精确”与“近似”分清，公式才接得上</h2>
 <table><thead><tr><th>课堂对象</th><th>模型下的精确结论</th><th>何时需要近似</th></tr></thead><tbody><tr><td>0、1结果Y</td><td>E(Y) = p，Var(Y) = p(1−p)</td><td>单个Y不会因抽样人数增多而变正态</td></tr><tr><td>样本率p̂</td><td>二项计数除以n；E = p，Var = p(1−p)/n</td><td>标准化后，由中心极限定理联系到N(0,1)</td></tr><tr><td>独立两组率差D</td><td>联合二项枚举；均值相减，方差相加</td><td>各组具备适当条件，再近似为正态</td></tr><tr><td>独立正态线性组合</td><td>仍为正态；方差按系数平方相加</td><td>原变量仅近似正态时，组合也需作近似理解</td></tr><tr><td>独立卡方之和</td><td>仍为卡方，自由度相加</td><td>Q的标准化方向若仅渐近正态，卡方结论也只是渐近的</td></tr><tr><td>二分类Q</td><td>Q = Z²</td><td>Z近似标准正态时，Q近似χ²(1)</td></tr><tr><td>k分类Q</td><td>固定正确模型下E(Q) = k−1</td><td>联合极限与总数约束给出渐近χ²(k−1)</td></tr></tbody></table>
 <p>本篇配套R、Python和MATLAB脚本，先算二项精确概率，再算正态近似与连续性校正；接着枚举两组的2091种计数组合，最后核对分类频数的协方差与Q。控制台按“问题—结果—解释”输出。无需三种语言都学，任选一种即可。</p>
@@ -221,9 +223,9 @@
 <p><strong>第二，人数多，还要看事件出现得够不够多。</strong> n = 100、p = 0.01时，预期只有1个人答对，实际答对人数常在0、1、2附近，分布明显偏向一侧；左右对称的正态曲线就可能近似不好。因此，要同时检查np和n(1−p)，即预期的答对人数和答错人数。</p>
 <p><strong>第三，两个率相减后的波动，还取决于它们是否共同变化。</strong> 一般要写出“两份方差之和减去两倍协方差”；确认两组独立后，协方差为0，才简化为两份方差相加。同一批对象前后测量时，这种独立性通常不能直接假定。</p>
 <p>沿着这三个关系，才能理解标准误怎样计算，以及后面的置信区间和假设检验为什么这样构造。</p>
-<p>本篇配套资料：<a href="https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article09_expectation_variance_covariance" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article09_expectation_variance_covariance</a></p>
-<p>完整仓库下载：<a href="https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip</a></p>
-<p>下载解压后进入article09目录，按README运行<code>代码/moments_v2.R</code>、<code>代码/moments_v2.py</code>或<code>代码/moments_v2.m</code>。旧版脚本保留供对照。所有输入均是教学模型或教学计数，不含真实学生个人资料。</p>
-<p>延伸阅读：二项分布的正态近似与连续性校正，Penn State STAT 414，第28课：<a href="https://online.stat.psu.edu/stat414/Lesson28" target="_blank" rel="noopener">https://online.stat.psu.edu/stat414/Lesson28</a></p>
+<p>本篇配套资料：<a href="https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article09_expectation_variance_covariance" rel="noopener" target="_blank">https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article09_expectation_variance_covariance</a></p>
+<p>完整仓库下载：<a href="https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip" rel="noopener" target="_blank">https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip</a></p>
+<p>下载解压后进入article09目录，按README运行<code>代码/moments.R</code>、<code>代码/moments.py</code>或<code>代码/moments.m</code>。配套目录只保留当前一套脚本。所有输入均是教学模型或教学计数，不含真实学生个人资料。</p>
+<p>延伸阅读：二项分布的正态近似与连续性校正，Penn State STAT 414，第28课：<a href="https://online.stat.psu.edu/stat414/Lesson28" rel="noopener" target="_blank">https://online.stat.psu.edu/stat414/Lesson28</a></p>
 <p>这篇想补上的，是我在课堂上省略的连接：<strong>从观察怎样产生，到统计量怎样构造；从运算性质，到抽样分布；最后才是用哪一种分布做近似。</strong></p>
-<p>这里是“明哥的微生物世界”。我们继续把统计课堂里没讲透的地方，慢慢讲清楚。</p><footer>明哥的微生物世界 · 统计课堂 09</footer></main></body></html>
+<p>这里是“明哥的微生物世界”。我们继续把统计课堂里没讲透的地方，慢慢讲清楚。</p><footer>明哥的微生物世界 · 统计课堂 08</footer></main></body></html>
