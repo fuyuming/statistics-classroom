@@ -13,7 +13,7 @@ def make_plots(root, curve, pmf, results):
     plt.rcParams.update({'font.family':font,'axes.unicode_minus':False,'font.size':12,
                          'axes.spines.top':False,'axes.spines.right':False,
                          'savefig.facecolor':'white'})
-    blue,orange = '#277E91','#D67D38'
+    blue,orange = '#56b4e9','#D67D38'
     dest=root/'文章配图'
     fig,axes=plt.subplots(2,2,figsize=(11,8.5),layout='constrained')
     for ax, name in zip(axes.ravel(), ['small','larger','rare','balanced']):
@@ -64,7 +64,7 @@ def make_reference_plots(root, q_sim, z):
     rho = np.linspace(-1,1,201)
     variance = 2-2*rho
     fig,ax=plt.subplots(figsize=(9,5.3),layout='constrained')
-    ax.plot(rho,variance,color='#19837b',lw=2.5)
+    ax.plot(rho,variance,color='#56b4e9',lw=2.5)
     ax.scatter([0,.8],[2,.4],color='#bb6a38',s=45,zorder=3)
     ax.annotate('不相关：差的方差为2',(0,2),xytext=(-.4,3.0),bbox={'facecolor':'#fbfaf6','edgecolor':'none','pad':3},arrowprops={'arrowstyle':'->'})
     ax.annotate('正相关：共同波动在差中抵消',(.8,.4),xytext=(-.2,.9),arrowprops={'arrowstyle':'->'})
@@ -72,11 +72,11 @@ def make_reference_plots(root, q_sim, z):
     fig.savefig(folder/'01_协方差与差值.png',dpi=180)
     pd.DataFrame({'rho':rho,'variance_of_difference':variance}).to_csv(folder/'01_curve.csv',index=False)
     fig,axes=plt.subplots(2,1,figsize=(9,8),layout='constrained')
-    axes[0].bar([r'$Z_1^2$',r'$Z_2^2$',r'$Z_3^2$'],z**2,color=['#19837b','#5264a7','#bb6a38'])
+    axes[0].bar([r'$Z_1^2$',r'$Z_2^2$',r'$Z_3^2$'],z**2,color=['#56b4e9','#5264a7','#bb6a38'])
     for i,value in enumerate(z**2):axes[0].text(i,value+.07,f'{value:.1f}',ha='center')
     axes[0].set(ylabel='该方向的平方',ylim=(0,3.8),title='三个比较方向：0.4 + 0.4 + 3.2 = Q = 4')
     x=np.linspace(.001,20,501)
-    axes[1].hist(q_sim,bins=np.arange(0,np.ceil(q_sim.max())+1,.5),density=True,color='#a7cdc7',label='多项模型模拟（20,000次）')
+    axes[1].hist(q_sim,bins=np.arange(0,np.ceil(q_sim.max())+1,.5),density=True,color='#aedcf5',label='多项模型模拟（20,000次）')
     axes[1].plot(x,chi2.pdf(x,3),color='#5264a7',lw=2,label='χ²(3) 理论密度')
     axes[1].set(xlabel='Pearson Q',ylabel='密度',xlim=(0,20),title='零假设：n = 80，四类概率各0.25')
     axes[1].legend(fontsize=11)
