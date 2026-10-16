@@ -1,0 +1,41 @@
+# 由power_design.py调用，使用其计算结果；英文图标配正文中文图注。
+figout = root / '文章配图'
+figout.mkdir(exist_ok=True)
+plt.rcParams.update({'font.size':12, 'axes.spines.top':False, 'axes.spines.right':False})
+blue, red, sky = '#285CA0', '#D16A5A', '#72B9E3'
+x = np.sort(np.append(np.linspace(6.6,8.3,2400), cutoff))
+fig, axes = plt.subplots(2,1,figsize=(8,8),sharex=True)
+for ax, mean, title in zip(axes,[mu0,mu1],['A: true mean = 7.25 cm','B: true mean = 7.65 cm']):
+    density = norm.pdf(x,mean,se)
+    ax.plot(x,density,color=blue,lw=2)
+    ax.axvline(cutoff,color='#333333',ls='--')
+    if mean == mu0:
+        ax.fill_between(x,0,density,where=x>=cutoff,color=red,alpha=.65,label=f'False positive: alpha = {alpha:.2f}')
+    else:
+        ax.fill_between(x,0,density,where=x<=cutoff,color=red,alpha=.65,label=f'Miss: beta = {beta:.4f}')
+        ax.fill_between(x,0,density,where=x>=cutoff,color=sky,alpha=.8,label=f'Detect: power = {power:.4f}')
+    ax.set(title=title,ylabel='Density',ylim=(0,3.6))
+    ax.legend(loc='upper right',fontsize=11,frameon=False)
+axes[-1].set_xlabel('Sample mean of 100 fish (cm)')
+fig.tight_layout()
+fig.savefig(figout / '01_两个真实世界.png',dpi=180)
+ns = np.arange(5,251)
+powers = norm.sf(norm.ppf(1-alpha)-d*np.sqrt(ns))
+fig,ax = plt.subplots(figsize=(8,5))
+ax.plot(ns,powers,color=blue,lw=2)
+ax.axhline(target,color=red,ls='--',label=f'Target power = {target:.0%}')
+ax.axvline(n_min,color='#555555',ls=':',label=f'Minimum n = {n_min}')
+ax.scatter([n_min],[power_minimum],color=blue,zorder=4)
+ax.set(xlabel='Sample size (n)',ylabel='Power',ylim=(0,1),title='Right-sided Z test: d = 0.253, alpha = 0.05')
+ax.legend(frameon=False,loc='lower right')
+fig.tight_layout()
+fig.savefig(figout / '02_样本量与功效.png',dpi=180)
+fig,ax = plt.subplots(figsize=(8,4.5))
+for i in range(3):
+    ax.plot([ci_low[i],ci_high[i]],[i,i],color=blue,lw=3)
+    ax.scatter(observed_difference,i,color=blue,s=65,zorder=4)
+ax.axvline(0,color='#777777',ls='--')
+ax.set(yticks=[0,1,2],yticklabels=['n = 25','n = 100','n = 400'],xlabel='Observed difference and 95% CI (cm)',ylim=(-.6,2.6),title='Same observed difference: 0.40 cm')
+ax.invert_yaxis()
+fig.tight_layout()
+fig.savefig(figout / '03_同样差值不同精度.png',dpi=180)
