@@ -51,6 +51,30 @@ stopifnot(nrow(index_B) == B_rep,
           all(index_A >= 1 & index_A <= n_A),
           all(index_B >= 1 & index_B <= n_B))
 
+# %% 0.1 实际分析先调用专用包；后面的循环用于理解原理
+# 首次使用：install.packages("boot.pval")
+# 先预测A−B方向；运行后同时读效应量、CI与P，而不只看P。
+if (!requireNamespace("boot.pval", quietly = TRUE)) {
+  stop("请先运行 install.packages('boot.pval')，再重新运行本脚本。")
+}
+set.seed(20261023)
+fit_package <- boot.pval::boot_t_test(A, B, var.equal = FALSE,
+                                     R = 10000, type = "stud")
+fit_package
+package_result <- data.frame(
+  difference_g = unname(fit_package$estimate[1] - fit_package$estimate[2]),
+  T = unname(fit_package$statistic),
+  CI_low_g = unname(fit_package$conf.int[1]),
+  CI_high_g = unname(fit_package$conf.int[2]),
+  P = fit_package$p.value,
+  package_version = as.character(utils::packageVersion("boot.pval"))
+)
+package_result
+# 0.7.0版本：差19.1667g；CI约[-2.319064,40.927598]；P=.0730。
+# 输出R=10000是重抽样次数，不是t分布自由度。
+# 包使用自己的抽样，后文固定索引用于三语言逐轮核对，数值略有差异。
+write.csv(package_result, file.path(out_dir, "boot_pval_package_result.csv"), row.names = FALSE)
+
 # %% 1. 观察到的均数差和学生化统计量
 # A−B是效应量；SE使用两组各自的样本方差和n，不把两组混成一组。
 delta_obs <- mean(A) - mean(B)

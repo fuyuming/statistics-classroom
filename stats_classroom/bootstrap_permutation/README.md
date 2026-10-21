@@ -31,7 +31,7 @@
 source("代码/bootstrap_permutation.R", encoding = "UTF-8")
 ```
 
-只使用基础 R；绘图采用基础图形设备。脚本不恢复旧工作空间，也不依赖上次会话的变量。
+第0.1节直接调用 `boot.pval::boot_t_test()`，首次使用先运行 `install.packages("boot.pval")`。后面的原理演示使用基础R，绘图采用基础图形设备。脚本不恢复旧工作空间，也不依赖上次会话的变量。
 
 ## Python / Spyder
 
@@ -85,3 +85,7 @@ Current Folder 与搜索路径是两回事；本脚本按自身位置查找 `dat
 ## 中文与编码
 
 脚本和数据使用 UTF-8。Python 绘图会查找系统中文字体（微软雅黑、黑体、Noto Sans CJK SC、苹方等）；若找不到则改用英文图，数值照常输出，避免生成方框字。安装任一上述字体后重启 Python。请保持整个项目解压后的目录结构，输出均留在本项目内。
+
+## 专用包快捷调用
+
+R入口第0.1节使用boot.pval 0.7.0、seed=20261023、R=10000、type="stud"、var.equal=FALSE：差19.1667g、95%CI[-2.319064,40.927598]、P=.0730。结果另存`运行结果/R/boot_pval_package_result.csv`。包调用与共享索引演示不是同一批抽样，不要求末位一致。
