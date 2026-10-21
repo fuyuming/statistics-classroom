@@ -1,0 +1,2 @@
+example,term,estimate,standard_error,df,t_value,p_value,ci_low,ci_high,check_t_value,check_p_value
+paired_new_minus_old,Intercept,1.3,0.47258156262526074,9.0,2.750847901848534,0.022445658672013473,0.230946233100898,2.369053766899102,2.750847901848533,0.022445658672013494

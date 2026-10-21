@@ -1,0 +1,13 @@
+quantity,value
+sample_proportion,0.461538461538462
+wald_low,0.190545689312682
+wald_high,0.732531233764241
+cp_lower_bisection_60,0.192232441801288
+cp_upper_bisection_60,0.748654517729696
+cp_lower_beta_check,0.192232441801288
+cp_upper_beta_check,0.748654517729696
+reference_9_of_10_p_value_at_0.7,0.2995766785
+reference_9_of_10_cp_low,0.554983882971805
+reference_9_of_10_cp_high,0.997471421455538
+zero_of_10_two_sided_upper,0.308497107818761
+zero_of_10_one_sided_upper,0.258865550893052
