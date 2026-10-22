@@ -58,6 +58,18 @@ wilson_check <- prop.test(x, n, correct = FALSE, conf.level = confidence)$conf.i
 wilson_ci
 # 6/13的95%区间：[0.2320607, 0.7085620]。这是近似方法，不是CP。
 stopifnot(max(abs(wilson_ci - wilson_check)) < 1e-10)
+# R默认correct=TRUE，实际使用时明确报告是否作连续性校正。
+# 它处理用连续正态近似离散二项计数时的半格边界；CP不需要这一校正。
+wilson_corrected <- prop.test(x, n, correct = TRUE, conf.level = confidence)$conf.int
+wilson_corrected
+# 默认6/13：校正区间[0.2040175,0.7387967]，比未校正版本宽。
+# 有校正不等于所有情况下都更准确；本节先对照软件默认值，再回到CP主线。
+wilson_correction_comparison <- data.frame(
+  method=c("Wilson_without_continuity_correction", "Wilson_with_continuity_correction"),
+  lower=c(wilson_check[1],wilson_corrected[1]),
+  upper=c(wilson_check[2],wilson_corrected[2]))
+write.csv(wilson_correction_comparison, file.path(out, "Wilson连续性校正对照.csv"), row.names=FALSE)
+
 normal_wilson <- data.frame(
   quantity=c("z_critical", "normal_central_area", "wilson_low", "wilson_high"),
   value=c(z_975, normal_central_area, wilson_ci))

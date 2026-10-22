@@ -56,7 +56,7 @@ wilson_center = (sample_proportion + z_975**2 / (2*n)) / wilson_denominator
 wilson_half_width = z_975 * np.sqrt(sample_proportion*(1-sample_proportion)/n + z_975**2/(4*n**2)) / wilson_denominator
 wilson_low = wilson_center - wilson_half_width
 wilson_high = wilson_center + wilson_half_width
-# 默认6/13：Wilson区间[0.2320607,0.7085620]；与反正弦变换无关。
+# 默认6/13：Wilson区间[0.2320607,0.7085620]。
 normal_wilson = pd.DataFrame({
     "quantity": ["z_critical", "normal_central_area", "wilson_low", "wilson_high"],
     "value": [z_975, normal_central_area, wilson_low, wilson_high]})
