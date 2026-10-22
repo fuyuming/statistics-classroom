@@ -31,7 +31,13 @@ tail_target <- alpha / 2
 # 1. 先看样本率和Wald近似区间。
 sample_proportion <- x / n
 wald_se <- sqrt(sample_proportion * (1 - sample_proportion) / n)
+# 双侧95%：左边累计概率=1-0.025=0.975，因此查97.5%分位点。
 z_975 <- qnorm(1 - tail_target)
+z_975
+# 95%时约1.959964，不是从本次13人算出的值。
+normal_central_area <- pnorm(z_975) - pnorm(-z_975)
+normal_central_area
+# [1] 0.95：曲线下的面积，不能用曲线高度替代。
 wald_low <- sample_proportion - z_975 * wald_se
 wald_high <- sample_proportion + z_975 * wald_se
 wald_result <- data.frame(
@@ -40,6 +46,23 @@ wald_result <- data.frame(
 )
 write.csv(wald_result, file.path(out, "Wald近似.csv"), row.names = FALSE, fileEncoding = "UTF-8")
 # 参考：sample_proportion=0.46153846，Wald区间约为0.1905457—0.7325312。
+
+# 1.1 Wilson区间（课堂外补充），不作连续性校正。
+# 与Wald的区别：score检验的分母采用候选p0，而不是固定的样本率。
+# 将 n*(p_hat-p0)^2 <= z^2*p0*(1-p0) 解成二次不等式。
+wilson_denominator <- 1 + z_975^2 / n
+wilson_center <- (sample_proportion + z_975^2 / (2*n)) / wilson_denominator
+wilson_half_width <- z_975 * sqrt(sample_proportion*(1-sample_proportion)/n + z_975^2/(4*n^2)) / wilson_denominator
+wilson_ci <- wilson_center + c(-1, 1) * wilson_half_width
+wilson_check <- prop.test(x, n, correct = FALSE, conf.level = confidence)$conf.int
+wilson_ci
+# 6/13的95%区间：[0.2320607, 0.7085620]。这是近似方法，不是CP。
+stopifnot(max(abs(wilson_ci - wilson_check)) < 1e-10)
+normal_wilson <- data.frame(
+  quantity=c("z_critical", "normal_central_area", "wilson_low", "wilson_high"),
+  value=c(z_975, normal_central_area, wilson_ci))
+write.csv(normal_wilson, file.path(out, "正态分位点与Wilson.csv"), row.names=FALSE)
+# 思考：Wald在x=0时的估计标准误是0；Wilson的上限仍大于0，为什么？
 
 # 2. 固定输入文件中的x，扫描候选总体率p。
 # 1-pbinom(x-1, n, p)计算P_p(X>=x)，包含观察到的x。

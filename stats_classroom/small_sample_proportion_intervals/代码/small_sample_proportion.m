@@ -23,7 +23,10 @@ tail_target = alpha / 2;
 %% 1. 先看样本率和Wald近似区间
 sample_proportion = x / n;
 wald_se = sqrt(sample_proportion * (1 - sample_proportion) / n);
+% 双侧95%查0.975分位点，约1.959964；这是分布的分位点。
 z_975 = norminv(1 - tail_target);
+normal_central_area = normcdf(z_975) - normcdf(-z_975);
+% 中间曲线下的面积是0.95，不是曲线高度。
 wald_low = sample_proportion - z_975 * wald_se;
 wald_high = sample_proportion + z_975 * wald_se;
 wald_result = table( ...
@@ -32,6 +35,20 @@ wald_result = table( ...
     'VariableNames', {'quantity', 'value'})
 writetable(wald_result, fullfile(out, 'Wald近似.csv'));
 % 参考：sample_proportion=0.46153846，Wald区间约为0.1905457—0.7325312。
+
+%% 1.1 Wilson区间：score检验反演，未作连续性校正
+% 分母使用候选p0，解二次不等式，两根之间就是区间。
+wilson_denominator = 1 + z_975^2 / n;
+wilson_center = (sample_proportion + z_975^2/(2*n)) / wilson_denominator;
+wilson_half_width = z_975 * sqrt(sample_proportion*(1-sample_proportion)/n + z_975^2/(4*n^2)) / wilson_denominator;
+wilson_low = wilson_center - wilson_half_width;
+wilson_high = wilson_center + wilson_half_width;
+% 6/13的区间约[0.2320607,0.7085620]；它不采用反正弦变换。
+normal_wilson = table( ...
+    ["z_critical"; "normal_central_area"; "wilson_low"; "wilson_high"], ...
+    [z_975; normal_central_area; wilson_low; wilson_high], ...
+    'VariableNames', {'quantity','value'})
+writetable(normal_wilson, fullfile(out, '正态分位点与Wilson.csv'));
 
 %% 2. 固定输入文件中的x，扫描候选总体率p
 p_grid = (0:scan_step:1)';

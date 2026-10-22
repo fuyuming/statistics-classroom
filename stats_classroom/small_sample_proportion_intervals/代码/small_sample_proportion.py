@@ -32,7 +32,10 @@ tail_target = alpha / 2
 # %% 1. 先看样本率与Wald近似区间
 sample_proportion = x / n
 wald_se = np.sqrt(sample_proportion * (1 - sample_proportion) / n)
+# ppf输入累计概率，返回分位点；95%双侧查0.975，得到约1.959964。
 z_975 = norm.ppf(1 - tail_target)
+normal_central_area = norm.cdf(z_975) - norm.cdf(-z_975)
+# 中间的面积=0.95；PDF曲线的高度本身不是概率。
 wald_low = sample_proportion - z_975 * wald_se
 wald_high = sample_proportion + z_975 * wald_se
 
@@ -45,6 +48,20 @@ wald_result = pd.DataFrame(
 wald_result.to_csv(out / "Wald近似.csv", index=False, encoding="utf-8-sig")
 # 参考：sample_proportion=0.46153846，Wald区间约为0.1905457—0.7325312。
 # 这是正态近似结果；下面的端点直接使用二项尾概率。
+
+# %% 1.1 Wilson区间：反演使用候选p0标准误的score检验
+# 解 n*(p_hat-p0)^2 <= z^2*p0*(1-p0)，两根之间就是区间。
+wilson_denominator = 1 + z_975**2 / n
+wilson_center = (sample_proportion + z_975**2 / (2*n)) / wilson_denominator
+wilson_half_width = z_975 * np.sqrt(sample_proportion*(1-sample_proportion)/n + z_975**2/(4*n**2)) / wilson_denominator
+wilson_low = wilson_center - wilson_half_width
+wilson_high = wilson_center + wilson_half_width
+# 默认6/13：Wilson区间[0.2320607,0.7085620]；与反正弦变换无关。
+normal_wilson = pd.DataFrame({
+    "quantity": ["z_critical", "normal_central_area", "wilson_low", "wilson_high"],
+    "value": [z_975, normal_central_area, wilson_low, wilson_high]})
+normal_wilson.to_csv(out / "正态分位点与Wilson.csv", index=False, encoding="utf-8-sig")
+normal_wilson
 
 # %% 2. 固定输入文件中的x，扫描候选总体率p
 # sf(x-1)计算P_p(X>=x)，必须包含观察到的x。
@@ -375,3 +392,8 @@ validation_objects = {
     "reference_p_value": reference_p_value,
     "zero_of_10_upper": (zero_two_sided_upper, zero_one_sided_upper),
 }
+
+# %% 6. 文章补图：1.96来源、二项近似与公式推导
+# 排版代码单独保存，主流程仍按统计问题分节。示意图使用文中固定参数。
+from plot_interval_explanations import draw_explanations
+draw_explanations(project_fig_dir, out)
