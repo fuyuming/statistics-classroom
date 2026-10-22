@@ -1,0 +1,5 @@
+We fitted a linear model (estimated using OLS) to predict gain_g with group01 (formula: gain_g ~ group01). The model explains a statistically not significant and moderate proportion of variance (R2 = 0.18, F(1, 17) = 3.67, p = 0.072, adj. R2 = 0.13). The model's intercept, corresponding to group01 = 0, is at 101.00 (95% CI [84.22, 117.78], t(17) = 12.70, p < .001). Within this model:
+
+  - The effect of group01 is statistically non-significant and positive (beta = 19.17, 95% CI [-1.94, 40.28], t(17) = 1.92, p = 0.072)
+
+Standardized parameters were obtained by fitting the model on a standardized version of the dataset. 95% Confidence Intervals (CIs) and p-values were computed using a Wald t-distribution approximation.

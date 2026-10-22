@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# 学习方式：按分节逐段运行，先读注释，再查看结果对象；预期数值用于核对。
 """统计课堂：t检验，原来也是回归。
 
 Spyder：打开本文件后按 F5 完整运行；命令行运行也可以。
@@ -13,7 +14,6 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from scipy import stats
 
@@ -72,16 +72,20 @@ def coefficient_record(fit, example, term_index=0):
 
 
 # %% 1. 单样本t：只有截距的模型
-# statsmodels的OLS需要显式提供一列常数；这一列就是只有截距的设计。
+# 公式y ~ 1只放截距，.fit()才执行拟合；与R的lm公式含义相同。
 b_data = rat.loc[rat["group"] == "B"].copy()
 b_y = b_data["gain_g"].to_numpy(dtype=float)
-constant = np.ones((len(b_y), 1))
-fit_b_default = sm.OLS(b_y, constant).fit()
+fit_b_default = smf.ols("gain_g ~ 1", data=b_data).fit()
+# 截距101，95%CI[81.926,120.074]，默认检验均数=0。
+mean_summary = fit_b_default.summary()
+mean_summary
 
 # 默认截距检验的是均数=0。把参考值移到0，就可以检验均数=mu0。
 # 100 g是本项目人为提出的教学参照，不是教材例4-8原问题。
 mu0 = 100.0
-fit_b_reference = sm.OLS(b_y - mu0, constant).fit()
+b_data["gain_minus_reference"] = b_data["gain_g"] - mu0
+fit_b_reference = smf.ols("gain_minus_reference ~ 1", data=b_data).fit()
+# 现在截距1表示均数减100，P约0.902；差值区间包含0。
 single_results = pd.DataFrame(
     [
         coefficient_record(fit_b_default, "single_B_vs_0"),
@@ -161,7 +165,8 @@ group_results
 # %% 3. 配对t：先按ID作差，再拟合只有截距的模型
 # 同一个人的两次评分不是两个独立组。delta保留了ID配对关系；随后检验平均delta=0。
 paired["delta"] = paired["new"] - paired["old"]
-fit_paired = sm.OLS(paired["delta"].to_numpy(dtype=float), np.ones((len(paired), 1))).fit()
+fit_paired = smf.ols("delta ~ 1", data=paired).fit()
+# 每行一个人的配对差值：平均差1.3分，95%CI[0.231,2.369]。
 paired_check = stats.ttest_1samp(paired["delta"], popmean=0.0)
 paired_result = pd.DataFrame([coefficient_record(fit_paired, "paired_new_minus_old")])
 paired_result["check_t_value"] = float(paired_check.statistic)

@@ -10,7 +10,7 @@
 
 ## 运行方式
 
-- **R / RStudio**：R 自带 `lm()`、`t.test()` 和绘图函数，不需要额外安装包。打开本项目 Rproj 后 Source 完整的 `代码/t_tests_as_regression.R`。项目设置为 UTF-8，不恢复旧工作空间。脚本最后留下 `results` 结构对象，并把表格写入 `运行结果/R/`。
+- **R / RStudio**：R 自带 `lm()`、`t.test()` 和绘图函数，模型计算无需额外包；报告演示需要先运行 `install.packages("report")`。打开本项目 Rproj 后 Source 完整的 `代码/t_tests_as_regression.R`。项目设置为 UTF-8，不恢复旧工作空间。脚本最后留下 `results` 结构对象，并把表格写入 `运行结果/R/`。
 - **Python / Spyder**：按 F5 完整运行 `代码/t_tests_as_regression.py`；命令行是备选。需要 `numpy`、`pandas`、`scipy`、`statsmodels`、`matplotlib`，版本下限见 `requirements.txt`。脚本用 statsmodels 的 OLS 公式接口和 SciPy 的 t 检验核对，结果写入 `运行结果/Python/`。
 - **MATLAB**：运行 `代码/t_tests_as_regression.m`，需要 Statistics and Machine Learning Toolbox（`fitlm`、`ttest`、`ttest2`）。脚本从自身位置定位项目，不要求手动把 `数据/` 加入搜索路径；表格写入 `运行结果/MATLAB/`。
 
@@ -34,7 +34,7 @@
 | Welch（仅作口径对照） | df≈13.0159 | t=1.9319 | 0.07543 | [−2.2637, 40.5970] g |
 | 新款−旧款（配对差值） | 1.3000；df=9 | t=2.7508 | 0.02245 | [0.2309, 2.3691] 分 |
 
-`lm(y ~ 1)`、`OLS(y, const)` 和 `fitlm(tbl,'y ~ 1')` 的截距都默认检验参考值 0。若目标是 `μ₀=100`，先用 `I(y - μ₀) ~ 1`（或等价的差值列）再看截距。两独立样本的 OLS 是合并方差推断；它不等于 Welch。两组时整体 F 与该单一组系数的 t² 相等，这个 F 检验均数模型，不是比较两个总体方差的 F 检验。
+`lm(y ~ 1)`、`smf.ols("y ~ 1", data=dat).fit()` 和 `fitlm(tbl,'y ~ 1')` 的截距都默认检验参考值 0。若目标是 `μ₀=100`，先用 `I(y - μ₀) ~ 1`（或等价的差值列）再看截距。两独立样本的 OLS 是合并方差推断；它不等于 Welch。两组时整体 F 与该单一组系数的 t² 相等，这个 F 检验均数模型，不是比较两个总体方差的 F 检验。
 
 ## 输出与图
 
@@ -52,3 +52,7 @@
 ## 中文与编码
 
 脚本和数据使用 UTF-8。Python 绘图会查找系统中文字体（微软雅黑、黑体、Noto Sans CJK SC、苹方等）；若找不到会给出明确提示，避免生成方框字。安装任一上述字体后重启 Python。请保持整个项目解压后的目录结构，输出均留在本项目内。
+
+## 2026-10-22 学生版补充
+
+R第2.1节实际运行report并保存报告表和文字初稿；Python单样本和配对统一使用公式接口。步骤、参数含义、预期数字和思考题写在注释中。RStudio可选中一段运行；Spyder用单元格运行并在变量浏览器查看对象，F5完整运行时不会自动显示每个裸表达式。MATLAB注释使用 `%`。

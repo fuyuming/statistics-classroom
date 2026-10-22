@@ -1,4 +1,5 @@
 # %% 明哥的微生物世界 · 统计课堂
+# 学习方式：按分节逐段运行，先读注释，再查看结果对象；预期数值用于核对。
 # Bootstrap与置换检验：反复抽样，究竟在模拟什么？
 #
 # Spyder：在项目目录中打开本文件，按F5完整运行；也可按# %%分节运行。
@@ -325,6 +326,19 @@ run_notes = [
     f"Python {sys.version.split()[0]}; NumPy {np.__version__}; pandas {pd.__version__}; SciPy {scipy.__version__}; Matplotlib {matplotlib.__version__}",
 ]
 (out_dir / "运行记录.txt").write_text("\n".join(run_notes) + "\n", encoding="utf-8")
+
+# %% 8. 公众号公式图：数学排版避免星号被Markdown误认成斜体
+# 这里只负责排版，不参与前面的数值计算。
+from matplotlib.mathtext import math_to_image
+from matplotlib.font_manager import FontProperties
+formula_dir = project_figure_dir
+formula_dir.mkdir(exist_ok=True)
+math_to_image(r"$T^*=\frac{\overline{A_0^*}-\overline{B_0^*}}{\sqrt{s_{A^*}^2/12+s_{B^*}^2/7}}$",
+              formula_dir / "03_Bootstrap学生化公式.png",
+              prop=FontProperties(size=22), dpi=240, format="png", color="#1769aa")
+math_to_image(r"$\mathrm{SE}_{\mathrm{obs}}=\sqrt{\frac{s_A^2}{12}+\frac{s_B^2}{7}}$",
+              formula_dir / "04_观察标准误公式.png",
+              prop=FontProperties(size=22), dpi=240, format="png", color="#1769aa")
 
 if matplotlib.get_backend().lower() != "agg":
     plt.show()

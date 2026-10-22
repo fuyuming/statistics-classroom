@@ -1,8 +1,10 @@
 # -*- coding: UTF-8 -*-
+# 学习方式：按分节逐段运行，先读注释，再查看结果对象；预期数值用于核对。
 # 统计课堂：t检验，原来也是回归
 # 目的：用普通最小二乘模型重写单样本、两独立样本和配对t检验。
 # 运行：打开项目Rproj后在RStudio Source本文件；也可用Rscript运行。
-# 依赖：R自带的 stats；共享输入在 数据/，结果在 运行结果/R/。
+# 依赖：R自带的 stats；自动报告另需 report 包。
+# 首次安装：install.packages("report")；共享输入在 数据/，结果在 运行结果/R/。
 # 约定：A组编码为1，B组编码为0；所有观测值使用原始单位g或分。
 # 结果对象在每一节末尾保留，RStudio中可直接点开查看；数值同时写入CSV便于核对。
 
@@ -39,11 +41,19 @@ paired_head
 # 这等价于单样本t检验均数是否为0。B组均数约101 g，比较0通常没有教学意义。
 b_data <- rat[rat$group == "B", ]
 fit_b_default <- lm(gain_g ~ 1, data = b_data)
+# 截距=101，SE=7.795，t=12.957，df=6；这里P检验均数=0。
+summary(fit_b_default)
+writeLines(capture.output(summary(fit_b_default)), file.path(out, "单样本截距模型_summary.txt"))
+# 均数的95%CI约[81.926, 120.074] g，注意这是B组单独估计的区间。
+confint(fit_b_default)
 
 # I(y - mu0)把明确的参考值移到0，再用同一个截距模型检验。
 # 这里的100 g是本项目人为提出的课堂参照，不是教材例4-8的原问题。
 mu0 <- 100
 fit_b_reference <- lm(I(gain_g - mu0) ~ 1, data = b_data)
+# 减去100后：截距=1，P=0.902，差值区间[-18.074, 20.074] g。
+summary(fit_b_reference)
+confint(fit_b_reference)
 
 extract_fit <- function(model, example, term_index = 1) {
   coefficient_table <- summary(model)$coefficients
@@ -118,6 +128,32 @@ welch_result <- data.frame(
   ci_high = c(pooled_t$conf.int[2], welch_t$conf.int[2])
 )
 write.csv(welch_result, file.path(out, "04_pooled_vs_welch.csv"), row.names = FALSE)
+
+# %% 2.1 用report写报告：样本、效应量、区间与P值一起交代
+# 前面的lm结果就是report的输入，不需要重新手写统计量。
+# 没有安装report时先运行顶部的安装命令，再继续本节。
+if (!requireNamespace("report", quietly = TRUE)) {
+  stop('请先运行 install.packages("report")，然后重新运行脚本。')
+}
+# model.frame给出真正参与拟合的观测，table统计两组实际样本量。
+used_data <- model.frame(fit_groups)
+sample_sizes <- table(used_data$group01)
+sample_sizes
+# 0=B组：7只；1=A组：12只。
+
+# FALSE仅关闭额外的标准化系数。group01的原单位系数仍是效应量。
+report_draft <- report::report(fit_groups, include_effectsize = FALSE)
+report_table <- report::report_table(fit_groups, include_effectsize = FALSE)
+report_draft
+report_table
+# 核对group01这一行：A-B=19.17 g，95%CI[-1.94, 40.28]，P=0.072。
+# 自动报告还需补上样本来源、饲料组别和g单位，不直接照搬成研究结论。
+# 中文示范：高蛋白组12只，低蛋白组7只；均数分别120.17与101.00 g。
+# 共同方差模型估计均数差19.17 g，95%CI[-1.94,40.28] g，
+# t(17)=1.916，双侧P=0.0724；尚不足以确认均数差异，不能据此认定相同。
+# 思考：如果只留下P值，同行还能判断差异多大、估计有多精确吗？
+write.csv(as.data.frame(report_table), file.path(out, "06_report_table.csv"), row.names = FALSE)
+writeLines(as.character(report_draft), file.path(out, "06_report_draft.txt"), useBytes = TRUE)
 
 # %% 3. 配对t：先按ID作差，再拟合只有截距的模型
 # 同一个人的两次评分不是两组独立对象。先计算每个人的delta=new-old，

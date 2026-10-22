@@ -1,4 +1,5 @@
 %% 统计课堂：t检验，原来也是回归
+% 学习方式：按分节逐段运行，先读注释，再查看结果对象；预期数值用于核对。
 % MATLAB点击Run完整运行；也可在命令行用 -batch 执行。
 % 需要 Statistics and Machine Learning Toolbox（fitlm、ttest、ttest2）。
 % 一行是一只大鼠的长表；配对例题按ID计算delta后拟合只有截距的模型。
