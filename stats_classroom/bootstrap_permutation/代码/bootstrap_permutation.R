@@ -273,6 +273,6 @@ run_notes <- c(
   sprintf("Bootstrap-t CI=[%.10f, %.10f]", CI_t[1], CI_t[2]),
   sprintf("permutation exact partitions=%d, P=%.10f", perm_rep, perm_p),
   sprintf("rate coverage exact enumeration=%.10f", coverage_exact),
-  capture.output(sessionInfo())
+  paste("R", getRversion(), "; boot.pval", packageVersion("boot.pval"))
 )
 writeLines(run_notes, file.path(out_dir, "运行记录.txt"), useBytes = TRUE)
