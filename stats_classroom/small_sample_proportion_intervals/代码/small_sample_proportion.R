@@ -58,6 +58,23 @@ wilson_check <- prop.test(x, n, correct = FALSE, conf.level = confidence)$conf.i
 wilson_ci
 # 6/13的95%区间：[0.2320607, 0.7085620]。这是近似方法，不是CP。
 stopifnot(max(abs(wilson_ci - wilson_check)) < 1e-10)
+# 用同一个候选p0=0.20比较Wald和score，两者均暂不作连续性校正。
+# p_hat由本次样本计算；p0是我们正在考察的候选总体率。
+illustration_p0 <- 0.20
+score_se_at_p0 <- sqrt(illustration_p0 * (1 - illustration_p0) / n)
+wald_z_at_p0 <- (sample_proportion - illustration_p0) / wald_se
+score_z_at_p0 <- (sample_proportion - illustration_p0) / score_se_at_p0
+wald_score_comparison <- data.frame(
+  method=c("Wald", "Score_for_Wilson"),
+  candidate_p=illustration_p0,
+  standard_error=c(wald_se,score_se_at_p0),
+  z_value=c(wald_z_at_p0,score_z_at_p0),
+  retained=c(abs(wald_z_at_p0)<=z_975,abs(score_z_at_p0)<=z_975))
+wald_score_comparison
+# 6/13时：Wald Z=1.892，保留20%；score Z=2.357，排除20%。
+# 这正是20%在Wald区间内、却不在未校正Wilson区间内的原因。
+write.csv(wald_score_comparison, file.path(out,"Wald与Wilson候选20百分比.csv"),row.names=FALSE)
+
 # R默认correct=TRUE，实际使用时明确报告是否作连续性校正。
 # 它处理用连续正态近似离散二项计数时的半格边界；CP不需要这一校正。
 wilson_corrected <- prop.test(x, n, correct = TRUE, conf.level = confidence)$conf.int
