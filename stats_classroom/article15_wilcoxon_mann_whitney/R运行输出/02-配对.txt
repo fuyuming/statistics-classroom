@@ -1,0 +1,25 @@
+
+> options(width = 42)
+
+> paired <- read.csv("../data/paired_vitaminA.csv")
+
+> X <- paired$X
+
+> Y <- paired$Y
+
+> paired_result <- wilcox.test(X, Y, paired = TRUE, 
++     alternative = "two.sided", exact = TRUE, conf.int = TRUE)
+
+> paired_result
+
+	Wilcoxon signed rank exact test
+
+data:  X and Y
+V = 35, p-value = 0.01563
+alternative hypothesis: true location shift is not equal to 0
+96.1 percent confidence interval:
+ 0.275 1.200
+sample estimates:
+(pseudo)median 
+         0.925 
+

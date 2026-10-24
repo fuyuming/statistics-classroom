@@ -1,0 +1,6 @@
+{
+  "R_version": "4.6.1",
+  "one_sample": {"V": 35, "p": 0.015625, "conf_level_percent": 96.1, "ci": [0.275, 1.2], "estimate": 0.925},
+  "paired": {"V": 35, "p": 0.015625, "conf_level_percent": 96.1, "ci": [0.275, 1.2], "estimate": 0.925},
+  "independent": {"W": 22, "p": 0.02777778, "conf_level_percent": 95.2, "ci": [2.0, "Inf"], "estimate": 5.0}
+}

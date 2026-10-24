@@ -1,0 +1,25 @@
+
+> options(width = 42)
+
+> textbook <- read.csv("../data/textbook_example.csv")
+
+> A <- textbook$value[textbook$group == "A"]
+
+> B <- textbook$value[textbook$group == "B"]
+
+> independent <- wilcox.test(A, B, alternative = "greater", 
++     exact = TRUE, conf.int = TRUE)
+
+> independent
+
+	Wilcoxon rank sum exact test
+
+data:  A and B
+W = 22, p-value = 0.02778
+alternative hypothesis: true location shift is greater than 0
+95.2 percent confidence interval:
+   2 Inf
+sample estimates:
+difference in location 
+                     5 
+

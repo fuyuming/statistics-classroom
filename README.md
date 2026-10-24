@@ -18,6 +18,7 @@
 |---|---|---|
 | 04 | 变异系数（CV）与几何均数／几何标准差（GM／GSD）——课堂上没展开的两节（先发） | [stats_classroom/article04_cv_geometric_mean](stats_classroom/article04_cv_geometric_mean/) |
 | 08 | 减去均值之后：为什么正态样本的均值与方差相互独立？（V2科学修订稿、三语言代码与共享模拟数据） | [stats_classroom/article08_mean_variance_independence](stats_classroom/article08_mean_variance_independence/) |
+| 15 | Wilcoxon 与 Mann–Whitney：原始秩和、U与符号秩统计量（R、Python、MATLAB三语言） | [stats_classroom/article15_wilcoxon_mann_whitney](stats_classroom/article15_wilcoxon_mann_whitney/) |
 
 请进入对应文件夹，再按该文件夹的 README 运行。
 
