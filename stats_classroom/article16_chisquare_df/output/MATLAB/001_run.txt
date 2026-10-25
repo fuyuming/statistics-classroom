@@ -1,0 +1,69 @@
+
+O =
+
+   225   275
+   128   272
+
+
+row_total =
+
+   500
+   400
+
+
+col_total =
+
+   353   547
+
+
+N =
+
+   900
+
+
+E =
+
+  196.1111  303.8889
+  156.8889  243.1111
+
+
+df =
+
+     1
+
+
+cell_contribution =
+
+    4.2556    2.7463
+    5.3195    3.4329
+
+
+chi_uncorrected =
+
+   15.7542
+
+
+p_uncorrected =
+
+   7.2126e-05
+
+
+chi_yates =
+
+   15.2136
+
+
+p_yates =
+
+   9.6009e-05
+
+
+result =
+
+  1×13 table
+
+    rate_difference    rate_difference_pp     ci_low     ci_high    ci_corrected_low    ci_corrected_high    z_pooled    z_squared    chi_uncorrected    p_uncorrected    chi_yates     p_yates      df
+    _______________    __________________    ________    _______    ________________    _________________    ________    _________    _______________    _____________    _________    __________    __
+
+         0.13                  13            0.066823    0.19318        0.064573             0.19543          3.9692      15.754          15.754          7.2126e-05       15.214      9.6009e-05    1 
+

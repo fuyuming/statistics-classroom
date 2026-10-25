@@ -1,0 +1,17 @@
+{
+  "checked": [
+    "rate_difference",
+    "chi_uncorrected",
+    "p_uncorrected",
+    "chi_yates",
+    "p_yates",
+    "z_pooled",
+    "df",
+    "ci_corrected_low",
+    "ci_corrected_high"
+  ],
+  "tolerance": 1e-08,
+  "all_passed": true,
+  "MATLAB_actual_entry": "MATLAB/four_cell_df.m",
+  "Python_version": "3.12.11"
+}

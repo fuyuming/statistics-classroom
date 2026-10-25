@@ -1,0 +1,41 @@
+     收看 未收看
+女性  225    275
+男性  128    272
+      row_total.女性  row_total_male.男性       col_watch.收看 
+                 500                  400                  353 
+col_not_watch.未收看                    N 
+                 547                  900 
+         收看   未收看
+女性 196.1111 303.8889
+男性 156.8889 243.1111
+              df minimum_expected 
+          1.0000         156.8889 
+chi_uncorrected              df   p_uncorrected 
+   1.575423e+01    1.000000e+00    7.212649e-05 
+         收看   未收看
+女性 4.255587 2.746293
+男性 5.319484 3.432866
+
+	Pearson's Chi-squared test with Yates' continuity correction
+
+data:  O
+X-squared = 15.214, df = 1, p-value = 9.601e-05
+
+
+	2-sample test for equality of proportions with continuity correction
+
+data:  c(O[1, 1], O[2, 1]) out of row_total
+X-squared = 15.214, df = 1, p-value = 9.601e-05
+alternative hypothesis: two.sided
+95 percent confidence interval:
+ 0.06457346 0.19542654
+sample estimates:
+prop 1 prop 2 
+  0.45   0.32 
+
+     rate_difference rate_difference_pp     ci_low   ci_high ci_corrected_low
+女性            0.13                 13 0.06457346 0.1954265       0.06457346
+     ci_corrected_high z_pooled z_squared chi_uncorrected p_uncorrected
+女性         0.1954265  3.96916  15.75423        15.75423  7.212649e-05
+     chi_yates      p_yates df
+女性  15.21361 9.600896e-05  1

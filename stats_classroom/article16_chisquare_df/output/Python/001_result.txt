@@ -1,0 +1,2 @@
+scipy_version=1.18.0
+{'rate_difference': np.float64(0.13), 'rate_difference_pp': np.float64(13.0), 'ci_uncorrected': array([0.06682346, 0.19317654]), 'ci_corrected': array([0.06457346, 0.19542654]), 'z_pooled': np.float64(3.9691598444620357), 'z_squared': np.float64(15.754229870889892), 'chi_uncorrected': np.float64(15.75422987088989), 'p_uncorrected': np.float64(7.21264882734887e-05), 'chi_yates': np.float64(15.213610422028992), 'p_yates': np.float64(9.600895967690793e-05), 'df': 1}

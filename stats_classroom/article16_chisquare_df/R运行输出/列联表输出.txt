@@ -1,0 +1,18 @@
+     收看 未收看
+女性  225    275
+男性  128    272
+         收看   未收看
+女性 196.1111 303.8889
+男性 156.8889 243.1111
+
+	Pearson's Chi-squared test with Yates' continuity correction
+
+data:  tab
+X-squared = 15.214, df = 1, p-value = 9.601e-05
+
+
+	Pearson's Chi-squared test
+
+data:  tab
+X-squared = 15.754, df = 1, p-value = 7.213e-05
+

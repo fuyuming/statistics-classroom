@@ -1,0 +1,2 @@
+"rate_difference","rate_difference_pp","ci_low","ci_high","ci_corrected_low","ci_corrected_high","z_pooled","z_squared","chi_uncorrected","p_uncorrected","chi_yates","p_yates","df"
+0.13,13,0.0645734559769119,0.195426544023088,0.0645734559769119,0.195426544023088,3.96915984446204,15.7542298708899,15.7542298708899,7.21264882734888e-05,15.213610422029,9.60089596769079e-05,1
