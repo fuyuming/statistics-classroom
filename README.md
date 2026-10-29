@@ -20,6 +20,7 @@
 | 08 | 减去均值之后：为什么正态样本的均值与方差相互独立？（V2科学修订稿、三语言代码与共享模拟数据） | [stats_classroom/article08_mean_variance_independence](stats_classroom/article08_mean_variance_independence/) |
 | 15 | Wilcoxon 与 Mann–Whitney：原始秩和、U与符号秩统计量（R、Python、MATLAB三语言） | [stats_classroom/article15_wilcoxon_mann_whitney](stats_classroom/article15_wilcoxon_mann_whitney/) |
 | 16 | 四格表的卡方检验：期望数、自由度1与两率比较（R、Python、MATLAB三语言） | [stats_classroom/article16_chisquare_df](stats_classroom/article16_chisquare_df/) |
+| 17 | 泊松分布拟合优度：尾部合并、分组MLE与自由度（R、Python、MATLAB三语言） | [stats_classroom/article17_poisson_gof](stats_classroom/article17_poisson_gof/) |
 
 请进入对应文件夹，再按该文件夹的 README 运行。
 
