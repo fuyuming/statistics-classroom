@@ -1,0 +1,10 @@
+pair,method,p
+physical-drug,原始P,0.0167543065703854
+physical-drug,Bonferroni,0.0502629197111564
+physical-drug,Holm,0.0335086131407709
+physical-topical,原始P,9.34461551598506e-06
+physical-topical,Bonferroni,2.8033846547955183e-05
+physical-topical,Holm,2.8033846547955183e-05
+drug-topical,原始P,0.0477637740360152
+drug-topical,Bonferroni,0.1432913221080456
+drug-topical,Holm,0.0477637740360152

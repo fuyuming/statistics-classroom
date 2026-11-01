@@ -22,6 +22,7 @@
 | 16 | 四格表的卡方检验：期望数、自由度1与两率比较（R、Python、MATLAB三语言） | [stats_classroom/article16_chisquare_df](stats_classroom/article16_chisquare_df/) |
 | 17 | 泊松分布拟合优度：尾部合并、分组MLE与自由度（R、Python、MATLAB三语言） | [stats_classroom/article17_poisson_gof](stats_classroom/article17_poisson_gof/) |
 | 18 | McNemar精确检验与mid-P：边界概率、连续性校正与条件错误率（R、Python、MATLAB三语言） | [stats_classroom/article18_mcnemar_midp](stats_classroom/article18_mcnemar_midp/) |
+| 19 | 三组比较、Bonferroni与Holm：比较族、家族错误率及P值、效应量和置信区间（R、Python、MATLAB三语言） | [stats_classroom/article19_multiple_comparisons](stats_classroom/article19_multiple_comparisons/) |
 
 请进入对应文件夹，再按该文件夹的 README 运行。
 
