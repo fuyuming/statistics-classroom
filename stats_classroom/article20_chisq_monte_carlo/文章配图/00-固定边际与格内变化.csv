@@ -1,0 +1,7 @@
+table,group,DD,ID,II,row_total
+observed,DN,42,48,21,111
+observed,无DN,30,72,36,138
+observed,合计,72,120,57,249
+simulated,DN,32,51,28,111
+simulated,无DN,40,69,29,138
+simulated,合计,72,120,57,249
