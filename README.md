@@ -21,6 +21,7 @@
 | 15 | Wilcoxon 与 Mann–Whitney：原始秩和、U与符号秩统计量（R、Python、MATLAB三语言） | [stats_classroom/article15_wilcoxon_mann_whitney](stats_classroom/article15_wilcoxon_mann_whitney/) |
 | 16 | 四格表的卡方检验：期望数、自由度1与两率比较（R、Python、MATLAB三语言） | [stats_classroom/article16_chisquare_df](stats_classroom/article16_chisquare_df/) |
 | 17 | 泊松分布拟合优度：尾部合并、分组MLE与自由度（R、Python、MATLAB三语言） | [stats_classroom/article17_poisson_gof](stats_classroom/article17_poisson_gof/) |
+| 18 | McNemar精确检验与mid-P：边界概率、连续性校正与条件错误率（R、Python、MATLAB三语言） | [stats_classroom/article18_mcnemar_midp](stats_classroom/article18_mcnemar_midp/) |
 
 请进入对应文件夹，再按该文件夹的 README 运行。
 

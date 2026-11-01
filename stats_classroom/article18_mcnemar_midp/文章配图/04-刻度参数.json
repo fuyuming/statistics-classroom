@@ -1,0 +1,10 @@
+{
+  "m": 14,
+  "observed_B": 12,
+  "B_tail_boundary": 11.5,
+  "D_definition": "B minus the other discordant count (14-B)",
+  "D_transform": "B-(14-B)=2*B-14",
+  "observed_D": 10,
+  "D_tail_boundary": 9,
+  "diagram_type": "lattice boundaries, not probability density"
+}
