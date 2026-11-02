@@ -25,6 +25,7 @@
 | 19 | 三组比较、Bonferroni与Holm：比较族、家族错误率及P值、效应量和置信区间（R、Python、MATLAB三语言） | [stats_classroom/article19_multiple_comparisons](stats_classroom/article19_multiple_comparisons/) |
 | 20 | R怎样模拟卡方检验的P值？ | [stats_classroom/article20_chisq_monte_carlo](stats_classroom/article20_chisq_monte_carlo/) |
 | 23 | Kruskal–Wallis之后，Dunn检验到底在比较什么？ | [stats_classroom/article23_dunn_rank](stats_classroom/article23_dunn_rank/) |
+| 24 | 同一批人测了4次，方差分析怎样保留配对关系？ | [stats_classroom/article24_repeated_anova](stats_classroom/article24_repeated_anova/) |
 
 请进入对应文件夹，再按该文件夹的 README 运行。
 
