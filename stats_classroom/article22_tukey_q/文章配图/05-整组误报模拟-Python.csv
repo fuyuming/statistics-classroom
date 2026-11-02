@@ -1,0 +1,5 @@
+﻿method,status,count,proportion
+Unadjusted pairs,有误报,1213,0.1213
+Unadjusted pairs,无误报,8787,0.8787
+Tukey family,有误报,525,0.0525
+Tukey family,无误报,9475,0.9475

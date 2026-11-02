@@ -1,0 +1,3 @@
+"method","trials","false_positive_trials","rate"
+"Unadjusted pairs",10000,1163,0.1163
+"Tukey family",10000,518,0.0518
