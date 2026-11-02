@@ -1,0 +1,13 @@
+{
+  "source": "R/permutation_differences.csv",
+  "rounds": 10000,
+  "n": [
+    11,
+    10,
+    12
+  ],
+  "rank_variance": 92.65625,
+  "theoretical_SE": 4.205819831441363,
+  "observed_difference": 12.054545454545456,
+  "simulated_SD": 4.220821392566348
+}

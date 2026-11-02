@@ -1,0 +1,4 @@
+Python 3.12.12
+NumPy 2.4.3
+pandas 3.0.1
+SciPy 1.17.1
