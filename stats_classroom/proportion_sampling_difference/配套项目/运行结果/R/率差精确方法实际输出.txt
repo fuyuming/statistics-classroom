@@ -1,0 +1,36 @@
+第一组样本率、第二组样本率及两者之差
+     first     second difference
+       0.2        0.0        0.2
+零假设下两组计数方差的估计，均为0.9，低于Rosner经验门槛5
+[1] 0.9 0.9
+
+	Unconditional Exact Test on Difference in Proportions, method= score,
+	central
+
+data:  x1/n1=(0/10) and x2/n2= (2/10)
+proportion 1 = 0, proportion 2 = 0.2, p-value = 0.215
+alternative hypothesis: true p2-p1 is not equal to 0
+95 percent confidence interval:
+ -0.1291264  0.5560955
+sample estimates:
+p2-p1
+  0.2
+
+$conf.level
+[1] 0.95
+
+$CItype
+[1] "Two.sided"
+
+$estimate
+[1] 0.2
+
+$ExactCI
+[1] -0.12914  0.56654
+
+                  method estimate      lower     upper   p_value
+1 exact2x2_score_central      0.2 -0.1291264 0.5560955 0.2149734
+2  ExactCIdiff_inductive      0.2 -0.1291400 0.5665400        NA
+包版本
+   exact2x2 ExactCIdiff
+    "1.7.0"       "2.1"

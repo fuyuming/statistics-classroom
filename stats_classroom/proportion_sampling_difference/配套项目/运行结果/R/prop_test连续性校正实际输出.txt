@@ -1,0 +1,23 @@
+
+	2-sample test for equality of proportions without continuity correction
+
+data:  c(60, 20) out of c(300, 200)
+X-squared = 8.9286, df = 1, p-value = 0.002807
+alternative hypothesis: two.sided
+95 percent confidence interval:
+ 0.03853916 0.16146084
+sample estimates:
+prop 1 prop 2
+   0.2    0.1
+
+
+	2-sample test for equality of proportions with continuity correction
+
+data:  c(60, 20) out of c(300, 200)
+X-squared = 8.2, df = 1, p-value = 0.004189
+alternative hypothesis: two.sided
+95 percent confidence interval:
+ 0.0343725 0.1656275
+sample estimates:
+prop 1 prop 2
+   0.2    0.1

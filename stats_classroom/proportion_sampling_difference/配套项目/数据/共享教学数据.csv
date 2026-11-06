@@ -1,0 +1,8 @@
+kind,scenario,n,p,p1,p2,x1,x2,model,notes
+one,one_p05_100,100,0.5,,,,,"Binomial(n,p)","教学构造：单组计数 X~Binomial(100,0.5)"
+one,one_p01_100,100,0.01,,,,,"Binomial(n,p)","教学构造：单组计数 X~Binomial(100,0.01)"
+one,one_p001_1000,1000,0.001,,,,,"Binomial(n,p)","教学构造：单组计数 X~Binomial(1000,0.001)"
+difference,diff_p03_50,50,,0.3,0.3,,,"Independent binomial convolution","两组独立且等 n：X1,X2~Binomial(50,0.3)"
+difference,diff_p001_1000,1000,,0.001,0.001,,,"Independent binomial convolution","两组独立且等 n：X1,X2~Binomial(1000,0.001)"
+observed,observed_comparison,500,,,,60,20,"Two independent proportions","比较 60/300 与 20/200；此行 n=总样本量仅作记录"
+boundary,boundary_zero_20,20,0,,,,,"One binomial boundary example","边界例：X=0,n=20；p列仅为占位"

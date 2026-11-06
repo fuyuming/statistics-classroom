@@ -1,0 +1,3 @@
+"method","estimate","lower","upper","p_value"
+"exact2x2_score_central",0.2,-0.129126370251477,0.556095461229662,0.214973361263973
+"ExactCIdiff_inductive",0.2,-0.12914,0.56654,NA

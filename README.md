@@ -26,6 +26,7 @@
 | 20 | R怎样模拟卡方检验的P值？ | [stats_classroom/article20_chisq_monte_carlo](stats_classroom/article20_chisq_monte_carlo/) |
 | 23 | Kruskal–Wallis之后，Dunn检验到底在比较什么？ | [stats_classroom/article23_dunn_rank](stats_classroom/article23_dunn_rank/) |
 | 24 | 同一批人测了4次，方差分析怎样保留配对关系？ | [stats_classroom/article24_repeated_anova](stats_classroom/article24_repeated_anova/) |
+| 待定 | 样本率与率差的抽样分布、正态近似及精确推断（R、Python、MATLAB配套） | [stats_classroom/proportion_sampling_difference](stats_classroom/proportion_sampling_difference/) |
 
 请进入对应文件夹，再按该文件夹的 README 运行。
 
