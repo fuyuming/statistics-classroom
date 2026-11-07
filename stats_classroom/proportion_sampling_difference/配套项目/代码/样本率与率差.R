@@ -91,6 +91,39 @@ write.csv(comparison, file.path(out, "continuity_correction_comparison.csv"), ro
 print(binom.test(0, 20))
 write.csv(data.frame(x = 0, n = 20, wald_low = 0, wald_high = 0, clopper_pearson_low = 0, clopper_pearson_high = qbeta(.975, 1, 20)), file.path(out, "boundary_zero_20.csv"), row.names = FALSE)
 
+# Cohen's h：用样本率计算反正弦变换后的效应量（方向为第一组减第二组）。
+# asin() 接受0到1的数值，返回弧度角；h的大小分类只作经验参考，医学意义仍需结合结局判断。
+cohens_h <- function(p1, p2) {
+  2 * asin(sqrt(p1)) - 2 * asin(sqrt(p2))
+}
+conventional_band <- function(h) {
+  ah <- abs(h)
+  if (ah < .2) {
+    "below_small_reference"
+  } else if (ah < .5) {
+    "small"
+  } else if (ah < .8) {
+    "medium"
+  } else {
+    "large"
+  }
+}
+effect <- data.frame(
+  p1 = c(r1, .55),
+  p2 = c(r2, .45)
+)
+effect$risk_difference <- effect$p1 - effect$p2
+effect$difference_percentage_points <- 100 * effect$risk_difference
+effect$cohens_h <- cohens_h(effect$p1, effect$p2)
+effect$abs_h <- abs(effect$cohens_h)
+effect$conventional_band <- vapply(effect$cohens_h, conventional_band, character(1))
+write.csv(effect, file.path(out, "effect_size_comparison.csv"), row.names = FALSE)
+cat("\nCohen's h（反正弦变换后的效应量；方向为第一组减第二组）\n")
+cat("h = 2*asin(sqrt(p1)) - 2*asin(sqrt(p2))；医学意义需结合结局、临床阈值和研究设计判断。\n")
+cat(sprintf("主例：第一组率=%.6f，第二组率=%.6f，率差=%.1f百分点，h=%.13f，惯例分类=%s\n", r1, r2, 100 * (r1-r2), cohens_h(r1, r2), conventional_band(cohens_h(r1, r2))))
+cat("惯例参考：|h|<.2低于小效应参考值；.2<=|h|<.5小；.5<=|h|<.8中；>=.8大；不代表医学重要性。\n")
+print(effect)
+
 
 # 图3的单根柱形怎样算 -----------------------------------------
 # 教学模型给定两组总体率均为0.30，率差0.02对应相差1名阳性。

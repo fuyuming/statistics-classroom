@@ -36,6 +36,12 @@ Python首次运行若提示缺少模块，在Spyder使用的同一Python环境�
 
 R脚本新增correct=FALSE/TRUE对照，结果为运行结果/R/continuity_correction_comparison.csv，实际输出保存在prop_test连续性校正实际输出.txt。该对照用于第五节软件设置解释。
 
+## Cohen's h：同样率差在不同基线下的效应量
+
+脚本还用样本率计算比例差的 Cohen's h（反正弦变换后的效应量）：`h = 2 * asin(sqrt(p1)) - 2 * asin(sqrt(p2))`，方向固定为第一组减第二组。`asin` 接受0到1的数值，返回值按弧度表示。主例 60/300 对 20/200 的两组率为 0.20 和 0.10，率差为 +0.10（10 个百分点），预期 `h = 0.2837941092083`。结果写入三种语言各自的 `运行结果/{语言}/effect_size_comparison.csv`。
+
+按 `abs(h)` 的经验参考分类：`abs(h)<.2` 低于小效应参考值，`.2<=abs(h)<.5` 小，`.5<=abs(h)<.8` 中，`abs(h)>=.8` 大；分类字符串用 `below_small_reference`、`small`、`medium`、`large`，便于跨语言比较。这些阈值不是医学重要性判断，实际意义仍需结合结局、临床阈值和研究设计。效应量结果表另列 0.55−0.45，展示原始率差同为 0.10 时，基线不同会改变 h；原始率差本身没有通用的“大/中/小”标签。公式依据 R `pwr::ES.h` 文档（https://search.r-project.org/CRAN/refmans/pwr/html/ES.h.html）及 Cohen (1988) 第6章（https://www.utstat.toronto.edu/brunner/oldclass/378f16/readings/CohenPower.pdf）。
+
 
 ## 率差精确检验与区间的R练习
 

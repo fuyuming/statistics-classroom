@@ -94,6 +94,26 @@ writetable(table(0,20,0,0,0,cp, ...
     fullfile(out,'boundary_zero_20.csv'));
 fprintf('Z=%.8g P=%.8g Q=%.8g\n', z, erfc(abs(z)/sqrt(2)), z^2);
 
+%% Cohen's h：反正弦变换后的效应量，方向为第一组减第二组。
+% asin接受0到1的数值并返回弧度角；先分别变换两组样本率，再相减。
+effect_p1 = [r1; 0.55];
+effect_p2 = [r2; 0.45];
+effect_rd = effect_p1 - effect_p2;
+effect_h = cohens_h(effect_p1, effect_p2);
+effect_band = strings(2,1);
+for ii = 1:2
+    effect_band(ii) = conventional_band(effect_h(ii));
+end
+effect = table(effect_p1, effect_p2, effect_rd, 100*effect_rd, effect_h, abs(effect_h), effect_band, ...
+    'VariableNames', {'p1','p2','risk_difference','difference_percentage_points','cohens_h','abs_h','conventional_band'});
+writetable(effect, fullfile(out,'effect_size_comparison.csv'));
+main_h = cohens_h(r1, r2);
+fprintf('\nCohen''s h (inverse-sine transformed effect size; direction is group 1 minus group 2)\n');
+fprintf('h = 2*asin(sqrt(p1)) - 2*asin(sqrt(p2)); medical meaning depends on outcome, clinical threshold, and study design.\n');
+fprintf('main example: rate1=%.6f, rate2=%.6f, risk_difference=%.1f percentage points, h=%.13f, conventional_band=%s\n', r1, r2, 100*(r1-r2), main_h, conventional_band(main_h));
+fprintf('Reference bands: |h|<.2 below small-effect reference; .2<=|h|<.5 small; .5<=|h|<.8 medium; >=.8 large; not medical importance.\n');
+disp(effect);
+
 function y = binom_pmf_stable(n,p)
 k=(0:n)';
 y=exp(gammaln(n+1)-gammaln(k+1)-gammaln(n-k+1)+k*log(p)+(n-k)*log1p(-p));
@@ -104,3 +124,18 @@ end
 function y = normcdf_local(x,m,s), y=.5*(1+erf((x-m)/(sqrt(2)*s))); end
 function y = normsf_local(x,m,s), y=.5*erfc((x-m)/(sqrt(2)*s)); end
 function y = ifelse(test,a,b), if test, y=a; else, y=b; end, end
+function h = cohens_h(p1,p2)
+h = 2*asin(sqrt(p1))-2*asin(sqrt(p2));
+end
+function band = conventional_band(h)
+ah = abs(h);
+if ah < .2
+    band = "below_small_reference";
+elseif ah < .5
+    band = "small";
+elseif ah < .8
+    band = "medium";
+else
+    band = "large";
+end
+end

@@ -117,3 +117,32 @@ summary.to_csv(OUT / "observed_comparison.csv", index=False); print(summary.to_s
 n = 20; x = 0; wald = (0.0, 0.0); cp = (0.0, beta.ppf(.975, 1, n))
 pd.DataFrame([{"x": x, "n": n, "wald_low": wald[0], "wald_high": wald[1], "clopper_pearson_low": cp[0], "clopper_pearson_high": cp[1]}]).to_csv(OUT / "boundary_zero_20.csv", index=False)
 print(f"boundary x=0,n=20: Wald={wald}, Clopper-Pearson={cp}")
+
+# %% Cohen's h：反正弦变换后的效应量，方向为第一组减第二组。
+# asin接受0到1的数值并返回弧度角；先分别变换两组样本率，再相减。
+def cohens_h(p1, p2):
+    return 2 * math.asin(math.sqrt(p1)) - 2 * math.asin(math.sqrt(p2))
+
+def conventional_band(h):
+    ah = abs(h)
+    if ah < 0.2:
+        return "below_small_reference"
+    if ah < 0.5:
+        return "small"
+    if ah < 0.8:
+        return "medium"
+    return "large"
+
+effect = pd.DataFrame({"p1": [r1, 0.55], "p2": [r2, 0.45]})
+effect["risk_difference"] = effect["p1"] - effect["p2"]
+effect["difference_percentage_points"] = 100 * effect["risk_difference"]
+effect["cohens_h"] = [cohens_h(p1, p2) for p1, p2 in zip(effect["p1"], effect["p2"])]
+effect["abs_h"] = effect["cohens_h"].abs()
+effect["conventional_band"] = effect["cohens_h"].map(conventional_band)
+effect.to_csv(OUT / "effect_size_comparison.csv", index=False)
+main_h = cohens_h(r1, r2)
+print("\nCohen's h (inverse-sine transformed effect size; direction is group 1 minus group 2)")
+print("h = 2*asin(sqrt(p1)) - 2*asin(sqrt(p2)); medical meaning depends on the outcome, clinical threshold, and study design.")
+print(f"main example: rate1={r1:.6f}, rate2={r2:.6f}, risk_difference={r1-r2:.1%} ({100*(r1-r2):.1f} percentage points), h={main_h:.13f}, conventional_band={conventional_band(main_h)}")
+print("Reference bands: |h|<.2 below small-effect reference; .2<=|h|<.5 small; .5<=|h|<.8 medium; >=.8 large; not medical importance.")
+print(effect.to_string(index=False))
