@@ -34,3 +34,15 @@ $ExactCI
 包版本
    exact2x2 ExactCIdiff
     "1.7.0"       "2.1"
+
+	Unconditional Exact Test on Difference in Proportions, method=
+	user-fixed, central
+
+data:  x1/n1=(0/10) and x2/n2= (2/10)
+proportion 1 = 0, proportion 2 = 0.2, p-value = 0.5034
+alternative hypothesis: true p2-p1 is not equal to 0
+95 percent confidence interval:
+ -0.2789154  0.6176205
+sample estimates:
+p2-p1
+  0.2

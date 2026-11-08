@@ -1,0 +1,2 @@
+method,estimate,p_value,lower,upper,grid_points
+unconditional_difference_central,0.2,0.50344467163086,-0.278914856910705,0.617619895935059,501

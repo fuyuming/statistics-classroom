@@ -71,3 +71,29 @@ print(results)
 write.csv(results, file.path(output_directory, "率差精确方法比较.csv"), row.names = FALSE)
 cat("包版本\n")
 print(c(exact2x2 = as.character(packageVersion("exact2x2")), ExactCIdiff = as.character(packageVersion("ExactCIdiff"))))
+
+
+# 三语言共同方法核对 ------------------------------------------
+# Python和MATLAB原生扩展按观察率差排序。用整数交叉乘积保持相等率差的并列。
+# user-fixed接口使用这个预先给定的排序函数，随X2增加而增加、随X1增加而减少。
+# central用两倍较小的单侧精确P值组成双侧P值，区间反演单侧检验。
+# 这与正文的score排序及BinomCI分别属于不同的精确方法，数值可以不同。
+common_result <- exact2x2::uncondExact2x2(
+  x1 = positive_second, n1 = sample_size_second,
+  x2 = positive_first, n2 = sample_size_first,
+  parmtype = "difference", nullparm = 0,
+  alternative = "two.sided", method = "user-fixed",
+  Tfunc = function(X1, N1, X2, N2, delta0) X2 * N1 - X1 * N2,
+  tsmethod = "central", midp = FALSE,
+  conf.int = TRUE, conf.level = 0.95,
+  control = exact2x2::ucControl(nPgrid = 1000, nCIgrid = 1000)
+)
+print(common_result)
+common_table <- data.frame(
+  method = "unconditional_difference_central",
+  estimate = as.numeric(common_result$estimate),
+  lower = common_result$conf.int[1],
+  upper = common_result$conf.int[2],
+  p_value = common_result$p.value
+)
+write.csv(common_table, file.path(output_directory, "率差精确_三语言共同方法.csv"), row.names = FALSE)
