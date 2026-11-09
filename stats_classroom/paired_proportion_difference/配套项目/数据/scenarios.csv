@@ -1,0 +1,3 @@
+scenario,n,nplus,nzero,nminus,both_positive,both_negative
+main_20,20,1,14,5,8,6
+large_1000,1000,50,700,250,400,300

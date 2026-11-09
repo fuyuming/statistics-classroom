@@ -1,0 +1,8 @@
+
+
+
+data:  
+
+95 percent confidence interval:
+ -0.2319192 -0.1685890
+
