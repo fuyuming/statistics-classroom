@@ -4,7 +4,7 @@
 
 ## 先从基础分布开始
 
-配合基础正文v2，先运行`distribution_basics`，只看“给定三种变化概率后，人数和率差怎样分布”。它不引入未知参数、尾部或排序算法。
+配合正文v2的前半部分，先运行`distribution_basics`，只看“给定三种变化概率后，人数和率差怎样分布”。它不引入未知参数、尾部或排序算法。
 
 - R：打开`配对率差.Rproj`，Source `代码/distribution_basics.R`，仅需基础R。
 - Python：用Spyder打开项目文件夹，F5运行`代码/distribution_basics.py`。
@@ -12,7 +12,7 @@
 
 三套统一使用qplus=.05、qzero=.70、qminus=.25。先显示2人的五个D概率，再保存`基础分布_231组概率.csv`与`基础分布_率差概率.csv`，最后用`基础分布_汇总.csv`核对全概率、均值−.20和方差.013。20人观察组合(1,14,5)的概率为.0770154091。
 
-正文的`PairedCI()`调用用于下一步：从观察人数估计未知总体率差。它与前面固定已知q的分布计算是不同问题。完整分析和内部排序演示按下面的入口继续运行。
+正文的`PairedCI()`调用用于下一步：从观察人数估计未知总体率差。它与前面固定已知q的分布计算是不同问题。完整分析和正文第八节的排序演示按下面的入口继续运行。
 
 ## 继续运行完整分析
 
@@ -44,7 +44,7 @@ python 代码/plot_figures.py
 
 | 计算内容 | R | Python | MATLAB |
 | --- | --- | --- | --- |
-| 基础正文：同一已知概率模型的精确分布 | `代码/distribution_basics.R` | `代码/distribution_basics.py` | `代码/distribution_basics.m` |
+| 正文前半部分：同一已知概率模型的精确分布 | `代码/distribution_basics.R` | `代码/distribution_basics.py` | `代码/distribution_basics.m` |
 | 个人记录、精确分布、均值方差、标准误与效应量 | `代码/paired_rate.R` | `代码/paired_rate.py` | `代码/paired_rate.m` |
 | 三语言共同的固定D排序精确区间 | `代码/paired_exact.R`（由区间入口调用） | `代码/paired_exact.py` | `代码/paired_exact.m` |
 | 图1、图2、图3及网格试算 | `代码/plot_figures.R` | `代码/plot_figures.py` | `代码/plot_figures.m` |
