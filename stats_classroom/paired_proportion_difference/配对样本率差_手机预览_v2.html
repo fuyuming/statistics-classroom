@@ -1,0 +1,134 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>配对样本率差怎样分布？从每个人的变化到精确区间</title><style>*{box-sizing:border-box}body{margin:0;background:#f1f4f3;color:#27343a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:720px;margin:24px auto;padding:32px 36px 56px;background:#fff;border-top:5px solid #258dcc}.brand{display:flex;align-items:center;gap:12px;color:#258dcc;font-size:14px;letter-spacing:.04em}.brand img{width:48px;height:48px;border-radius:50%}h1{font-size:30px;line-height:1.45;color:#0000F5;margin:26px 0 20px}h2{font-size:22px;line-height:1.5;color:#0000F5;border-left:4px solid #58b9ed;padding-left:13px;margin:42px 0 20px}h3{font-size:19px;line-height:1.55;color:#0000F5;margin:30px 0 14px}p{font-size:17px;line-height:1.95;margin:19px 0;text-align:justify}strong{color:#27343a;font-weight:700}blockquote{margin:20px 0 30px;padding:10px 18px;background:#f0f8ff;border-left:2px solid #58b9ed}blockquote p{font-size:14px;line-height:1.9;margin:8px 0;color:#53666c}a{color:#258dcc;text-decoration:none;border-bottom:1px solid #b9def5}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;background:#f0f8ff;color:#1769aa;padding:1px 5px;border-radius:4px}pre{background:#f7faf9;border:1px solid #e4ecea;border-radius:6px;padding:12px 14px;overflow-x:auto}pre code{background:none;padding:0;font-size:14px;line-height:1.7}div.formula{background:#f7faf9;border-left:3px solid #58b9ed;padding:12px 16px;margin:20px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:17px;color:#1769aa;text-align:center;line-height:1.9}ul,ol{font-size:17px;line-height:1.95;margin:18px 0;padding-left:26px}li{margin:8px 0}table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px}th,td{border-bottom:1px solid #e4ecea;padding:9px 10px;text-align:left;line-height:1.7}th{background:#f0f8ff;color:#1769aa;font-weight:650}footer{border-top:1px solid #dfe8e6;margin-top:36px;padding-top:16px;font-size:12px;color:#758787;line-height:1.8}@media(max-width:600px){body{background:#fff}main{margin:0;padding:24px 22px 40px;border-top-width:4px}h1{font-size:27px}h2{font-size:21px}h3{font-size:18px}p,ul,ol{font-size:16px;line-height:1.95}table{font-size:14px}}main > p img{display:block;width:100%;height:auto;margin:24px 0 8px;border:1px solid #e4ecea}main > p:has(img){margin:25px -12px 4px}main > p:has(img) a{border:0;display:block}main > p > em:only-child{display:block;font-size:13px;line-height:1.8;font-style:normal;color:#657a7d;text-align:left;margin:0 0 28px}@media(max-width:600px){main > p:has(img){margin-left:-12px;margin-right:-12px}}a{overflow-wrap:anywhere}table{display:block;overflow-x:auto}blockquote p{font-size:16px}hr{border:0;border-top:1px solid #dfe8e6;margin:30px 0}p{text-align:left}pre{max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere}pre code{display:block;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}</style></head><body><main><div class="brand"><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E8%B4%A6%E5%8F%B7%E5%A4%B4%E5%83%8F.png" alt="账号头像">明哥的微生物世界 · 统计课堂</div><h1>配对样本率差怎样分布？从每个人的变化到精确区间</h1><blockquote><p>明哥的微生物世界 · 统计课堂 26</p><p>摘要　同一批人前后检测，先算每个人的变化，再求平均，就得到配对样本率差。从20人的例题出发，用一个小模型算清它的精确分布、均值和方差，再用R计算总体率差的精确区间。</p></blockquote>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/00_%E8%AF%BE%E5%A0%82%E5%B0%81%E9%9D%A2.png" alt="本科第九次课：率与率差的估计和检验"></p>
+<p>大家好，我是明哥。</p>
+<p>最近开始接手本科生《概率与生物医学统计》这门课后半部分的教学。一些需要继续展开的知识点，会和研究生课程的补充内容一起，放在“统计课堂”里，相互衔接、相互补充。</p>
+<p>前篇统计课堂25讲了两个独立样本率之差。这次继续配套本科生第9课《率与率差的估计和检验》，看同一批人前后各测一次的情形。</p>
+<p>这时，每个人都带着前、后两次结果进入样本。把同一个人的两次结果相减，就能保留这层配对关系。本篇沿着一个问题往下走：<strong>我们观察到的率差，怎样由每个人的变化形成；换一批人时，它又会怎样变化？</strong></p>
+<h2>一、先把20人的例题算清楚</h2>
+<p>假设从某个目标人群随机抽取20名成年人，相隔两周，用同一方法、同一判定标准各检测一次。每个人的两次记录都完整，不同人的记录相互独立。结果为：</p>
+<ul><li>8人两次都是阳性。</li><li>6人两次都是阴性。</li><li>1人由阴性变为阳性。</li><li>5人由阳性变为阴性。</li></ul>
+<p>我们关注<strong>后测阳性率减前测阳性率</strong>，回答三个问题：样本率差是多少；反复抽样时这个率差怎样分布；根据20人的资料，总体率差的95%置信区间是多少。</p>
+<p>前测有8 + 5 = 13人阳性，样本率为13/20 = 0.65；后测有8 + 1 = 9人阳性，样本率为9/20 = 0.45。因此，样本率差为−0.20，即后测低20个百分点。</p>
+<p>还可以从每个人的变化来算。把阴性记为0、阳性记为1，个人后测减前测记为Z：阴转阳取＋1，阳转阴取−1，两次相同取0。</p>
+<p>这20个人中，1人贡献＋1，5人各贡献−1，其余14人贡献0。总差值为−4，除以全部20个人，仍得到−0.20。把一般样本量记为n，本例n = 20；式（1）的下标i表示第几个人。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F01.png" alt="式（1） 配对样本率差等于个人前后差值的平均数"></p>
+<p><em>式（1）｜前测为Xᵢ，后测为Yᵢ，个人差值为Zᵢ；样本率差D是这些差值的平均数。</em></p>
+<p><strong>配对率差可以先逐人作差，再求平均。</strong> 分母包括全部20个人，两次未变的14人也保留在样本中。后文讨论的随机量D，就是这样得到的。</p>
+<h2>二、怎样计算一组三类人数的概率？</h2>
+<p>要研究重复抽样，需要先有一个概率模型。设一个人出现＋1、0、−1的总体概率分别为q₊、q₀、q₋，三者之和为1。总体后测率减前测率记为θ。</p>
+<p>两次均阳性者对前、后两率的贡献相同，相减后抵消；两次均阴性者对两边都贡献0。因此，<strong>总体率差θ等于阴转阳概率减去阳转阴概率。</strong></p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F02.png" alt="式（2） 三种变化概率及总体率差"></p>
+<p><em>式（2）｜三种变化概率之和为1，θ = q₊ − q₋。</em></p>
+<p>下面先假定q₊ = 0.05、q₀ = 0.70、q₋ = 0.25，用来说明概率怎样计算。在这个给定模型中，θ固定为0.05 − 0.25 = −0.20。这组概率只用于解释重复抽样的分布；真实研究中的总体概率仍需估计。</p>
+<p>抽n个人后，＋1的人数记为N₊，取0的人数记为T，−1的人数记为N₋。如果不同人独立，并采用相同的三种概率，这三类人数共同服从多项分布；只有三类时，也称三项分布。它回答的是：<strong>三类人数同时取到某一组数值的概率是多少？</strong><sup>[1]</sup></p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03.png" alt="式（3） 三类人数的联合概率"></p>
+<p><em>式（3）｜r、t、s分别是＋1、0、−1的人数，相加等于n。</em></p>
+<p>这个公式可以分成两部分理解。后面的q₊ʳq₀ᵗq₋ˢ，是<strong>已经指定哪些人属于哪一类时，这一种人员安排的概率</strong>；前面的阶乘系数，数的是<strong>有多少种人员安排会产生同样的三类人数</strong>。</p>
+<p>这段用3个人把阶乘系数拆开看，主例仍保留20人。把甲、乙、丙排成一列，规定前两位取＋1，最后一位取0。第一位有3人可选，第二位剩2人，第三位剩1人，共3! = 6种人员排列。</p>
+<table><thead><tr><th>人员排列</th><th>对应的实际结果</th></tr></thead><tbody><tr><td>甲乙丙、乙甲丙</td><td>甲乙取＋1，丙取0</td></tr><tr><td>甲丙乙、丙甲乙</td><td>甲丙取＋1，乙取0</td></tr><tr><td>乙丙甲、丙乙甲</td><td>乙丙取＋1，甲取0</td></tr></tbody></table>
+<p>两个取＋1的人交换顺序，类别分配没有改变，每种结果被重复数了2! = 2次，所以要除以2!。取0的只有1人，内部只有1! = 1种顺序；取−1的有0人，空类别只有一种安排，约定0! = 1。这两项除数均为1。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03_%E7%B3%BB%E6%95%B0.png" alt="式（3）的系数示例：6种人员排列去重后得到3种类别分配"></p>
+<p><em>系数示例｜式（3）中的人数取r = 2、t = 1、s = 0。</em></p>
+<p>去掉重复后，得到3种类别分配。每一种的概率都是0.05 × 0.05 × 0.70 = 0.00175，总概率为3 × 0.00175 = 0.00525。式（3）就是这样计算：<strong>安排种数乘以一种安排的概率。</strong></p>
+<p>人数增加到n时，同一类别内的r!、t!、s!种顺序同样需要去重，这就得到式（3）的阶乘系数。不同人的记录独立，但三类人数受到总和为n的约束，不能把这三个总人数看成相互独立。</p>
+<h2>三、有了人数概率，怎样得到率差的分布？</h2>
+<p>三类人数确定以后，D = (N₊ − N₋)/n也就确定了。但不同的人数组合，可能得到相同的D。<strong>先算每个人数组合的概率，再把产生同一率差的组合归在一起、将概率相加，就得到D的分布。</strong></p>
+<p>为了能把每一种结果列完，先把演示模型的样本量缩小到2人，仍用q₊ = 0.05、q₀ = 0.70、q₋ = 0.25。计算D = 0的概率。</p>
+<p>第一种情况，两人都不变，即（N₊，T，N₋）＝（0，2，0）。概率为0.70 × 0.70 = 0.49。</p>
+<p>第二种情况，一人＋1、一人−1，即（1，0，1）。有两种人员安排：第一人＋1、第二人−1，概率0.05 × 0.25 = 0.0125；交换两人的结果，概率仍为0.0125。合起来为0.025。</p>
+<p>这两组人数都产生D = 0，而且互斥，所以P(D = 0) = 0.49 + 0.025 = 0.515。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F04_%E5%B1%95%E5%BC%80.png" alt="式（4）的两人计算示例：将能得到D等于0的两组人数概率相加"></p>
+<p><em>式（4）计算示例｜两人都不变，或两人发生相反变化，都能得到D = 0。</em></p>
+<p>其余率差也这样计算，就得到全部分布：</p>
+<table><thead><tr><th>率差D</th><th>产生这一率差的情况</th><th>概率</th></tr></thead><tbody><tr><td>−1</td><td>两人都取−1</td><td>0.0625</td></tr><tr><td>−0.5</td><td>一人−1，另一人0，两种安排</td><td>0.35</td></tr><tr><td>0</td><td>两人都0，或一人＋1、一人−1</td><td>0.515</td></tr><tr><td>0.5</td><td>一人＋1，另一人0，两种安排</td><td>0.07</td></tr><tr><td>1</td><td>两人都取＋1</td><td>0.0025</td></tr></tbody></table>
+<p>五个概率相加等于1。<strong>这就是给定上述三种总体概率时，2人配对样本率差的精确分布。</strong></p>
+<p>写成一般形式，就得到式（4）。其中k是＋1人数减去−1人数，是整数；率差为D = k/n。公式把所有满足r − s = k的人数组合概率相加<sup>[1]</sup>。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F04.png" alt="式（4） 将产生同一率差的人数组合概率相加"></p>
+<p><em>式（4）｜先用式（3）计算每组人数的概率，再按同一率差归类求和。</em></p>
+<p>回到20人，可以先固定＋1人数来枚举：＋1有0人时，其余两类有21种分配；＋1有1人时有20种；依次减少，＋1有20人时只剩1种。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F10.png" alt="式（5） 20人三类人数共有231种组合"></p>
+<p><em>式（5）｜21项从21减到1，平均数为11，总和为21 × 11 = 231。</em></p>
+<p>例如观察人数（1，14，5）：从20人选1人取＋1，有20种选法；剩余19人选14人取0，有11628种；余下5人取−1，共232560种人员安排。每种安排的概率为0.05 × 0.70¹⁴ × 0.25⁵，乘以安排种数，得到这组人数的概率约为0.07701541。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/v2_%E5%85%AC%E5%BC%8F06_%E4%BA%BA%E6%95%B0%E6%A6%82%E7%8E%87.png" alt="式（6） 给定概率模型下，20人观察组合的概率计算"></p>
+<p><em>式（6）｜沿用q₊ = 0.05、q₀ = 0.70、q₋ = 0.25，计算恰好出现（1，14，5）的概率。</em></p>
+<p>全部231组也各用式（3）计算，概率之和为1。再按D归类相加，就得到20人时D的41个可能取值及其概率。配套的基础练习把这两步分别保存为“231组人数概率表”和“率差概率表”，可以逐行对照。</p>
+<h2>四、平均率差和抽样波动由什么决定？</h2>
+<p>这里E表示按总体概率计算的平均值，即期望；Var表示方差。一个人的Z取＋1、0、−1，E(Z) = q₊ − q₋。平方以后，两种变化都变成1，所以E(Z²) = q₊ + q₋。再用Var(Z) = E(Z²) − [E(Z)]²求方差；这些性质在<a href="https://mp.weixin.qq.com/s/QkG1VROHLoOtyDgxEonrDw" target="_blank" rel="noopener">统计课堂08</a>讲过<sup>[2]</sup>。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F05.png" alt="式（7） 个人差值的均值与方差"></p>
+<p><em>式（7）｜两个方向相减决定均值，两个方向的变化总量也进入方差。</em></p>
+<p>D是n个独立个人差值的平均数。因此，D的均值仍为θ，方差为个人差值方差除以n。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F06.png" alt="式（8） 配对样本率差的均值、方差和标准误"></p>
+<p><em>式（8）｜标准误是D的标准差，描述重复抽样时样本率差的波动。</em></p>
+<p>在给定的概率模型中，θ = 0.05 − 0.25 = −0.20；个人差值方差为0.05 + 0.25 − 0.20² = 0.26。抽2人时，D的方差为0.13；抽20人时为0.013；抽1000人时为0.00026。人数增加，平均率差不变，抽样波动减小。</p>
+<p>这里保留配对关系的方法，仍然是先对每个人作差。也可以从“后测率方差＋前测率方差−两倍协方差”推导，同一个人的两次结果之间的联系保留在协方差中。</p>
+<h2>五、用20人的观察资料，估计总体率差</h2>
+<p>现在回到最初实际观察到的20人。样本率差D = −0.20已经算出，但总体率差θ还未知。前面回答的是“已知总体概率，样本会怎样变化”；这一步回答的是“已有样本，总体率差怎样估计”。PairedCI直接使用观察人数1、14、5，并不把演示模型的三种概率当作已知总体概率传入。</p>
+<p><code>ExactCIdiff::PairedCI()</code>用于两个配对总体率之差的精确区间，输入的是三类人数。它依据三项联合分布构造区间，并处理模型中未知的概率<sup>[3,4]</sup>。</p>
+<pre><code>ExactCIdiff::PairedCI(
+  n12 = 1,   # 后测阳性、前测阴性，即＋1
+  t = 14,    # 两次结果相同，即0
+  n21 = 5,   # 后测阴性、前测阳性，即−1
+  conf.level = 0.95,
+  CItype = &quot;Two.sided&quot;
+)</code></pre>
+<p>实际输出如下。</p>
+<pre><code>$conf.level
+[1] 0.95
+
+$CItype
+[1] &quot;Two.sided&quot;
+
+$estimate
+[1] -0.2
+
+$ExactCI
+[1] -0.44923  0.06303</code></pre>
+<p><strong>点估计为−20个百分点，95%区间约为−44.92至6.30个百分点。</strong> 区间同时包含负值、0和正值，说明这20人的资料还不能把总体净变化的方向估计得很确定。</p>
+<p>区间写成[L，U]时，L是左端点，称为置信下限；U是右端点，称为置信上限。95%说的是区间构造方法的长期覆盖水平：在模型成立时重复抽样、反复构造区间，理论上至少95%的区间会包含真实θ。</p>
+<p><strong>精确区间可以用于小样本，计算可行时也适用于大样本。</strong> “精确”指依据有限样本分布构造区间；软件仍需数值求解，区间可能偏保守，计算时间也随样本量和算法变化<sup>[3]</sup>。本例直接采用精确区间，不以单一人数门槛决定是否采用近似。</p>
+<p>这里先把输入、估计对象和输出读清楚。希望继续了解未知概率处理和排序细节的读者，可以接着看<a href="%E9%85%8D%E5%AF%B9%E6%A0%B7%E6%9C%AC%E7%8E%87%E5%B7%AE_%E7%AE%97%E6%B3%95%E8%A1%A5%E5%85%85_v1.html" target="_blank" rel="noopener">方法补充</a>；其中保留完整试算，正文的分布计算不需要先依赖这些排序细节。</p>
+<h2>六、样本增加以后，分布怎样变化？</h2>
+<p>先看分布形状：仍采用同一组给定概率，比较重复抽样的结果。不同人的Z独立同分布、个人差值方差大于0时，随着n增加，标准化后的D分布趋近标准正态，这是中心极限定理的应用<sup>[5]</sup>。式（9）用N表示正态分布。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F07.png" alt="式（9） 配对样本率差的正态近似"></p>
+<p><em>式（9）｜用式（8）的均值与方差，写出D的大样本近似。</em></p>
+<p><strong>式（9）中N的第二个参数表示方差。</strong> 图1上半部分抽20人，下半部分抽1000人，三种总体概率保持不变。横轴是D；例如总差值k = −4、n = 20时，D = −0.20。下半部分横轴作了局部放大。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%9B%BE1_%E9%85%8D%E5%AF%B9%E7%8E%87%E5%B7%AE%E7%B2%BE%E7%A1%AE%E4%B8%8E%E8%BF%91%E4%BC%BC.png" alt="图1 给定三种变化概率，比较20人与1000人的率差精确分布及正态近似"></p>
+<p><em>图1｜q₊ = 0.05、q₀ = 0.70、q₋ = 0.25。柱为精确概率，点为正态分布在对应单格区间内的概率；两幅图的横轴范围不同。</em></p>
+<p>率差的一格宽度为1/n，所以每格左右边界分别离中心0.5/n；这就是图中把连续面积与离散概率对应起来的边界处理。随着人数增加，分布更集中，正态近似与精确分布也更接近。</p>
+<p>但总人数大，仍可能只有很少的人发生变化。图2固定n = 1000，改为q₊ = 0.001、q₀ = 0.997、q₋ = 0.002，每次抽样平均只有3人变化，分布仍呈明显的离散形状。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%9B%BE2_%E5%8F%98%E5%8C%96%E7%A8%80%E5%B0%91.png" alt="图2 1000人但平均只有3人变化时的分布"></p>
+<p><em>图2｜大样本的形状要结合变化概率判断；本图与图1采用不同概率模型。</em></p>
+<p>单个二项率常用np ≥ 5且n(1−p) ≥ 5，或更保守地两项均≥10作为经验检查，其中两项是期望阳性和期望阴性人数<sup>[6]</sup>。配对率差涉及三类变化，不能只看前、后各自的率是否通过这类检查。精确方法提供了不依赖正态近似的计算路径。</p>
+<p>接下来另做区间演算。假设1000人采用同样的配对设计：400人两次阳性、300人两次阴性、50人阴转阳、250人阳转阴。前后率仍为0.65和0.45，D仍为−0.20。把三类样本比例代入式（8），得到估计标准误0.01612；据此计算Wald近似区间。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F08.png" alt="式（10） 1000人例题的标准误及Wald近似区间"></p>
+<p><em>式（10）｜区间约为[−0.2316，−0.1684]，与20人主例的精确区间采用不同构造。</em></p>
+<pre><code>n &lt;- 1000
+n_plus &lt;- 50
+n_minus &lt;- 250
+difference &lt;- (n_plus - n_minus) / n
+se &lt;- sqrt(((n_plus + n_minus) / n - difference^2) / n)
+difference + c(-1, 1) * qnorm(0.975) * se</code></pre>
+<p>实际输出如下。</p>
+<pre><code>[1] -0.2316035 -0.1683965</code></pre>
+<p>这个大样本例题用于看清标准误与近似区间怎样计算。实际分析仍可在计算可行时采用精确方法；20人与1000人的点估计虽然相同，估计精度却不同。</p>
+<h2>七、率差本身就是效应量</h2>
+<p>总体率差θ是原始尺度上的效应量，D是它的样本估计。主例的−0.20表示<strong>后测阳性率净下降20个百分点</strong>。5人阳转阴、1人阴转阳，净变化为4人；真正发生变化的是6人，占30%。</p>
+<p>原始率差没有通用的小、中、大分界。它是否重要，需要结合指标、前测水平、研究人群和事先关心的差异幅度，同时报告置信区间。前后观察到变化，也还需要研究设计和其他证据来解释变化原因。</p>
+<h2>八、本篇讲了哪些知识？</h2>
+<ol><li><strong>配对率差来自个人变化。</strong> 后测减前测取＋1、0、−1，D是全部个人差值的平均数。</li><li><strong>先算人数组合的概率。</strong> 不同人独立时，用“安排种数 × 一种安排的概率”计算三项概率。</li><li><strong>再按相同率差归类相加。</strong> 这就从三类人数的联合分布得到D的精确分布。</li><li><strong>均值看两个方向之差，方差还看变化总量。</strong> 给定变化概率，人数增加会减小平均率差的抽样波动。</li><li><strong>真实研究还要估计未知总体率差。</strong> 20人的主例用PairedCI计算精确区间；大样本时，精确方法在计算可行时仍可使用。</li><li><strong>效应大小与不确定性一起解释。</strong> 报告率差和百分点，区分净变化与实际发生变化的人数比例。</li></ol>
+<h2>配套练习</h2>
+<p>和前面的统计课堂一样，保留R、Python、MATLAB三套对应脚本。先运行本语言的<code>distribution_basics</code>：查看两人小模型，再对照20人的231组人数概率与41个率差概率。它们统一采用q₊ = 0.05、q₀ = 0.70、q₋ = 0.25。</p>
+<p>正文统计图由R生成。完整项目仍保留原来的分析、精确区间和排序算法演示；具体入口见配套README，基础分布与方法扩展分别说明。</p>
+<p>本篇完整项目：</p>
+<p><a href="https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/paired_proportion_difference" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/paired_proportion_difference</a></p>
+<p><a href="https://github.com/fuyuming/statistics-classroom/raw/refs/heads/main/stats_classroom/paired_proportion_difference/%E9%85%8D%E5%AF%B9%E6%A0%B7%E6%9C%AC%E7%8E%87%E5%B7%AE_%E5%AE%8C%E6%95%B4%E9%A1%B9%E7%9B%AE.zip" target="_blank" rel="noopener">下载本篇完整ZIP</a>。解压后进入<code>paired_proportion_difference</code>，先读README。</p>
+<p>系列仓库：<a href="https://github.com/fuyuming/statistics-classroom" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom</a></p>
+<p><a href="https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip" target="_blank" rel="noopener">下载整个仓库ZIP</a>，解压后进入<code>stats_classroom/paired_proportion_difference</code>。</p>
+<p>这里是明哥的微生物世界，我们下次再见。</p>
+<h2>参考资料</h2>
+<p>[1] Chen Y-C. University of Washington STAT 512, Lecture 7: Multinomial distribution. <a href="https://faculty.washington.edu/yenchic/20A_stat512/Lec7_Multinomial.html" target="_blank" rel="noopener">https://faculty.washington.edu/yenchic/20A_stat512/Lec7_Multinomial.html</a></p>
+<p>[2] 明哥的微生物世界．期望、方差、协方差：统计公式是怎样一步步推出来的？统计课堂08。<a href="https://mp.weixin.qq.com/s/QkG1VROHLoOtyDgxEonrDw" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/QkG1VROHLoOtyDgxEonrDw</a></p>
+<p>[3] Shan G, Wang W. ExactCIdiff: An R Package for Computing Exact Confidence Intervals for the Difference of Two Proportions. The R Journal. 2013;5(2):62–70. <a href="https://journal.r-project.org/articles/RJ-2013-026/index.html" target="_blank" rel="noopener">https://journal.r-project.org/articles/RJ-2013-026/index.html</a></p>
+<p>[4] ExactCIdiff官方手册，PairedCI。<a href="https://cran.r-project.org/web/packages/ExactCIdiff/ExactCIdiff.pdf" target="_blank" rel="noopener">https://cran.r-project.org/web/packages/ExactCIdiff/ExactCIdiff.pdf</a></p>
+<p>[5] Penn State STAT 414. Lesson 27: The Central Limit Theorem. <a href="https://online.stat.psu.edu/stat414/Lesson27" target="_blank" rel="noopener">https://online.stat.psu.edu/stat414/Lesson27</a></p>
+<p>[6] Penn State STAT 500. Lesson 4, Section 4.2.2: Sampling Distribution of the Sample Proportion. <a href="https://online.stat.psu.edu/stat500/Lesson04" target="_blank" rel="noopener">https://online.stat.psu.edu/stat500/Lesson04</a></p></main></body></html>

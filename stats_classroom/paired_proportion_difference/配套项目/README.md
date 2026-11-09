@@ -2,7 +2,20 @@
 
 本项目与文章、配图放在同一个主文件夹。三套主脚本与三套绘图入口均保留，按相同教学问题对应。数据均为教学构造。选择自己熟悉的一种语言，先核对20人例题，再比较不同样本量的分布。
 
-## 先用一种语言跑通
+## 先从基础分布开始
+
+配合基础正文v2，先运行`distribution_basics`，只看“给定三种变化概率后，人数和率差怎样分布”。它不引入未知参数、尾部或排序算法。
+
+- R：打开`配对率差.Rproj`，Source `代码/distribution_basics.R`，仅需基础R。
+- Python：用Spyder打开项目文件夹，F5运行`代码/distribution_basics.py`。
+- MATLAB：将Current Folder设为“代码”，运行`distribution_basics`，无需统计工具箱。
+
+三套统一使用qplus=.05、qzero=.70、qminus=.25。先显示2人的五个D概率，再保存`基础分布_231组概率.csv`与`基础分布_率差概率.csv`，最后用`基础分布_汇总.csv`核对全概率、均值−.20和方差.013。20人观察组合(1,14,5)的概率为.0770154091。
+
+正文的`PairedCI()`调用用于下一步：从观察人数估计未知总体率差。它与前面固定已知q的分布计算是不同问题。完整分析和内部排序演示按下面的入口继续运行。
+
+## 继续运行完整分析
+
 
 - **R**：双击`配对率差.Rproj`，打开`代码/paired_rate.R`并Source，得到精确分布、标准误及Wald区间，并自动运行`代码/plot_figures.R`生成正文三张统计图。随后安装`ExactCIdiff`、`PropCIs`，Source `代码/paired_intervals.R`，复现正文PairedCI与Tango区间，并运行三语言共同的精确区间示例。
 - **Python**：用Spyder打开本项目文件夹，打开`代码/paired_rate.py`并按F5。主入口会自动调用Python绘图生成三张对照图；然后运行`代码/paired_exact.py`。如提示缺包，在Spyder使用的同一解释器环境中执行`python -m pip install -r requirements.txt`。
@@ -31,6 +44,7 @@ python 代码/plot_figures.py
 
 | 计算内容 | R | Python | MATLAB |
 | --- | --- | --- | --- |
+| 基础正文：同一已知概率模型的精确分布 | `代码/distribution_basics.R` | `代码/distribution_basics.py` | `代码/distribution_basics.m` |
 | 个人记录、精确分布、均值方差、标准误与效应量 | `代码/paired_rate.R` | `代码/paired_rate.py` | `代码/paired_rate.m` |
 | 三语言共同的固定D排序精确区间 | `代码/paired_exact.R`（由区间入口调用） | `代码/paired_exact.py` | `代码/paired_exact.m` |
 | 图1、图2、图3及网格试算 | `代码/plot_figures.R` | `代码/plot_figures.py` | `代码/plot_figures.m` |
