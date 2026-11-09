@@ -56,3 +56,37 @@ summary <- data.frame(n=n, theta=theta, p_t=p_t, q_plus=q_plus, q_zero=q_zero, q
   observed_probability=observed_probability, observed_arrangements=observed_arrangements)
 write.csv(summary, file.path(out_dir, "三类人数概率汇总.csv"), row.names = FALSE, fileEncoding = "UTF-8")
 print(summary)
+
+#---- 固定Wang下限尾部的候选theta核对：4001点后在峰值邻域局部优化
+candidate_theta <- c(-0.45, -0.44923, -0.44)
+cutoff <- 0.025
+if (nrow(tail) != 141L || any(!is.finite(as.matrix(tail))) ||
+    any(tail$n_plus < 0 | tail$n_zero < 0 | tail$n_minus < 0) ||
+    any(tail$n_plus != floor(tail$n_plus) | tail$n_zero != floor(tail$n_zero) |
+        tail$n_minus != floor(tail$n_minus)) ||
+    any(tail$n_plus + tail$n_zero + tail$n_minus != n)) {
+  stop("wang_lower_tail_n20.csv必须恰好有141行，且每行是非负整数并且总和为20")
+}
+tail_probability <- function(theta_value, p_value) {
+  q_plus_value <- (1 - p_value + theta_value) / 2
+  q_minus_value <- (1 - p_value - theta_value) / 2
+  if (q_plus_value < -1e-12 || p_value < -1e-12 || q_minus_value < -1e-12) return(NA_real_)
+  q_plus_value <- max(0, q_plus_value)
+  p_value <- max(0, p_value)
+  q_minus_value <- max(0, q_minus_value)
+  coefficient <- factorial(n) / (factorial(tail$n_plus) * factorial(tail$n_zero) * factorial(tail$n_minus))
+  sum(coefficient * q_plus_value^tail$n_plus * p_value^tail$n_zero * q_minus_value^tail$n_minus)
+}
+candidate_rows <- lapply(candidate_theta, function(theta_value) {
+  grid <- seq(0, 1 - abs(theta_value), length.out = 4001L)
+  values <- vapply(grid, function(p) tail_probability(theta_value, p), numeric(1))
+  peak <- which.max(values)
+  left <- if (peak > 1L) grid[peak - 1L] else grid[peak]
+  right <- if (peak < length(grid)) grid[peak + 1L] else grid[peak]
+  refined <- optimize(function(p) -tail_probability(theta_value, p), interval = c(left, right), tol = 1e-14)
+  data.frame(theta = theta_value, p_t_at_max = refined$minimum,
+             max_tail_probability = -refined$objective, cutoff = cutoff)
+})
+candidate_out <- do.call(rbind, candidate_rows)
+write.csv(candidate_out, file.path(out_dir, "候选率差的尾部概率.csv"), row.names = FALSE, fileEncoding = "UTF-8")
+print(candidate_out)

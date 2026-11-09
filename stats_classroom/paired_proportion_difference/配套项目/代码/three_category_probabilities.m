@@ -53,3 +53,43 @@ summary = table(n, theta, p_t, q_plus, q_zero, q_minus, height(tableOut), ...
     'all_probability','tail_probability','other_probability','observed_probability','observed_arrangements'});
 writetable(summary, fullfile(outDir, '三类人数概率汇总.csv'), 'Encoding', 'UTF-8');
 disp(summary);
+
+%% 固定Wang下限尾部的候选theta核对：4001点后在峰值邻域局部优化
+candidateTheta = [-0.45, -0.44923, -0.44];
+cutoff = 0.025;
+counts = [tail.n_plus, tail.n_zero, tail.n_minus];
+if height(tail) ~= 141 || any(~isfinite(counts), 'all') || any(counts < 0, 'all') || ...
+        any(mod(counts, 1) ~= 0, 'all') || any(sum(counts, 2) ~= n)
+    error('wang_lower_tail_n20.csv必须恰好有141行，且每行是非负整数并且总和为20');
+end
+candidateValues = zeros(numel(candidateTheta), 4);
+for j = 1:numel(candidateTheta)
+    thetaValue = candidateTheta(j);
+    grid = linspace(0, 1-abs(thetaValue), 4001);
+    values = zeros(size(grid));
+    for i = 1:numel(grid)
+        values(i) = wangTailProbability(thetaValue, grid(i), tail, n);
+    end
+    [~, peak] = max(values);
+    left = grid(max(1, peak-1));
+    right = grid(min(numel(grid), peak+1));
+    [pBest, negProbability] = fminbnd(@(p) -wangTailProbability(thetaValue, p, tail, n), left, right, optimset('TolX', 1e-12));
+    candidateValues(j,:) = [thetaValue, pBest, -negProbability, cutoff];
+end
+candidateOut = array2table(candidateValues, 'VariableNames', {'theta','p_t_at_max','max_tail_probability','cutoff'});
+writetable(candidateOut, fullfile(outDir, '候选率差的尾部概率.csv'), 'Encoding', 'UTF-8');
+disp(candidateOut);
+
+function probability = wangTailProbability(thetaValue, pValue, tail, n)
+qPlusValue = (1 - pValue + thetaValue) / 2;
+qMinusValue = (1 - pValue - thetaValue) / 2;
+if min([qPlusValue, pValue, qMinusValue]) < -1e-12
+    probability = NaN;
+    return;
+end
+qPlusValue = max(0, qPlusValue);
+pValue = max(0, pValue);
+qMinusValue = max(0, qMinusValue);
+coefficient = factorial(n) ./ (factorial(tail.n_plus) .* factorial(tail.n_zero) .* factorial(tail.n_minus));
+probability = sum(coefficient .* qPlusValue.^tail.n_plus .* pValue.^tail.n_zero .* qMinusValue.^tail.n_minus);
+end
