@@ -25,3 +25,7 @@ R正文函数均实际运行。ExactCIdiff::PairedCI的20人精确区间[−0.44
 保留paired_rate.R / paired_rate.py / paired_rate.m三个主入口，以及plot_figures.R / plot_figures.py / plot_figures.m三个绘图入口。Python网格绘图由本语言的plot_grid_search.py辅助；三个主入口在分析完成后自动调用本语言绘图。正文R图放在文章配图，Python与MATLAB图放在各自运行结果/图像，均提供PNG与PDF。三套网格粗/细/参考数据分别有11、21、4001行；R/Python/MATLAB逐坐标最大绝对差为1.98e−16。主分布、均值方差与效应量重新对照最大差为1.11e−15。
 
 MATLAB R2025a已完整执行paired_rate.m并自动调用plot_figures.m，基础MATLAB原生求和断言通过，三张PNG与三份PDF均已导出；图3实际查看中文与图例正常。保留paired_exact.m及其此前通过的五案例精确区间检查。Python主入口及其三图也已完整执行，且图像独立输出，不覆盖R正文图。
+
+## 231组三类人数的逐项概率
+
+新增three_category_probabilities.R/.py/.m均实际运行，并由三套主入口自动调用。独立枚举231组，逐项核对三语言计数与安排数完全相同，概率最大绝对差4.03e−16。theta=−.45、pT=.44时，观察(1,14,5)安排数232560、单种安排概率1.8414377874e−8、总概率.004282447718435329；全部概率和1，141组Wang下限尾部概率.02375331196746，90组其余概率.97624668803254。脚本的三项概率与R dmultinom、Python scipy.stats.multinomial核对；MATLAB使用基础nchoosek与逐项乘积，无需统计工具箱。R额外验证从项目根source及直接Rscript均可运行。

@@ -81,3 +81,6 @@ writetable(result,fullfile(outDir,'paired_examples.csv'));
 %% 生成 MATLAB 配套三张图及 Wang 网格结果
 addpath(fileparts(mfilename('fullpath')));
 plot_figures();
+
+%% 逐组列出20人三类人数的231种结果及其概率
+three_category_probabilities;

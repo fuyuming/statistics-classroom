@@ -78,4 +78,7 @@ def main():
     import runpy
     runpy.run_path(str(ROOT / "代码" / "plot_figures.py"), run_name="__main__")
 
+    # 逐组展示231种人数结果的安排数、概率与尾部归属。
+    runpy.run_path(str(ROOT / "代码" / "three_category_probabilities.py"), run_name="__main__")
+
 if __name__=='__main__': main()

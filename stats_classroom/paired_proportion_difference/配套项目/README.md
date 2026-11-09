@@ -34,6 +34,7 @@ python 代码/plot_figures.py
 | 个人记录、精确分布、均值方差、标准误与效应量 | `代码/paired_rate.R` | `代码/paired_rate.py` | `代码/paired_rate.m` |
 | 三语言共同的固定D排序精确区间 | `代码/paired_exact.R`（由区间入口调用） | `代码/paired_exact.py` | `代码/paired_exact.m` |
 | 图1、图2、图3及网格试算 | `代码/plot_figures.R` | `代码/plot_figures.py` | `代码/plot_figures.m` |
+| 20人三类人数231组的逐项概率 | `代码/three_category_probabilities.R` | `代码/three_category_probabilities.py` | `代码/three_category_probabilities.m` |
 
 三套使用同一批输入和同一统计定义，各自在本语言完成计算。Python的网格部分拆在`plot_grid_search.py`，由Python绘图入口自动调用。正文采用R图；Python和MATLAB图放在各语言运行结果的“图像”子目录。R的`paired_intervals.R`还调用原包`PairedCI()`，其Wang构造与共同练习的固定D排序方法分别说明。
 
@@ -79,3 +80,9 @@ Python与MATLAB均在本语言中计算，不调用R。统计方法采用有限�
 脚本固定候选theta=−0.45，pT在[0,0.55]内变化，每试一个pT就将141个三项概率相加。先在全区间试11点，最高点为0.495；再在相邻点[0.44,0.55]之间试21点，最高点为0.4895。R的试算结果输出到`运行结果/R/wang_grid_*.csv`。Python对照脚本`代码/plot_grid_search.py`的CSV和图像放在`运行结果/Python`中。图保存在上级文章配图目录，同时提供PNG与PDF。
 
 11与21是便于观察的教学网格，不是正文PairedCI调用的60与40，也不是函数每一步内部运算的完整跟踪。这里找的是固定theta下的最大尾部概率，不是把pT估计为网格最高点；theta的区间端点仍由外层搜索获得。
+
+## 231组人数怎样计算概率？
+
+三个主入口会自动调用本语言的`three_category_probabilities`脚本，也可以单独运行它。固定theta=−.45、pT=.44，三种概率为.055、.44、.505；先从观察人数(1,14,5)算起，分别显示安排种数232560、一种指定安排的概率1.8414377874e−8和人数结果的总概率.0042824477，再枚举全部231组。
+
+打开各语言结果目录的`三类人数的231组概率.csv`：`n_plus/n_zero/n_minus`是三类人数；`arrangements`是能产生这组人数的人员安排种数；`single_arrangement_probability`是一种安排的概率；`probability`为相乘后的总概率；`in_lower_tail`说明该组是否属于主例的Wang下限尾部。`三类人数概率汇总.csv`给出总组数231、尾部141组、其余90组及其概率和。全部概率之和为1，尾部为.02375331196746，其余为.97624668803254。

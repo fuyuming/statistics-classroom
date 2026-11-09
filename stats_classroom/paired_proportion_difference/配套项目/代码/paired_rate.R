@@ -76,3 +76,6 @@ write.csv(result,file.path(out_dir,"paired_examples.csv"),row.names=FALSE)
 # 三、用R重现正文三张统计图 ----
 # 分布与尾部试算均由R计算，PNG与PDF保存在文章配图目录。
 source(file.path(root, "代码", "plot_figures.R"))
+
+# 四、逐组列出20人三类人数的231种结果及其概率 ----
+source(file.path(root, "代码", "three_category_probabilities.R"))

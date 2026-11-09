@@ -10,3 +10,5 @@
 - 完整下载：[本篇ZIP](https://github.com/fuyuming/statistics-classroom/raw/refs/heads/main/stats_classroom/paired_proportion_difference/%E9%85%8D%E5%AF%B9%E6%A0%B7%E6%9C%AC%E7%8E%87%E5%B7%AE_%E5%AE%8C%E6%95%B4%E9%A1%B9%E7%9B%AE.zip)。
 
 完整脚本、数据定义、依赖、对应输出与运行结果见配套目录。数据均为教学构造。
+
+- 逐项概率：[R计算的完整231组表](配套项目/运行结果/R/三类人数的231组概率.csv)，每行包含三类人数、人员安排种数、概率及尾部归属；三语言均有对应表。
