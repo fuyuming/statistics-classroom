@@ -84,3 +84,6 @@ plot_figures();
 
 %% 逐组列出20人三类人数的231种结果及其概率
 three_category_probabilities;
+
+%% 复现Wang排序第三位的两种试排
+wang_order_first_steps;

@@ -1,0 +1,4 @@
+"n_plus","n_zero","n_minus","wang_order_position","observed_order_position","one_sided_conf_level","in_lower_tail","theta_for_probability","p_t_for_probability","probability"
+2,13,5,135,141,0.975,TRUE,-0.45,0.44,0.00374714175363091
+1,14,5,141,141,0.975,TRUE,-0.45,0.44,0.00428244771843531
+1,13,6,152,141,0.975,FALSE,-0.45,0.44,0.0114685247611128

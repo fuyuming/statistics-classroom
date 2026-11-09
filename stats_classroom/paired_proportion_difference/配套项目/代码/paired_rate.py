@@ -81,4 +81,7 @@ def main():
     # 逐组展示231种人数结果的安排数、概率与尾部归属。
     runpy.run_path(str(ROOT / "代码" / "three_category_probabilities.py"), run_name="__main__")
 
+    # 两种候选分别试排，核对第三位为什么选择B。
+    runpy.run_path(str(ROOT / "代码" / "wang_order_first_steps.py"), run_name="__main__")
+
 if __name__=='__main__': main()

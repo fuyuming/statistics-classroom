@@ -35,6 +35,7 @@ python 代码/plot_figures.py
 | 三语言共同的固定D排序精确区间 | `代码/paired_exact.R`（由区间入口调用） | `代码/paired_exact.py` | `代码/paired_exact.m` |
 | 图1、图2、图3及网格试算 | `代码/plot_figures.R` | `代码/plot_figures.py` | `代码/plot_figures.m` |
 | 20人三类人数231组的逐项概率 | `代码/three_category_probabilities.R` | `代码/three_category_probabilities.py` | `代码/three_category_probabilities.m` |
+| Wang排序第三位的试算机制 | `代码/wang_order_first_steps.R` | `代码/wang_order_first_steps.py` | `代码/wang_order_first_steps.m` |
 
 三套使用同一批输入和同一统计定义，各自在本语言完成计算。Python的网格部分拆在`plot_grid_search.py`，由Python绘图入口自动调用。正文采用R图；Python和MATLAB图放在各语言运行结果的“图像”子目录。R的`paired_intervals.R`还调用原包`PairedCI()`，其Wang构造与共同练习的固定D排序方法分别说明。
 
@@ -86,3 +87,13 @@ Python与MATLAB均在本语言中计算，不调用R。统计方法采用有限�
 三个主入口会自动调用本语言的`three_category_probabilities`脚本，也可以单独运行它。固定theta=−.45、pT=.44，三种概率为.055、.44、.505；先从观察人数(1,14,5)算起，分别显示安排种数232560、一种指定安排的概率1.8414377874e−8和人数结果的总概率.0042824477，再枚举全部231组。
 
 打开各语言结果目录的`三类人数的231组概率.csv`：`n_plus/n_zero/n_minus`是三类人数；`arrangements`是能产生这组人数的人员安排种数；`single_arrangement_probability`是一种安排的概率；`probability`为相乘后的总概率；`in_lower_tail`说明该组是否属于主例的Wang下限尾部。`三类人数概率汇总.csv`给出总组数231、尾部141组、其余90组及其概率和。全部概率之和为1，尾部为.02375331196746，其余为.97624668803254。
+
+## 下限尾部的计入标准
+
+本例用97.5%单侧下限构造配合双侧95%区间。`数据/wang_lower_tail_n20.csv`按Wang次序存放观察组及其之前的141组，末行为观察组(1,14,5)。前141组无并列，因此本例第1至141位计入，第142位以后不计入；一般情形下与观察组同一层级的并列结果需一并计入。`数据/下限尾部判定示例.csv`另给三组实际位置135、141、152及判定。概率在给定theta与pT后另算，不能用单组概率是否大于观察组概率代替Wang次序。
+
+## Wang排序怎样选第三位？
+
+`wang_order_first_steps.R/.py/.m`只演示排序开头的真实比较：已排好的两组为(20,0,0)、(19,1,0)，待排A=(19,0,1)、B=(18,2,0)。各候选单独加入前两组，对这三个组的概率求和，再在合法pT范围寻找最大值；改变theta求最大尾概率=.025的最小根。A与B的临时下限约.50253447、.60859627，因此B排第三。尚未选中的A在下一轮需重新试算。
+
+三个主入口会自动执行这一步，也可以单独运行相应脚本。输出`Wang排序第三位试算.csv`（两行候选及临时下限等）和`Wang排序候选尾部.csv`（每个候选各三组）。这三份脚本演示同一步选择，不是完整PairedCI移植；完整Wang区间仍由R包函数计算。

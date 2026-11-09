@@ -79,3 +79,6 @@ source(file.path(root, "代码", "plot_figures.R"))
 
 # 四、逐组列出20人三类人数的231种结果及其概率 ----
 source(file.path(root, "代码", "three_category_probabilities.R"))
+
+# 五、复现Wang排序第三位的两种试排 ----
+source(file.path(root, "代码", "wang_order_first_steps.R"))
