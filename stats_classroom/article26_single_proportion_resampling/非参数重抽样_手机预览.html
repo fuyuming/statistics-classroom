@@ -1,0 +1,322 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>非参数重抽样与蒙特卡洛：Bootstrap与Permutation在模拟什么？</title><style>*{box-sizing:border-box}body{margin:0;background:#f1f4f3;color:#27343a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:720px;margin:24px auto;padding:32px 36px 56px;background:#fff;border-top:5px solid #258dcc}.brand{display:flex;align-items:center;gap:12px;color:#258dcc;font-size:14px;letter-spacing:.04em}.brand img{width:48px;height:48px;border-radius:50%}h1{font-size:30px;line-height:1.45;color:#0000F5;margin:26px 0 20px}h2{font-size:22px;line-height:1.5;color:#0000F5;border-left:4px solid #58b9ed;padding-left:13px;margin:42px 0 20px}h3{font-size:19px;line-height:1.55;color:#0000F5;margin:30px 0 14px}p{font-size:17px;line-height:1.95;margin:19px 0;text-align:left}strong{color:#27343a;font-weight:700}blockquote{margin:20px 0 30px;padding:10px 18px;background:#f0f8ff;border-left:2px solid #58b9ed}blockquote p{font-size:14px;line-height:1.9;margin:8px 0;color:#53666c}a{color:#258dcc;text-decoration:none;border-bottom:1px solid #b9def5}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;background:#f0f8ff;color:#1769aa;padding:1px 5px;border-radius:4px}pre{background:#f7faf9;border:1px solid #e4ecea;border-radius:6px;padding:12px 14px;overflow-x:auto}pre code{background:none;padding:0;font-size:14px;line-height:1.7}div.formula{background:#f7faf9;border-left:3px solid #58b9ed;padding:12px 16px;margin:20px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:17px;color:#1769aa;text-align:center;line-height:1.9}ul,ol{font-size:17px;line-height:1.95;margin:18px 0;padding-left:26px}li{margin:8px 0}table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px}th,td{border-bottom:1px solid #e4ecea;padding:9px 10px;text-align:left;line-height:1.7}th{background:#f0f8ff;color:#1769aa;font-weight:650}footer{border-top:1px solid #dfe8e6;margin-top:36px;padding-top:16px;font-size:12px;color:#758787;line-height:1.8}@media(max-width:600px){body{background:#fff}main{margin:0;padding:24px 22px 40px;border-top-width:4px}h1{font-size:27px}h2{font-size:21px}h3{font-size:18px}p,ul,ol{font-size:16px;line-height:1.95}table{font-size:14px}}main > p img{display:block;width:100%;height:auto;margin:24px 0 8px;border:1px solid #e4ecea}main > p:has(img){margin:25px -12px 4px}main > p:has(img) a{border:0;display:block}main > p > em:only-child{display:block;font-size:13px;line-height:1.8;font-style:normal;color:#657a7d;text-align:left;margin:0 0 28px}@media(max-width:600px){main > p:has(img){margin-left:-12px;margin-right:-12px}}a{overflow-wrap:anywhere}table{display:block;overflow-x:auto}blockquote p{font-size:16px}hr{border:0;border-top:1px solid #dfe8e6;margin:30px 0}code{overflow-wrap:anywhere}pre code{white-space:pre-wrap;overflow-wrap:anywhere}td code{white-space:nowrap;overflow-wrap:normal;word-break:normal}</style></head><body><main><div class="brand">明哥的微生物世界 · 统计课堂 26</div><h1>非参数重抽样与蒙特卡洛：Bootstrap与Permutation在模拟什么？</h1><blockquote><p>明哥的微生物世界 · 统计课堂 26</p><p>摘要　非参数重抽样依据什么生成结果，蒙特卡洛又怎样把这些规则变成可计算的区间与P值？本文从单样本率入手，用Bootstrap估计抽样波动，再用两组资料演示Permutation（置换检验）怎样构造H₀参照分布，理解两种重抽样方法与<strong>蒙特卡洛模拟（依靠重复随机抽样的计算机仿真）</strong>之间的联系。</p></blockquote>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/00_%E8%AF%BE%E5%A0%82%E5%B0%81%E9%9D%A2_v6.png" alt="本科第9次课：样本率的估计和检验"></p>
+<p><em>第9课《样本率的估计和检验》配套延伸 · 统计课堂26</em></p>
+<p>大家好，我是明哥。</p>
+<p>本科同学在第8课学习非参数检验时，听冯老师介绍过Bootstrap的基本原理，但还没有实际操作。第9课是我接手后的第一次课，同学们又学习了三种由单样本率估计总体率的置信区间。这篇从刚学过的单样本率入手，讲清Bootstrap与Permutation的非参数重抽样原理，以及它们与蒙特卡洛计算的联系，再借助R的<strong>infer</strong>包完成区间估计和置换检验。两个例子对应不同的研究设计，用来展示怎样根据问题选择重抽规则<sup>[1]</sup>。</p>
+<p><a href="https://mp.weixin.qq.com/s/1nNR1qagwiCCmsYLbylLxA" target="_blank" rel="noopener">统计课堂12《Bootstrap与置换检验：反复抽样，究竟在模拟什么？》</a>已经讨论了重抽样的基本规则。下面先从180人的资料入手，再用两组各4人的小例子完成置换检验，看看每个函数接收什么、返回什么，以及每轮样本怎样变成最终的区间和P值。文中的R代码按出现顺序运行，后一步会使用前一步保存的对象；环境准备见配套README。</p>
+<h2>一、从观察到的65%开始</h2>
+<p>假设从某目标人群随机抽取180名受试者，按预先规定的同一标准记录是否达标：117人达标，63人未达标。样本量记为n，本题n=180。采用二项模型，<strong>不同受试者相互独立，每人的达标概率相同，记为总体率p</strong>。</p>
+<p>对这份单样本资料，先回答两个估计问题：</p>
+<ol><li>用双侧95%区间估计总体达标率。</li><li>与研究开始前指定的固定参考率45%相比，总体达标率相差多少？估计率差p−0.45，并给出双侧95%区间。</li></ol>
+<p>先按汇总人数建立数据表dat，每行保存一名受试者的达标或未达标结果。outcome是列名，yes表示达标，no表示未达标；<code>factor()</code>把它设为分类变量。<code>dat$outcome</code>中的<code>$</code>表示从dat中取出outcome这一列，<code>table()</code>统计两类人数。</p>
+<pre><code>dat &lt;- data.frame(
+  outcome = factor(
+    c(rep(&quot;yes&quot;, 117), rep(&quot;no&quot;, 63)),
+    levels = c(&quot;no&quot;, &quot;yes&quot;)
+  )
+)
+table(dat$outcome)</code></pre>
+<pre><code> no yes
+ 63 117</code></pre>
+<p>达标率就是yes在180条记录中所占的比例。infer先用<code>specify()</code>确认分析列和成功类别，再用<code>calculate(stat=&quot;prop&quot;)</code>计算这个比例。代码中的<code>infer::</code>表示调用infer包中的函数，<code>|&gt;</code>把前一步的结果传给下一步<sup>[2]</sup>。</p>
+<pre><code>obs_stat &lt;- dat |&gt;
+  infer::specify(response = outcome, success = &quot;yes&quot;) |&gt;
+  infer::calculate(stat = &quot;prop&quot;)
+as.data.frame(obs_stat)</code></pre>
+<pre><code>  stat
+1 0.65</code></pre>
+<p><code>response</code>指定分析列；<code>success=&quot;yes&quot;</code>指定要计算哪一类的率；<code>stat=&quot;prop&quot;</code>中的prop表示proportion，即比例。返回的obs_stat是一张小表，stat这一列存放观察率0.65。</p>
+<p>得到观察率65%之后，还要回答题目的第一问：用这180人估计总体率，结果有多不确定？接下来从当前样本有放回地重抽，每轮仍取180条记录，用各轮率的变化了解抽样波动。</p>
+<h2>二、把一次重抽展开看</h2>
+<h3>（一）非参数Bootstrap为什么从原样本重抽？</h3>
+<p>如果能从目标总体反复抽取180人，每次都算一个样本率，就能看到样本率围绕真实总体率p怎样波动。现在手里只有这一份样本，Bootstrap就用样本的<strong>经验分布</strong>近似未知的总体分布，再从中反复抽样。</p>
+<p>经验分布怎样构造？给原样本每条记录相同的抽取概率1/180。117条yes合计占65%，63条no合计占35%。每次有放回地抽取一条记录，就相当于从这个经验分布抽一次；抽满180条，便得到一轮Bootstrap样本。</p>
+<p><strong>用重抽率围绕观察率65%的波动，近似原样本率围绕真实总体率p的波动</strong>，这就是本题Bootstrap估计的出发点。原样本提供关于总体的信息，重抽则让这种近似的抽样波动显现出来<sup>[3]</sup>。</p>
+<p>这里的“非参数”，指重抽分布直接由观测值及其出现频率构造。本题以独立、同分布的受试者记录为重抽单位，接下来用infer生成这样的样本。</p>
+<h3>（二）generate返回每轮的记录</h3>
+<p>先做三轮，看看infer怎样保存重抽结果：同一条原记录可以被抽到多次，每轮抽满180条。每段随机计算开始前都设<code>set.seed(20261110)</code>，方便分别复现；本次运行使用R 4.6.1、infer 1.1.0。</p>
+<pre><code>set.seed(20261110)
+demo_samples &lt;- dat |&gt;
+  infer::specify(response = outcome, success = &quot;yes&quot;) |&gt;
+  infer::generate(reps = 3, type = &quot;bootstrap&quot;)
+nrow(demo_samples)
+table(demo_samples$replicate)</code></pre>
+<p>实际输出：</p>
+<pre><code>[1] 540
+  1   2   3
+180 180 180</code></pre>
+<p><code>reps=3</code>是生成三轮；<code>type=&quot;bootstrap&quot;</code>选择普通有放回重抽，每轮记录数仍为180。<code>nrow()</code>显示对象共有540行；<code>replicate</code>这一列记录轮次编号，表中的1、2、3各有180行<sup>[4]</sup>。</p>
+<h3>（三）calculate把每轮记录汇总成一个率</h3>
+<pre><code>demo_stats &lt;- demo_samples |&gt;
+  infer::calculate(stat = &quot;prop&quot;)
+as.data.frame(demo_stats)</code></pre>
+<p>实际输出：</p>
+<pre><code>  replicate      stat
+1         1 0.5888889
+2         2 0.6388889
+3         3 0.6055556</code></pre>
+<p>现在每轮只留下一个率，对应106、115、109人达标。<code>replicate</code>仍表示轮次，stat表示这一轮的达标率。</p>
+<p>把原始数据dat和这两个重抽对象放在一起看：</p>
+<table><thead><tr><th>对象</th><th>一行表示什么</th><th>本次行数</th></tr></thead><tbody><tr><td>dat</td><td>原样本的一条结果</td><td>180</td></tr><tr><td>demo_samples</td><td>某一轮里抽到的一条结果</td><td>540</td></tr><tr><td>demo_stats</td><td>一轮重抽得到的样本率</td><td>3</td></tr></tbody></table>
+<p><strong><code>generate()</code>保存各轮样本，<code>calculate()</code>把各轮样本变成统计量。</strong> 从demo_samples到demo_stats，540条记录变成了3个率。区间计算需要更多轮的率，下面把reps从3改为10000，沿用同样的流程。</p>
+<h2>三、用蒙特卡洛重抽构造Bootstrap区间</h2>
+<p>三轮结果已经显示出率的变化。要进一步用分位数构造区间，就需要积累更多轮的结果。<strong>蒙特卡洛模拟，就是依靠重复随机抽样的计算机仿真</strong>；在这里，Bootstrap规定从经验样本有放回重抽，蒙特卡洛模拟则把这条规则反复运行，形成区间计算所用的率分布。</p>
+<h3>（一）把三轮扩大到10000轮</h3>
+<pre><code>set.seed(20261110)
+boot_dist &lt;- dat |&gt;
+  infer::specify(response = outcome, success = &quot;yes&quot;) |&gt;
+  infer::generate(reps = 10000, type = &quot;bootstrap&quot;) |&gt;
+  infer::calculate(stat = &quot;prop&quot;)
+nrow(boot_dist)</code></pre>
+<pre><code>[1] 10000</code></pre>
+<p><code>boot_dist</code>有10000行，每行保存一轮的率。这10000个率组成Bootstrap模拟分布，用来近似了解样本率的抽样波动。<strong>10000是重抽轮数B，原样本人数n仍是180。</strong></p>
+<p>本题只有yes和no两种取值，每次从经验分布抽到yes的概率都是0.65。一轮独立抽取180次，因此达标计数服从Bin(180,0.65)，再除以180就是该轮率。也就是说，在本题中，按记录做非参数Bootstrap与按这个二项分布生成达标计数是等价的：</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F01.png" alt="式（1）给定当前样本时的Bootstrap计数与率"></p>
+<p><em>式（1）｜X∗表示一轮重抽中的达标人数，p̂∗表示该轮率。这里的0.65来自当前样本，Bootstrap用这份经验分布近似总体抽样波动。</em></p>
+<h3>（二）从分布中取出区间</h3>
+<p>现在手里有了10000个率，按大小排序，取2.5%和97.5%分位点作为本次百分位区间的两端。这一步由<code>get_confidence_interval()</code>完成：</p>
+<pre><code>ci &lt;- infer::get_confidence_interval(
+  boot_dist, level = .95, type = &quot;percentile&quot;
+)
+as.data.frame(ci)</code></pre>
+<pre><code>   lower_ci  upper_ci
+1 0.5777778 0.7166667</code></pre>
+<p><code>level=.95</code>指定95%置信水平，<code>type=&quot;percentile&quot;</code>指定百分位法，取这10000个率的2.5%和97.5%分位点。返回表中的lower_ci和upper_ci分别是下限、上限，得到本次<strong>双侧95%百分位Bootstrap区间：57.78%至71.67%</strong><sup>[5]</sup>。</p>
+<p>95%置信水平针对反复获得原始样本并各自计算区间的长期覆盖表现；这里使用的是近似区间程序。增加B可以减小端点的模拟波动，区间表现仍取决于抽样设计和样本提供的信息。</p>
+<p>有了总体率p的区间，就可以接着回答“比固定参考率45%高多少”。这个效应量记为率差p−0.45，点估计为0.65−0.45=0.20。由于45%是固定常数，将p的区间两端各减去0.45，就得到率差的区间：</p>
+<pre><code>effect &lt;- obs_stat$stat - .45
+effect_ci &lt;- c(ci$lower_ci, ci$upper_ci) - .45
+effect
+effect_ci</code></pre>
+<pre><code>[1] 0.2
+[1] 0.1277778 0.2666667</code></pre>
+<p>因此，观察率比固定参考率高<strong>20个百分点，率差的双侧95%Bootstrap百分位区间为12.78至26.67个百分点</strong>。</p>
+<h3>（三）把区间放回它来自的分布中</h3>
+<p>再来看总体率区间ci。它只保存两个端点；把ci标到boot_dist的直方图上，就能同时看到各轮率怎样分散，以及区间位于哪里：</p>
+<pre><code>infer::visualize(boot_dist, bins = 25) +
+  infer::shade_confidence_interval(ci)</code></pre>
+<p><code>visualize()</code>把boot_dist中的10000个率画成直方图；<code>bins=25</code>设置绘图分组数，纵轴显示落入各组的轮数。前面的reps决定生成多少轮，这里的bins决定怎样把结果分组展示。</p>
+<p><code>shade_confidence_interval()</code>再接收ci，在同一张图上标出两个端点及中间区域。两者用<code>+</code>连接，表示添加图层；前面的<code>|&gt;</code>则用于把数据传给下一个函数<sup>[6]</sup>。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/01_infer%E5%8C%BA%E9%97%B4_v4.png" alt="图1 使用infer原生绘图函数展示Bootstrap率及区间"></p>
+<p><em>图1｜infer实际重抽10000轮的结果。横轴为每轮达标率，纵轴为轮数；区间标记来自ci，观察率为0.65。配套脚本在原生绘图结果上补充中文标签。</em></p>
+<p>通过原样本的经验分布，我们已经给出了总体率和率差的区间。检验问题同样需要反复生成结果，但生成依据要随H₀和研究设计改变。接下来先比较规则，再把置换检验实际做一遍。</p>
+<h2>四、Bootstrap与置换：重抽规则怎样决定推断？</h2>
+<p>要选择检验的参照分布，先看每轮生成时究竟改变了什么。先比较当前样本的换序与两组结局的重排，再用完整的两组资料运行<code>type=&quot;permute&quot;</code>。</p>
+<h3>（一）同一个generate，可以选择三种生成规则</h3>
+<p>前面使用<code>type=&quot;bootstrap&quot;</code>。<code>type</code>还可取<code>&quot;permute&quot;</code>或<code>&quot;draw&quot;</code>，三个选项对应不同的数据生成依据<sup>[4]</sup>：</p>
+<table><thead><tr><th>type</th><th>每轮怎样生成</th><th>分布用来回答什么</th></tr></thead><tbody><tr><td><code>&quot;bootstrap&quot;</code></td><td>从经验样本有放回地抽取同样多的记录</td><td>近似抽样波动，估计标准误与置信区间</td></tr><tr><td><code>&quot;permute&quot;</code></td><td>按H₀允许的方式重排变量之间的对应关系</td><td>构造置换参照分布，检验变量关系或组间差异</td></tr><tr><td><code>&quot;draw&quot;</code></td><td>按H₀指定的理论概率生成结果</td><td>本题中生成固定率假设下的二分类样本</td></tr></tbody></table>
+<p><code>generate()</code>的常用参数还有：<code>x</code>接收输入数据，使用管道时由前一步传入；<code>reps</code>指定重复轮数，默认1；<code>variables</code>用于指定要重排的列，在置换时默认重排响应变量。本文把<code>type</code>明确写出，以便看清生成规则。</p>
+<h3>（二）有放回重抽与换序，各改变了什么？</h3>
+<p>有放回重抽时，同一条yes记录可以被抽到多次，也可能一次没有抽到，因此每轮yes的人数会变化。若每条记录都保留一次，只把180条记录换个顺序，117个yes和63个no的数量保持原样。</p>
+<p>用三次随机重排看看这一点。<code>sample()</code>把整列记录随机换序，<code>replace=FALSE</code>表示不放回；<code>replicate()</code>把计算重复三次：</p>
+<pre><code>set.seed(20261110)
+shuffle_rates &lt;- replicate(
+  3, mean(sample(dat$outcome, replace = FALSE) == &quot;yes&quot;)
+)
+shuffle_rates</code></pre>
+<pre><code>[1] 0.65 0.65 0.65</code></pre>
+<p>每轮率都为65%，原因是换序保留了117个yes和63个no。本题只有当前样本的结局记录，45%是研究预先给定的参照值。要看置换怎样产生有用的参照分布，需要进一步考虑结局与其他变量之间的对应关系。</p>
+<p>置换检验通常重排的是<strong>结局与组别等变量的对应关系</strong>。以两个独立组的比较为例：保留两组人数和全部结局，将结局重新分配给组别，再算两组率差。总达标人数保持不变，两组各自的达标人数却会变化，因此每次分配都能得到一个率差。</p>
+<p>要用这些率差作为H₀参照，需要满足可交换条件：在H₀及抽样设计下，重排上述对应关系后，资料的联合分布保持不变。满足这一条件时，就可以把观察率差放进置换分布中，判断它有多极端<sup>[7]</sup>。</p>
+<p>这里选择两组率差作为统计量。在可交换条件成立时，同样的重排思路也可用于均数差等统计量；决定置换规则的是H₀和研究设计<sup>[4]</sup>。</p>
+<p>在infer的这类两组流程中，<code>specify()</code>同时指定结局与组别，<code>hypothesize(null=&quot;independence&quot;)</code>声明无关联的原假设，再选择<code>type=&quot;permute&quot;</code>生成重排结果。</p>
+<h3>（三）两种非参数思路，怎样与蒙特卡洛计算联系起来？</h3>
+<p>前面的Bootstrap已经示范了蒙特卡洛计算；置换检验也可以反复随机重排，每轮计算统计量，再与观察值比较。两者采用的随机生成规则不同：Bootstrap依据经验分布，置换依据H₀下允许的重排。<strong>重抽规则说明统计依据，蒙特卡洛说明怎样用随机计算近似结果。</strong></p>
+<p>Bootstrap的非参数思路也能用于构造检验：先用经验分布估计统计量的抽样波动，再据此判断观察值偏离H₀的程度。例如，构造与检验方向、水平相配的Bootstrap置信区间，检查H₀给定值是否被区间排除，就能得到一种近似检验；其近似效果取决于所用的区间方法<sup>[7]</sup>。</p>
+<p>下面换用一个两组各4人的新例子，实际跑通<code>permute</code>。完成后再用180人的资料，补充演示与固定45%比较的检验。</p>
+<h2>五、用permute完成两组率的置换检验</h2>
+<h3>（一）两组各4人，比较什么？</h3>
+<p>假设从目标人群随机抽取8名受试者，随机分到A、B两组，各4人，分别采用两种培训方案。培训结束时，按同一标准记录是否达标。A组3人达标、1人未达标；B组1人达标、3人未达标。假设各人的结局相互独立，并满足H₀下的可交换条件。</p>
+<p>我们要判断A方案的总体达标率是否高于B方案。预先设H₀：分组与达标无关联，在本例二分类模型下对应pA=pB；H₁：pA&gt;pB，检验水准α=0.05。统计量取<strong>A组率减B组率</strong>。</p>
+<p>把这份新的两组资料写成study，每行记录一名受试者。group保存组别，outcome仍记录yes或no；观察率差随后保存为obs_diff。这两个对象分别对应前面单样本分析中dat与obs_stat的角色：</p>
+<pre><code>study &lt;- data.frame(
+  group = factor(rep(c(&quot;A&quot;, &quot;B&quot;), each = 4),
+                 levels = c(&quot;A&quot;, &quot;B&quot;)),
+  outcome = factor(
+    c(&quot;yes&quot;, &quot;yes&quot;, &quot;yes&quot;, &quot;no&quot;, &quot;yes&quot;, &quot;no&quot;, &quot;no&quot;, &quot;no&quot;),
+    levels = c(&quot;no&quot;, &quot;yes&quot;)
+  )
+)
+table(study$group, study$outcome)</code></pre>
+<pre><code>    no yes
+  A  1   3
+  B  3   1</code></pre>
+<p>A组达标率3/4=75%，B组1/4=25%。先用<code>calculate()</code>算出观察率差：</p>
+<pre><code>obs_diff &lt;- study |&gt;
+  infer::specify(outcome ~ group, success = &quot;yes&quot;) |&gt;
+  infer::calculate(stat = &quot;diff in props&quot;, order = c(&quot;A&quot;, &quot;B&quot;))
+as.data.frame(obs_diff)</code></pre>
+<pre><code>  stat
+1  0.5</code></pre>
+<p><code>outcome ~ group</code>把结局与组别的关系交给<code>specify()</code>，左边是结局，右边是解释变量。<code>stat=&quot;diff in props&quot;</code>指定率差；<code>order=c(&quot;A&quot;,&quot;B&quot;)</code>规定减法顺序为A−B。因此obs_diff保存的0.5就是<strong>50个百分点的观察率差</strong><sup>[2]</sup>。</p>
+<h3>（二）先看五轮置换怎样保存</h3>
+<p>H₀下若分组与达标无关联，就按允许的方式重排结局与组别的对应关系。每轮保留8条结局、A与B各4个名额，改变的是哪些结局落在A组、哪些落在B组。</p>
+<p>先用<code>hypothesize(null=&quot;independence&quot;)</code>声明无关联假设，再让<code>generate(type=&quot;permute&quot;)</code>生成五轮重排<sup>[8]</sup>：</p>
+<pre><code>set.seed(20261110)
+perm_demo &lt;- study |&gt;
+  infer::specify(outcome ~ group, success = &quot;yes&quot;) |&gt;
+  infer::hypothesize(null = &quot;independence&quot;) |&gt;
+  infer::generate(reps = 5, type = &quot;permute&quot;)
+nrow(perm_demo)
+table(perm_demo$replicate, perm_demo$group)</code></pre>
+<pre><code>[1] 40
+    A B
+  1 4 4
+  2 4 4
+  3 4 4
+  4 4 4
+  5 4 4</code></pre>
+<p>五轮各8条，共40行；每轮A、B组都保留4条。再用<code>calculate()</code>把每轮的记录汇总成一个率差：</p>
+<pre><code>perm_demo_stats &lt;- perm_demo |&gt;
+  infer::calculate(stat = &quot;diff in props&quot;, order = c(&quot;A&quot;, &quot;B&quot;))
+as.data.frame(perm_demo_stats)</code></pre>
+<pre><code>  replicate stat
+1         1  0.0
+2         2  0.0
+3         3  0.0
+4         4 -0.5
+5         5 -0.5</code></pre>
+<p>前3轮恰好两组率相同，后2轮的A−B率差为−50个百分点。与单列换序相比，这次结局被分配给不同组别，率差确实会变化。现在生成更多轮，形成H₀下的参照分布。</p>
+<h3>（三）10000轮置换，计算右尾P值</h3>
+<pre><code>set.seed(20261110)
+perm_dist &lt;- study |&gt;
+  infer::specify(outcome ~ group, success = &quot;yes&quot;) |&gt;
+  infer::hypothesize(null = &quot;independence&quot;) |&gt;
+  infer::generate(reps = 10000, type = &quot;permute&quot;) |&gt;
+  infer::calculate(stat = &quot;diff in props&quot;, order = c(&quot;A&quot;, &quot;B&quot;))
+nrow(perm_dist)</code></pre>
+<pre><code>[1] 10000</code></pre>
+<p>现在perm_dist有10000行，stat列的每个值是一轮H₀置换得到的A−B率差；obs_diff保存原资料的观察率差0.5。<strong>P值是在H₀及相应模型下，出现当前结果以及更加极端地背离H₀、也就是更趋向H₁方向的结果的概率。</strong> 本例的H₁指向A组率更高，因此将率差达到或超过0.5的轮次计入右尾：</p>
+<pre><code>perm_p &lt;- infer::get_p_value(
+  perm_dist, obs_stat = obs_diff, direction = &quot;greater&quot;
+)
+as.data.frame(perm_p)
+sum(perm_dist$stat &gt;= obs_diff$stat)</code></pre>
+<pre><code>  p_value
+1  0.2462
+[1] 2462</code></pre>
+<p>本次10000轮中，2462轮的率差至少为50个百分点，模拟置换P值估计为2462/10000=0.2462<sup>[9]</sup>。这就是<code>type=&quot;permute&quot;</code>的完整推断：声明H₀、生成置换样本、计算各轮率差，再与原观察率差比较。</p>
+<h3>（四）把置换分布画出来</h3>
+<pre><code>infer::visualize(perm_dist, bins = 5) +
+  ggplot2::geom_vline(xintercept = obs_diff$stat, color = &quot;red2&quot;)</code></pre>
+<p><code>visualize()</code>仍接收每轮一个统计量的分布；这里横轴变成A−B率差，红线标记观察率差0.5。图2使用同一份perm_dist，红色两根柱对应达到或超过观察率差的2462轮，与P值计算采用同一个判断条件；完整配色和中文标注见配套脚本。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/03_%E7%BD%AE%E6%8D%A2%E5%88%86%E5%B8%83_v10.png" alt="图2 infer生成的两组率差置换分布与观察率差"></p>
+<p><em>图2｜实际置换10000轮。横轴按百分点显示率差，红线为观察率差50个百分点；右尾包括50和100个百分点两个取值，合计2462轮。纵轴为轮数。</em></p>
+<h3>（五）只有70种分组时，直接穷举作对照</h3>
+<p>A、B各4人且组名固定，从8人中选4人进入A组，其余进入B组，分配方式只有70种。满足交换条件时，可以把70种全部列举出来，精确计算右尾比例<sup>[10]</sup>。</p>
+<p>R自带的<code>combn(8,4)</code>能列出全部A组索引。下面用y记录0/1结局，对每种索引计算A组均值减B组均值；在0/1资料中，均值就是率。<code>a_idx</code>表示本轮进入A组的4行，<code>-a_idx</code>表示其余4行<sup>[11]</sup>：</p>
+<pre><code>y &lt;- as.integer(study$outcome == &quot;yes&quot;)
+all_perm_stats &lt;- utils::combn(
+  nrow(study), 4,
+  FUN = function(a_idx) mean(y[a_idx]) - mean(y[-a_idx])
+)
+length(all_perm_stats)
+table(all_perm_stats)
+sum(all_perm_stats &gt;= obs_diff$stat)
+mean(all_perm_stats &gt;= obs_diff$stat)</code></pre>
+<pre><code>[1] 70
+all_perm_stats
+  -1 -0.5    0  0.5    1
+   1   16   36   16    1
+[1] 17
+[1] 0.2428571</code></pre>
+<p>70种分组只产生5种率差。达到或超过观察值0.5的有16+1=17种，因此精确单侧置换P值为17/70≈0.2429；10000轮蒙特卡洛结果0.2462是对它的随机近似。</p>
+<p>这也回答了小样本时“组合有限是否就不准”：穷举给出的概率是精确的，有限组合使P值较离散，可取的值较少，检出差异的能力也受到限制。更多模拟会反复遇到这些分组，主要改善计算精度。</p>
+<p>本例可以这样报告：</p>
+<blockquote><p>A组3/4达标、B组1/4达标，样本率差为50个百分点；单侧蒙特卡洛置换P值为0.2462（10000轮），穷举70种分组得到的精确置换P值为0.2429。在α=0.05下，结果未达到拒绝H₀的标准。</p></blockquote>
+<p>换用Bootstrap反复重抽，经验分布的信息仍来自每组原来的4人，小样本百分位区间也会受到信息量和覆盖表现的限制<sup>[7]</sup>。<strong>增加模拟轮数改善计算精度，增加原始样本量才补充研究信息。</strong></p>
+<p>两组置换检验到这里完成。下面重新使用第一节的dat与obs_stat，回到180人、固定45%的单样本问题，用<code>draw</code>按二项模型生成参照分布。</p>
+<h2>六、补充：单样本率与固定参考率怎样比较</h2>
+<p>前面用180人的资料估计了总体率及其与固定45%的率差。现在补充一个检验问题：如果总体率真是45%，出现117人或更多人达标，会有多罕见？</p>
+<p>继续使用单样本数据dat和观察率obs_stat。预先设H₀：p=0.45、H₁：p&gt;0.45，检验水准α=0.05，因此将117人及更多人达标的结果计入右尾。</p>
+<p>本题的H₀把二分类结果的概率确定为：达标45%，未达标55%。<strong>draw表示从指定的理论分布随机生成结果</strong>，这里采用H₀下的二项模型。先用<code>hypothesize()</code>声明固定率假设，再用<code>generate(type=&quot;draw&quot;)</code>生成每轮180人的结果<sup>[8]</sup>。</p>
+<pre><code>set.seed(20261110)
+null_dist &lt;- dat |&gt;
+  infer::specify(response = outcome, success = &quot;yes&quot;) |&gt;
+  infer::hypothesize(null = &quot;point&quot;, p = .45) |&gt;
+  infer::generate(reps = 10000, type = &quot;draw&quot;) |&gt;
+  infer::calculate(stat = &quot;prop&quot;)
+head(round(null_dist$stat * 180))</code></pre>
+<p>实际运行的前六轮达标人数：</p>
+<pre><code>[1] 78 85 80 78 91 77</code></pre>
+<p><code>null=&quot;point&quot;</code>表示一个固定参数值的假设，<code>p=.45</code>给出该值。dat仍保留117人达标的原样本；0.45控制draw生成的H₀模型样本。<code>calculate()</code>仍计算每轮率，<code>null_dist$stat</code>取出这些率，乘180还原为人数。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F02.png" alt="式（2）原假设下的计数模型及本题精确右尾概率定义"></p>
+<p><em>式（2）｜X₀∗表示H₀模型下一轮的达标人数；右尾包括117人及更多人达标。</em></p>
+<p>前面Bootstrap每次按样本中的65%达标比例抽取；这里draw每次按H₀指定的45%生成结果。两条流程都保留每轮180人、重复10000轮，并用<code>calculate(stat=&quot;prop&quot;)</code>算率，改变的是生成结果所依据的概率。</p>
+<h2>七、计算固定率的模拟P值，再作精确对照</h2>
+<h3>（一）把观察值交给get_p_value</h3>
+<p>第一节的obs_stat保存观察率0.65，null_dist保存刚才生成的H₀下10000个率。把这份参照分布和观察率一起交给<code>get_p_value()</code>，指定右尾方向，就能计算达到或超过0.65的模拟比例。<code>obs_stat=obs_stat</code>等号左边是函数的参数名，右边是已算好的对象名：</p>
+<pre><code>sim_p &lt;- infer::get_p_value(
+  null_dist, obs_stat = obs_stat, direction = &quot;greater&quot;
+)
+as.data.frame(sim_p)
+sum(null_dist$stat &gt;= 117/180)</code></pre>
+<p>实际输出中的P值字段及命中数：</p>
+<pre><code>  p_value
+1       0
+[1] 0</code></pre>
+<p><code>p_value</code>是本次模拟得到的极端结果比例；<code>direction=&quot;greater&quot;</code>把达到或超过观察率的结果计入右尾。函数同时提示，这个返回值是基于当前模拟轮数得到的近似。<sup>[9]</sup></p>
+<p>据此可以报告：<strong>本次10000轮模拟中0次命中，模拟P值估计为0</strong>。命中比例每增加一次，就增加1/B=0.0001。先在图上看观察率与这批模拟结果的关系，再用精确二项计算核对尾概率。</p>
+<h3>（二）在图上看这次比较</h3>
+<p>为了看清0.65在这批参照结果中的位置，沿用刚才的null_dist、obs_stat和greater方向作图：</p>
+<pre><code>infer::visualize(null_dist, bins = 25) +
+  infer::shade_p_value(
+    obs_stat = obs_stat, direction = &quot;greater&quot;
+  )</code></pre>
+<p><code>shade_p_value()</code>使用与计算相同的观察值和方向，在图上标记观察值及右尾方向；本次右尾命中0轮，该区域没有可见柱形<sup>[12]</sup>。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/02_infer%E5%8E%9F%E5%81%87%E8%AE%BE_v4.png" alt="图3 infer原生函数展示H0模拟分布与观察率"></p>
+<p><em>图3｜H₀为p=0.45，实际模拟10000轮，纵轴为轮数。观察率0.65位于这批模拟结果的右侧；本次该尾部命中0轮。精确右尾概率由后面的二项计算给出。</em></p>
+<h3>（三）把效应量、Bootstrap区间和模拟P值放在一起</h3>
+<p>现在先汇报这套模拟分析的结果。区间来自原样本的非参数Bootstrap，P值来自H₀二项模型的蒙特卡洛模拟，分别标明方法和方向：</p>
+<blockquote><p>180人中117人达标，样本率65%，较固定参考率45%高20个百分点；率差的双侧95%Bootstrap百分位区间为12.78至26.67个百分点（重抽10000轮）。H₀下模拟10000轮，0次出现至少117人达标，单侧蒙特卡洛P值估计为0（0/10000）。</p></blockquote>
+<p>这份报告同时回答三个问题：观察率比参考率高多少，这个差值的估计有多不确定，以及观察结果在H₀下有多极端。累计轮数和命中数则交代了模拟P值的计算依据。</p>
+<h3>（四）再与精确二项结果作对照</h3>
+<p>10000轮零命中记录了本次模拟的结果。对于这条极小尾概率，本题已有明确的二项模型，可以直接精确计算同一条右尾概率。R自带stats包的<code>binom.test()</code>同时返回与greater方向对应的单侧95%率区间<sup>[13]</sup>。</p>
+<pre><code>exact &lt;- stats::binom.test(
+  117, 180, p = .45,
+  alternative = &quot;greater&quot;, conf.level = .95
+)
+exact$p.value
+as.numeric(exact$conf.int)</code></pre>
+<pre><code>[1] 5.23827e-08
+[1] 0.5871878 1.0000000</code></pre>
+<p>这是二项模型直接计算的精确单侧P，约为5.24×10⁻⁸。模拟部分报告的是0/10000，精确部分给出的是同一H₀模型下的右尾概率，两者的计算来源分别标明。</p>
+<p>函数返回的总体率单侧95%精确区间为58.72%至100%，对应率差p−0.45的单侧95%精确区间为13.72至55.00个百分点。第三节报告的是双侧95%Bootstrap区间；这里是与greater单侧检验相配的精确区间。</p>
+<p>精确P远小于α=0.05，结果支持总体达标率高于45%；这与10000轮中未出现右尾结果的模拟现象一致。本篇用10000轮展示生成规则和P值的计算，对这条极小尾概率采用已有模型的精确结果。</p>
+<h2>八、本篇讲了哪些知识？</h2>
+<ol><li><strong>Bootstrap的原理。</strong> 用样本的经验分布近似未知总体分布，再有放回地重抽。各轮统计量的变化用来近似抽样波动，进而估计标准误和置信区间；本篇采用百分位法构造区间。</li><li><strong>Permutation的原理。</strong> 在H₀及研究设计允许的可交换条件下，重排数据之间的对应关系，保留规定的样本信息，得到H₀参照分布，再判断观察统计量有多极端。率差是本例选用的统计量。</li><li><strong>两种方法的区别与联系。</strong> Bootstrap从经验分布重抽，Permutation按H₀允许的关系重排；两者都可以用蒙特卡洛模拟反复生成结果。组合较少时，置换还可以直接穷举，得到精确P值。</li><li><strong>方法要匹配研究设计。</strong> 单组记录换序保持总率不变；两组比较可以在满足条件时重排结局与组别的对应；单样本与固定45%比较则按给定概率用draw生成模型样本。</li><li><strong>模拟轮数与样本量作用不同。</strong> 增加B改善蒙特卡洛计算精度，增加n才补充原始研究信息。小样本置换P值的离散性与计算是否精确，需要分别理解。</li><li><strong>infer怎样实现这些原理。</strong> specify指定变量，hypothesize声明检验的H₀，generate按所选规则生成样本，calculate把各轮样本变成统计量。区间和P值函数再接收这份统计量分布，完成推断。</li><li><strong>结果怎样报告。</strong> 交代效应量、区间或P值采用的方法、方向和模拟次数；区分实际命中比例与精确概率。数值和图使用同一批结果，解释回到题目的估计或检验目标。</li></ol>
+<p>这套比例分析也可用于AI模型的独立测试集评估：把每个独立测试样本的预测结果记为正确或错误，就得到同样的0/1资料，可以按上述流程估计正确率及其区间。</p>
+<p>读懂这两条操作后，可以继续把统计量换成数值变量的均数或两组均数差，分别使用<code>stat=&quot;mean&quot;</code>、<code>&quot;diff in means&quot;</code>。变量关系仍由<code>specify()</code>指定，生成规则继续根据研究设计选择<sup>[2]</sup>。</p>
+<h2>配套练习</h2>
+<p>Bootstrap与单样本率入口是<code>R/infer_walkthrough.R</code>，置换检验入口是<code>R/permutation_walkthrough.R</code>。正式计算均使用10000轮；三轮和五轮的小演示用于查看生成样本的结构。置换项目还保存70种分组的穷举结果，<code>R/article26_v8_additions.R</code>补充率差区间与单组换序操作。Python、MATLAB提供单样本率的基础练习。</p>
+<p>正文集中使用infer。配套项目还提供boot示例、generate不同类型及其他统计量的使用说明，以及区间构造和覆盖率拓展，供需要时继续阅读。三种语言沿用相同数据、方向与区间定义。</p>
+<p>同样的统计原理在Python与MATLAB中也有实现。本文用infer逐步展开操作，其他语言可以使用以下工具：</p>
+<table><thead><tr><th>实现环境</th><th>对应入口</th></tr></thead><tbody><tr><td>R：infer</td><td><code>generate()</code>选择<code>&quot;bootstrap&quot;</code>或<code>&quot;permute&quot;</code>，再计算统计量与推断结果</td></tr><tr><td>Python：SciPy</td><td><code>bootstrap()</code>计算Bootstrap区间；<code>permutation_test()</code>进行置换检验<sup>[14]</sup><sup>[15]</sup></td></tr><tr><td>MATLAB</td><td><code>bootstrp()</code>生成重抽统计量，<code>bootci()</code>计算Bootstrap区间；<code>randperm()</code>生成随机索引，可据此重排数据、计算统计量和P值<sup>[16]</sup><sup>[17]</sup></td></tr></tbody></table>
+<p>MATLAB的两个Bootstrap函数属于Statistics and Machine Learning Toolbox。与本文百分位区间对照时，SciPy指定<code>method=&quot;percentile&quot;</code>，MATLAB的<code>bootci</code>指定<code>&#x27;Type&#x27;,&#x27;per&#x27;</code>，同时统一置信水平和检验方向。MATLAB的<code>permute</code>用于数组维度重排，随机索引重排这里用<code>randperm</code><sup>[17]</sup>。</p>
+<p>本篇代码、数据和运行结果已上传GitHub。进入以下具体目录，先读<code>配套项目/README.md</code>：</p>
+<p><a href="https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article26_single_proportion_resampling" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article26_single_proportion_resampling</a></p>
+<p><a href="https://github.com/fuyuming/statistics-classroom/raw/refs/heads/main/stats_classroom/article26_single_proportion_resampling/%E7%BB%9F%E8%AE%A1%E8%AF%BE%E5%A0%8226_%E5%AE%8C%E6%95%B4%E9%A1%B9%E7%9B%AE.zip" target="_blank" rel="noopener">下载本篇完整项目ZIP（含正文、配图和三语言代码）</a></p>
+<p>系列已有资料的仓库入口：</p>
+<p><a href="https://github.com/fuyuming/statistics-classroom" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom</a></p>
+<p>系列仓库ZIP：</p>
+<p><a href="https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip</a></p>
+<p>从系列仓库ZIP解压后，本篇项目位于<code>stats_classroom/article26_single_proportion_resampling/配套项目</code>。</p>
+<p>这里是明哥的微生物世界，我们下次再见。</p>
+<h2>参考资料</h2>
+<p>[1] infer官方主页与介绍。<a href="https://infer.tidymodels.org/" target="_blank" rel="noopener">https://infer.tidymodels.org/</a></p>
+<p>[2] infer官方文档，specify与calculate。<a href="https://infer.tidymodels.org/reference/specify.html" target="_blank" rel="noopener">https://infer.tidymodels.org/reference/specify.html</a> 和 <a href="https://infer.tidymodels.org/reference/calculate.html" target="_blank" rel="noopener">https://infer.tidymodels.org/reference/calculate.html</a></p>
+<p>[3] Efron B. Bootstrap Methods: Another Look at the Jackknife. The Annals of Statistics, 1979, 7(1): 1–26，§2。<a href="https://doi.org/10.1214/aos/1176344552" target="_blank" rel="noopener">https://doi.org/10.1214/aos/1176344552</a></p>
+<p>[4] infer官方文档，generate生成重抽样本与模型样本。<a href="https://infer.tidymodels.org/reference/generate.html" target="_blank" rel="noopener">https://infer.tidymodels.org/reference/generate.html</a></p>
+<p>[5] infer官方文档，get_confidence_interval。<a href="https://infer.tidymodels.org/reference/get_confidence_interval.html" target="_blank" rel="noopener">https://infer.tidymodels.org/reference/get_confidence_interval.html</a></p>
+<p>[6] infer官方文档，visualize与shade_confidence_interval。<a href="https://infer.tidymodels.org/reference/visualize.html" target="_blank" rel="noopener">https://infer.tidymodels.org/reference/visualize.html</a> 和 <a href="https://infer.tidymodels.org/reference/shade_confidence_interval.html" target="_blank" rel="noopener">https://infer.tidymodels.org/reference/shade_confidence_interval.html</a></p>
+<p>[7] Hesterberg T. What Teachers Should Know about the Bootstrap: Resampling in the Undergraduate Statistics Curriculum. 2014预印本，§2、§7及§7.4（Bootstrap与置换、检验及小样本问题）。<a href="https://www.amstat.org/docs/default-source/amstat-documents/edu-resamplingundergradcurriculum.pdf" target="_blank" rel="noopener">https://www.amstat.org/docs/default-source/amstat-documents/edu-resamplingundergradcurriculum.pdf</a></p>
+<p>[8] infer官方文档，hypothesize。<a href="https://infer.tidymodels.org/reference/hypothesize.html" target="_blank" rel="noopener">https://infer.tidymodels.org/reference/hypothesize.html</a></p>
+<p>[9] infer官方文档，get_p_value与零值提示。<a href="https://infer.tidymodels.org/reference/get_p_value.html" target="_blank" rel="noopener">https://infer.tidymodels.org/reference/get_p_value.html</a></p>
+<p>[10] SciPy官方文档，permutation_test：独立样本置换、穷举与随机近似。<a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.permutation_test.html" target="_blank" rel="noopener">https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.permutation_test.html</a></p>
+<p>[11] R官方文档，combn列举所有组合。<a href="https://stat.ethz.ch/R-manual/R-devel/library/utils/html/combn.html" target="_blank" rel="noopener">https://stat.ethz.ch/R-manual/R-devel/library/utils/html/combn.html</a></p>
+<p>[12] infer官方文档，shade_p_value。<a href="https://infer.tidymodels.org/reference/shade_p_value.html" target="_blank" rel="noopener">https://infer.tidymodels.org/reference/shade_p_value.html</a></p>
+<p>[13] R官方文档，binom.test。<a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/binom.test.html" target="_blank" rel="noopener">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/binom.test.html</a></p>
+<p>[14] SciPy官方文档，bootstrap。<a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html" target="_blank" rel="noopener">https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html</a></p>
+<p>[15] SciPy官方文档，permutation_test。<a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.permutation_test.html" target="_blank" rel="noopener">https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.permutation_test.html</a></p>
+<p>[16] MathWorks官方文档，bootstrp与bootci。<a href="https://www.mathworks.com/help/stats/bootstrp.html" target="_blank" rel="noopener">https://www.mathworks.com/help/stats/bootstrp.html</a> 和 <a href="https://www.mathworks.com/help/stats/bootci.html" target="_blank" rel="noopener">https://www.mathworks.com/help/stats/bootci.html</a></p>
+<p>[17] MathWorks官方文档，randperm与permute。<a href="https://www.mathworks.com/help/matlab/ref/double.randperm.html" target="_blank" rel="noopener">https://www.mathworks.com/help/matlab/ref/double.randperm.html</a> 和 <a href="https://www.mathworks.com/help/matlab/ref/double.permute.html" target="_blank" rel="noopener">https://www.mathworks.com/help/matlab/ref/double.permute.html</a></p></main></body></html>
