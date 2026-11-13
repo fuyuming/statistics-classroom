@@ -1,0 +1,10 @@
+MATLAB 2025a
+    language     case      n      x     p_hat     p0       B         seed       bootstrap_ci_low    bootstrap_ci_high    conditional_count_q025    conditional_count_q975    h0_hits    h0_hit_rate    exact_right_tail_p    cp_ci_low    cp_ci_high    boundary_zero_bootstrap_low    boundary_zero_bootstrap_high    boundary_zero_cp_low    boundary_zero_cp_high    boundary_all_bootstrap_low    boundary_all_bootstrap_high    boundary_all_cp_low    boundary_all_cp_high
+    ________    ______    ___    ___    _____    ____    _____    __________    ________________    _________________    ______________________    ______________________    _______    ___________    __________________    _________    __________    ___________________________    ____________________________    ____________________    _____________________    __________________________    ___________________________    ___________________    ____________________
+
+    "MATLAB"    "main"    180    117    0.65     0.45    10000    2.0261e+07        0.57778              0.71667                  104                       129                 0            0             5.2383e-08         0.57551      0.71945                   0                              0                           0                     0.16843                       1                              1                       0.83157                   1
+
+
+单侧精确P=5.23826971453e-08；单侧95%率区间=[0.58718779,1]
+重排100次的率均为0.65；模拟命中比例不是精确P。
+CP为模型下的精确区间；Bootstrap百分位区间不具有同样的精确覆盖保证。

@@ -1,0 +1,25 @@
+Python 3.12.12, NumPy 2.4.3, SciPy 1.17.1
+v3: Percentile/Basic use infinite conditional Binomial endpoints; coverage is exact enumeration.
+Observed intervals (Percentile/Basic endpoints directly from conditional distribution):
+    method    lower    upper
+Percentile 0.577778 0.716667
+     Basic 0.583333 0.722222
+      Wald 0.580321 0.719679
+    Wilson 0.577847 0.715884
+        CP 0.575513 0.719455
+基础主脚本循环重抽的SD（bootstrap_rates）：0.0357443295679914
+Analytic SE: 0.0355512150128359
+Coverage at p=.65:
+   p     method  coverage
+0.65 Percentile  0.957662
+0.65      Basic  0.957662
+0.65       Wald  0.938904
+0.65     Wilson  0.949591
+0.65         CP  0.957662
+Coverage at p=.05:
+   p     method  coverage
+0.05 Percentile  0.940006
+0.05      Basic  0.945034
+0.05       Wald  0.940006
+0.05     Wilson  0.943596
+0.05         CP  0.961839

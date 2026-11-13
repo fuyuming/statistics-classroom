@@ -1,0 +1,66 @@
+R: R version 4.6.1 (2026-06-24)
+infer: 1.1.0
+ggplot2: 4.0.3
+ragg: 1.5.2
+Seed used for each independent block: 20261110
+
+Study (8 rows):
+ group outcome
+     A     yes
+     A     yes
+     A     yes
+     A      no
+     B     yes
+     B      no
+     B      no
+     B      no
+
+Study table: group x outcome
+     outcome
+group no yes
+    A  1   3
+    B  3   1
+
+Observed difference (A-B):
+ stat
+  0.5
+
+Five-round permute sample details:
+nrow(demo_samples): 40
+replicate x group counts (each cell should be 4):
+         group
+replicate A B
+        1 4 4
+        2 4 4
+        3 4 4
+        4 4 4
+        5 4 4
+Five-round calculated differences:
+ replicate stat
+         1  0.0
+         2  0.0
+         3  0.0
+         4 -0.5
+         5 -0.5
+
+10000-round permutation distribution:
+nrow(perm_dist): 10000
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max.
+-1.00000  0.00000  0.00000  0.00325  0.00000  1.00000
+Actual hits (stat >= 0.5): 2462 of 10000
+Actual hit proportion: 0.2462
+get_p_value(direction='greater'):
+ p_value
+  0.2462
+Plot font family: Heiti SC
+Plot saved: <article_root>/文章配图/03_置换分布_v10.png
+
+Exact enumeration:
+nrow(exact): 70
+
+  -1 -0.5    0  0.5    1
+   1   16   36   16    1
+Exact hits (stat >= 0.5): 17 of 70
+Exact P: 0.24285714
+
+CHECK: PASS (demo cells=4; MC P=hits/10000; exact hits=17/70; exact frequencies=1,16,36,16,1)

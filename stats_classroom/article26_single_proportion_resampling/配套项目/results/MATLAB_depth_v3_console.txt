@@ -1,0 +1,23 @@
+MATLAB 2025a
+v3: Percentile/Basic use infinite conditional Binomial endpoints; coverage is exact enumeration.
+Observed intervals (Percentile/Basic endpoints directly from conditional distribution):
+method,lower,upper
+Percentile,0.577777777777778,0.716666666666667
+Basic,0.583333333333333,0.722222222222222
+Wald,0.580320898968202,0.719679101031798
+Wilson,0.577847201202152,0.715884149421364
+CP,0.575513445122912,0.719454659606952
+基础主脚本循环重抽的SD（bootstrap_rates）：0.0351560308765988
+Analytic SE: 0.0355512150128359
+Coverage at p=0.65:
+Percentile,0.957662133503388
+Basic,0.957662133503388
+Wald,0.938904095614483
+Wilson,0.949591440910383
+CP,0.957662133503388
+Coverage at p=0.05:
+Percentile,0.94000600906731
+Basic,0.945033553410326
+Wald,0.94000600906731
+Wilson,0.943596128266372
+CP,0.961839462860953

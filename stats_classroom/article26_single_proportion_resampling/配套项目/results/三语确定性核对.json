@@ -1,0 +1,32 @@
+{
+  "R": {
+    "deterministic_checks": "pass",
+    "bootstrap_ci": [
+      0.577777777777778,
+      0.716666666666667
+    ],
+    "h0_hits": 0,
+    "B": 10000,
+    "exact_right_tail_p": 5.23826971452729e-08
+  },
+  "Python": {
+    "deterministic_checks": "pass",
+    "bootstrap_ci": [
+      0.5777777777777777,
+      0.7222222222222222
+    ],
+    "h0_hits": 0,
+    "B": 10000,
+    "exact_right_tail_p": 5.238269714527387e-08
+  },
+  "MATLAB": {
+    "deterministic_checks": "pass",
+    "bootstrap_ci": [
+      0.577777777777778,
+      0.716666666666667
+    ],
+    "h0_hits": 0,
+    "B": 10000,
+    "exact_right_tail_p": 5.23826971452726e-08
+  }
+}

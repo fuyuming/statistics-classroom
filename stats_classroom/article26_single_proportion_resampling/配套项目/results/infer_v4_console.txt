@@ -1,0 +1,57 @@
+R: R version 4.6.1 (2026-06-24)
+infer: 1.1.0
+ggplot2: 4.0.3
+Seed used for each independent block: 20261110
+
+Data counts:
+
+ no yes
+ 63 117
+
+Specification object (spec):
+Response: outcome (factor)
+# A tibble: 180 × 1
+   outcome
+   <fct>
+ 1 yes
+ 2 yes
+ 3 yes
+ 4 yes
+ 5 yes
+ 6 yes
+ 7 yes
+ 8 yes
+ 9 yes
+10 yes
+# ℹ 170 more rows
+Observed statistic (obs_stat):
+ stat
+ 0.65
+
+Three-round bootstrap sample rows:
+nrow(demo_samples): 540
+
+  1   2   3
+180 180 180
+ replicate       stat
+         1 0.58888889
+         2 0.63888889
+         3 0.60555556
+
+Bootstrap confidence interval (percentile, 95%):
+   lower_ci   upper_ci
+ 0.57777778 0.71666667
+
+Null distribution p-value (greater):
+ p_value
+       0
+Actual null hits (stat >= 117/180): 0 of 10000
+Actual null hit proportion: 0
+Captured get_p_value warning: Please be cautious in reporting a p-value of 0. This result is an approximation
+based on the number of `reps` chosen in the `generate()` step.
+ℹ See `get_p_value()` (`?infer::get_p_value()`) for more information.
+
+Single-group shuffle rates:
+[1] 0.65 0.65 0.65
+
+Evidence paths are project-relative: data/infer_v4_* and results/infer_v4_console.txt

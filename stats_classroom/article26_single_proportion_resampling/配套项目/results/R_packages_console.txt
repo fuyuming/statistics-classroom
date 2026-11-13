@@ -1,0 +1,56 @@
+infer: 1.1.0
+confintr: 1.0.2
+R: 4.6.1
+
+infer 非参数bootstrap百分位区间
+# A tibble: 1 × 2
+  lower_ci upper_ci
+     <dbl>    <dbl>
+1    0.578    0.717
+
+infer 原假设模拟；原题单侧 greater
+极端命中数: 0
+# A tibble: 1 × 1
+  p_value
+    <dbl>
+1       0
+注意：上述0是有限次模拟的命中比例。原题精确二项P值如下。
+
+	Exact binomial test
+
+data:  117 and 180
+number of successes = 117, number of trials = 180, p-value = 5.238e-08
+alternative hypothesis: true probability of success is greater than 0.45
+95 percent confidence interval:
+ 0.5871878 1.0000000
+sample estimates:
+probability of success
+                  0.65
+
+
+confintr 百分位bootstrap区间；显式指定perc
+
+	Two-sided 95% bootstrap confidence interval for the true proportion
+	based on 10000 bootstrap replications and the percent method
+
+Sample estimate: 0.65
+Confidence interval:
+     2.5%     97.5%
+0.5777778 0.7222222
+
+List of 6
+ $ parameter: chr "true proportion"
+ $ interval : num [1:2] 0.578 0.722
+ $ estimate : num 0.65
+ $ probs    : num [1:2] 0.025 0.975
+ $ type     : chr "bootstrap"
+ $ info     : chr "based on 10000 bootstrap replications and the percent method"
+ - attr(*, "class")= chr "cint"
+
+无限次bootstrap的条件二项分位区间（离散分位定义）
+[1] 0.5777778 0.7166667
+
+边界0/20的双侧95%CP区间
+[1] 0.0000000 0.1684335
+attr(,"conf.level")
+[1] 0.95

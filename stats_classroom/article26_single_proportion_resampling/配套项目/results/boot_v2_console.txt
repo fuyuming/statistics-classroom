@@ -1,0 +1,21 @@
+R: R version 4.6.1 (2026-06-24)
+boot: 1.3.32
+Seed: 20261110; n: 180; observed count: 117; observed rate: 0.65
+
+[1] boot::boot ordinary Bootstrap
+R: 10000
+First six counts (round(180 * boot_rates)):
+[1] 108 120 117 124 113 108
+Percentile 95% CI for rate:
+     2.5%     97.5%
+0.5777778 0.7166667
+
+[2] H0 simulation with rbinom
+H0: p = 0.45; size = 180; R = 10000
+First six simulated counts:
+[1] 84 79 81 71 90 88
+Null hits (count >= 117): 0
+Simulated hit proportion: 0
+
+Wrote: data/boot_v2_reference.csv
+Wrote: data/rbinom_v2_reference.csv

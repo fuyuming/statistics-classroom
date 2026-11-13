@@ -1,0 +1,25 @@
+R: R version 4.6.1 (2026-06-24)
+v3: Percentile/Basic use infinite conditional Binomial endpoints; coverage is exact enumeration.
+Observed intervals (Percentile/Basic endpoints directly from conditional distribution):
+     method     lower     upper
+ Percentile 0.5777778 0.7166667
+      Basic 0.5833333 0.7222222
+       Wald 0.5803209 0.7196791
+     Wilson 0.5778472 0.7158841
+         CP 0.5755134 0.7194547
+基础主脚本循环重抽的SD（bootstrap_rates）： 0.03547681
+Analytic SE: 0.03555122
+Coverage at p=.65:
+    p     method  coverage
+ 0.65 Percentile 0.9576621
+ 0.65      Basic 0.9576621
+ 0.65       Wald 0.9389041
+ 0.65     Wilson 0.9495914
+ 0.65         CP 0.9576621
+Coverage at p=.05:
+    p     method  coverage
+ 0.05 Percentile 0.9400060
+ 0.05      Basic 0.9450336
+ 0.05       Wald 0.9400060
+ 0.05     Wilson 0.9435961
+ 0.05         CP 0.9618395
