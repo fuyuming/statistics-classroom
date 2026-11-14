@@ -1,148 +1,123 @@
-function plot_figures()
-% 配对样本率差：三张教学图（基础 MATLAB，无统计工具箱）。
-% 可从项目根目录或代码目录运行；输入和输出均由项目相对路径确定。
+%% 统计课堂27：用精确概率和正态单格概率绘图
+% 问题：样本量20与1000时，率差的分布如何集中？总人数1000而变化稀少时近似怎样？
+% 数据身份：给定教学模型计算的概率，不是随机抽样数据；三个场景见参数节。
+% 运行：可独立从第一节顺序运行；默认显示图形，末尾save_figures控制文件导出。
 
-%% 路径、字体与输出目录
-scriptDir = fileparts(mfilename('fullpath'));
-root = fileparts(scriptDir);
-if ~isfolder(fullfile(root,'数据')) || ~isfolder(fullfile(root,'运行结果'))
-    root = pwd;
+%% 条件：项目路径与三个模型
+% 项目根目录包含“代码”和“数据”两个文件夹；按节运行时先从当前目录及父目录寻找。
+script_path = mfilename('fullpath');
+candidates = {pwd, fileparts(pwd)};
+if ~isempty(script_path)
+    candidates{end+1} = fileparts(script_path);
+    candidates{end+1} = fileparts(fileparts(script_path));
 end
-resultDir = fullfile(root,'运行结果','MATLAB');
-figDir = fullfile(resultDir,'图像');
-if ~isfolder(resultDir), mkdir(resultDir); end
-if ~isfolder(figDir), mkdir(figDir); end
-fontName = 'Arial Unicode MS';
-try
-    list = listfonts;
-    if ~any(strcmp(list,fontName)), fontName = 'PingFang SC'; end
-catch
-    fontName = 'Arial';
-end
-
-%% 图1：精确分布与正态单格近似
-fig = figure('Visible','off','Color','w','Units','inches','Position',[1 1 6.6 8.5]);
-tiledlayout(fig,2,1,'TileSpacing','compact','Padding','compact');
-draw_distribution(nexttile,'normal_n20','给定变化概率，n=20',[-0.65 0.25],resultDir,fontName);
-draw_distribution(nexttile,'normal_n1000','同一变化概率，n=1000（横轴局部放大）',[-0.27 -0.13],resultDir,fontName);
-save_figure(fig,figDir,'图1_配对率差精确与近似'); close(fig);
-
-%% 图2：变化稀少时的局部形状
-fig = figure('Visible','off','Color','w','Units','inches','Position',[1 1 6.6 4.8]);
-draw_distribution(gca,'rare_n1000','n=1000，平均只有3人发生变化',[-0.009 0.007],resultDir,fontName);
-save_figure(fig,figDir,'图2_变化稀少'); close(fig);
-
-%% 图3：Wang 下限的两步网格搜索
-countsTable = readtable(fullfile(root,'数据','wang_lower_tail_n20.csv'));
-counts = [countsTable.n_plus countsTable.n_zero countsTable.n_minus];
-assert(size(counts,1)==141,'Wang 尾部计数应有141行。');
-n = sum(counts(1,:));
-assert(all(sum(counts,2)==n),'每个尾部组合的总人数必须相同。');
-theta = -0.45;
-upper = 1-abs(theta);
-coarse = 0:0.055:0.55;
-fine = 0.44:0.0055:0.55;
-reference = linspace(0,upper,4001);
-yCoarse = tail_probability(coarse,theta,counts,n);
-yFine = tail_probability(fine,theta,counts,n);
-yReference = tail_probability(reference,theta,counts,n);
-[coarsePeak, coarseIdx] = max(yCoarse);
-[finePeak, fineIdx] = max(yFine);
-assert(abs(coarse(coarseIdx)-0.495)<1e-12 && abs(coarsePeak-0.02462737352027)<1e-12, ...
-    '粗网格峰值与预期不符。');
-assert(abs(fine(fineIdx)-0.4895)<1e-12 && abs(finePeak-0.02463073857116)<1e-12, ...
-    '细网格峰值与预期不符。');
-write_grid(fullfile(resultDir,'wang_grid_coarse.csv'),theta,coarse,yCoarse);
-write_grid(fullfile(resultDir,'wang_grid_fine.csv'),theta,fine,yFine);
-write_grid(fullfile(resultDir,'wang_grid_reference.csv'),theta,reference,yReference);
-summary = struct('theta',theta,'tail_count',size(counts,1),'p_t_range',[0 upper], ...
-    'coarse_points',numel(coarse),'fine_points',numel(fine), ...
-    'coarse_step',coarse(2)-coarse(1),'fine_step',fine(2)-fine(1), ...
-    'coarse_peak_p_t',coarse(coarseIdx),'coarse_peak_probability',coarsePeak, ...
-    'fine_range',[0.44 0.55],'fine_peak_p_t',fine(fineIdx), ...
-    'fine_peak_probability',finePeak);
-fid = fopen(fullfile(resultDir,'wang_grid_summary.json'),'w');
-assert(fid>=0,'无法写入 Wang 网格摘要。');
-fwrite(fid,jsonencode(summary),'char'); fprintf(fid,'\n'); fclose(fid);
-
-fig = figure('Visible','off','Color','w','Units','inches','Position',[1 1 7.1 8.8]);
-tiledlayout(fig,2,1,'TileSpacing','compact','Padding','compact');
-ax = nexttile;
-hRef = plot(ax,reference,yReference,'Color',[.435 .486 .533],'LineWidth',1.7); hold(ax,'on');
-yl = [0 max(yReference)*1.28]; ylim(ax,yl); xlim(ax,[0 upper]);
-patch(ax,[0.44 0.55 0.55 0.44],[yl(1) yl(1) yl(2) yl(2)],[.875 .420 .145], ...
-    'FaceAlpha',.12,'EdgeColor','none');
-plot(ax,reference,yReference,'Color',[.435 .486 .533],'LineWidth',1.7);
-hCoarse = scatter(ax,coarse,yCoarse,28,[.071 .4 .671],'filled');
-plot(ax,coarse(coarseIdx),coarsePeak,'o','Color',[.875 .420 .145],'LineWidth',2,'MarkerSize',9);
-xlabel(ax,'两次结果相同的总体概率 p_T','FontName',fontName); ylabel(ax,'单侧尾部概率','FontName',fontName);
-title(ax,'上：固定候选 θ = -0.45，先在整个范围粗搜','FontName',fontName);
-grid(ax,'on'); ax.GridColor=[.86 .86 .86];
-legend(ax,[hRef hCoarse],{'密集计算的参考曲线','粗网格：11个试算点'},'Location','southwest','Box','off','FontName',fontName);
-text(ax,.38,max(yReference)*1.05,sprintf('粗网格最高点 p_T=%.3f',coarse(coarseIdx)), ...
-    'Color',[.64 .176 .176],'FontName',fontName);
-ax = nexttile;
-localX = linspace(0.44,0.55,1601); localY = tail_probability(localX,theta,counts,n);
-spread = max(yFine)-min(yFine);
-plot(ax,localX,localY,'Color',[.435 .486 .533],'LineWidth',1.7); hold(ax,'on');
-ylim(ax,[max(0,min(yFine)-.18*spread), max(yFine)+.48*spread]); xlim(ax,[.44 .55]);
-scatter(ax,fine,yFine,28,[.875 .420 .145],'filled');
-inside = coarse>=.44 & coarse<=.55;
-scatter(ax,coarse(inside),yCoarse(inside),34,[.071 .4 .671],'filled');
-plot(ax,fine(fineIdx),finePeak,'o','Color',[.64 .176 .176],'LineWidth',2,'MarkerSize',9);
-xlabel(ax,'两次结果相同的总体概率 p_T','FontName',fontName); ylabel(ax,'单侧尾部概率','FontName',fontName);
-title(ax,'下：放大 [0.440, 0.550]，再细搜','FontName',fontName);
-grid(ax,'on'); ax.GridColor=[.86 .86 .86];
-legend(ax,{'密集计算的参考曲线','细网格：21个试算点','该区域内粗网格点'},'Location','southwest','Box','off','FontName',fontName);
-text(ax,.497,max(yFine)+.18*spread,sprintf('细网格最高点 p_T=%.4f\n尾部概率=%.6f',fine(fineIdx),finePeak), ...
-    'Color',[.64 .176 .176],'FontName',fontName);
-save_figure(fig,figDir,'图3_未知概率的两步网格搜索'); close(fig);
-fprintf('MATLAB 图形已生成；粗峰 %.4f / %.14f，细峰 %.4f / %.14f。\n', ...
-    coarse(coarseIdx),coarsePeak,fine(fineIdx),finePeak);
-end
-
-function draw_distribution(ax,name,titleText,limits,resultDir,fontName)
-% 读取逐格概率，并用柱形表示精确概率、点表示正态单格概率。
-data = readtable(fullfile(resultDir,['distribution_' name '.csv']));
-shown = data.D>=limits(1) & data.D<=limits(2);
-d = data.D(shown); exact = data.exact_probability(shown); normal = data.normal_cell_probability(shown);
-assert(~isempty(d),'指定横轴范围内没有分布数据。');
-ymax = 1.25*max([exact;normal]);
-bar(ax,d,exact,0.82*min(diff(unique(d))),'FaceColor',[.298 .471 .659],'EdgeColor','none','FaceAlpha',.8); hold(ax,'on');
-plot(ax,d,normal,'o','Color',[.894 .341 .337],'MarkerFaceColor',[.894 .341 .337],'MarkerSize',4);
-xlim(ax,limits); ylim(ax,[0 ymax]); xlabel(ax,'率差 D=k/n（后测减前测）','FontName',fontName); ylabel(ax,'单个取值的概率','FontName',fontName);
-title(ax,titleText,'FontName',fontName); grid(ax,'on'); ax.GridColor=[.9 .9 .9];
-legend(ax,{'精确概率','正态单格概率'},'Location','northeast','Box','off','FontName',fontName);
-end
-
-function y = tail_probability(p_t,theta,counts,n)
-% 三项多项式概率的原生对数求和；显式处理 0 人数与 0 概率。
-p_t = p_t(:)';
-probs = [(1-p_t+theta)/2; p_t; (1-p_t-theta)/2];
-assert(all(probs(:)>=-1e-12 & probs(:)<=1+1e-12),'p_T 超出合法范围。');
-probs = max(probs,0);
-logCoeff = gammaln(n+1)-sum(gammaln(counts+1),2);
-y = zeros(1,numel(p_t));
-for j=1:numel(p_t)
-    logTerms = logCoeff;
-    for k=1:3
-        nk = counts(:,k); pk = probs(k,j);
-        if pk==0
-            logTerms(nk>0) = -Inf;
-        else
-            logTerms = logTerms + nk.*log(pk); % nk=0 时贡献为0
-        end
+project = '';
+for candidate_index = 1:numel(candidates)
+    candidate = candidates{candidate_index};
+    if isfile(fullfile(candidate,'数据','paired_20.csv'))
+        project = candidate;
+        break;
     end
-    y(j) = sum(exp(logTerms));
 end
+if isempty(project)
+    error('请将Current Folder设为配套项目根目录或代码目录。');
+end
+code_dir = fullfile(project,'代码');
+addpath(code_dir);
+data_dir = fullfile(project,'数据');
+out_dir = fullfile(project,'运行结果','MATLAB');
+plot_n = [20; 1000; 1000];
+plot_qplus = [0.05; 0.05; 0.001];
+plot_qminus = [0.25; 0.25; 0.002];
+plot_tables = cell(3,1);
+
+%% 手动计算/概率辅助算法：先生成可查看的绘图数据
+% kernel按-1、0、+1排列；conv每次加入1个独立人的变化，总和范围扩展1。
+for plot_index = 1:3
+    plot_size = plot_n(plot_index);
+    plot_plus = plot_qplus(plot_index);
+    plot_minus = plot_qminus(plot_index);
+    plot_zero = 1 - plot_plus - plot_minus;
+    plot_kernel = [plot_minus, plot_zero, plot_plus];
+    plot_probability = 1;
+    for person = 1:plot_size
+        plot_probability = conv(plot_probability,plot_kernel);
+    end
+    plot_k = (-plot_size:plot_size)';
+    plot_D = plot_k/plot_size;
+    plot_theta = plot_plus-plot_minus;
+    plot_variance_Z = plot_plus+plot_minus-plot_theta^2;
+    plot_SE_D = sqrt(plot_variance_Z/plot_size);
+    % 相邻率差的中点是分格边界；CDF差给每格概率，不是密度高度。
+    plot_edges = (plot_D(1:end-1)+plot_D(2:end))/2;
+    plot_cdf = 0.5*erfc(-(plot_edges-plot_theta)/(sqrt(2)*plot_SE_D));
+    plot_normal = diff([0;plot_cdf;1]);
+    plot_tables{plot_index} = table(plot_k,plot_D,plot_probability',plot_normal, ...
+    'VariableNames',{'k','D','exact_probability','normal_cell_probability'});
+end
+plot_data_20 = plot_tables{1};
+plot_data_1000 = plot_tables{2};
+plot_data_rare = plot_tables{3};
+plot_data_20(1:5,:)
+% D是真实率差坐标；两个probability字段分别是精确概率和近似单格概率。
+
+%% 调用绘图函数：图1比较同一模型下的两个样本量
+fig1 = figure('Color','w','Units','inches','Position',[1 1 6.6 8.5]);
+plot_limits = {[-0.65 0.25],[-0.27 -0.13]};
+plot_titles = {'Given transition probabilities, n=20','Same model, n=1000 (zoomed x-axis)'};
+for panel = 1:2
+    plot_axis = subplot(2,1,panel,'Parent',fig1);
+    plot_table = plot_tables{panel};
+    limits = plot_limits{panel};
+    shown = plot_table.D>=limits(1) & plot_table.D<=limits(2);
+    d = plot_table.D(shown);
+    exact = plot_table.exact_probability(shown);
+    normal = plot_table.normal_cell_probability(shown);
+    % bar的x直接使用D，宽度.82是相邻格点间距的82%。
+    bar(plot_axis,d,exact,0.82,'FaceColor',[0.298 0.471 0.659],'EdgeColor','none');
+    hold(plot_axis,'on');
+    plot(plot_axis,d,normal,'o','Color',[0.894 0.341 0.337],'MarkerSize',4);
+    xlim(plot_axis,limits);
+    ylim(plot_axis,[0,1.25*max([exact;normal])]);
+    xlabel(plot_axis,'Rate difference D (after - before)');
+    ylabel(plot_axis,'Probability per grid cell');
+    title(plot_axis,plot_titles{panel});
+    legend(plot_axis,{'Exact PMF','Normal cell probability'},'Location','northeast');
+    grid(plot_axis,'on');
 end
 
-function write_grid(path,theta,p_t,y)
-T = table(repmat(theta,numel(p_t),1),p_t(:),y(:),'VariableNames',{'theta','p_t','tail_probability'});
-writetable(T,path);
-end
+%% 调用绘图函数：图2观察变化稀少的模型
+fig2 = figure('Color','w','Units','inches','Position',[1 1 6.6 4.8]);
+plot_axis = axes('Parent',fig2);
+plot_table = plot_data_rare;
+limits = [-0.009 0.007];
+shown = plot_table.D>=limits(1) & plot_table.D<=limits(2);
+d = plot_table.D(shown);
+exact = plot_table.exact_probability(shown);
+normal = plot_table.normal_cell_probability(shown);
+bar(plot_axis,d,exact,0.82,'FaceColor',[0.298 0.471 0.659],'EdgeColor','none');
+hold(plot_axis,'on');
+plot(plot_axis,d,normal,'o','Color',[0.894 0.341 0.337],'MarkerSize',4);
+xlim(plot_axis,limits);
+ylim(plot_axis,[0,1.25*max([exact;normal])]);
+xlabel(plot_axis,'Rate difference D (after - before)');
+ylabel(plot_axis,'Probability per grid cell');
+title(plot_axis,'n=1000, expected 3 people change');
+legend(plot_axis,{'Exact PMF','Normal cell probability'},'Location','northeast');
+grid(plot_axis,'on');
 
-function save_figure(fig,figDir,baseName)
-print(fig,fullfile(figDir,[baseName '.png']),'-dpng','-r190');
-print(fig,fullfile(figDir,[baseName '.pdf']),'-dpdf','-painters');
+%% 思考：先预测再改参数
+% 将第三个场景的变化总概率增加，再比较精确柱形与近似圆点的接近程度。
+
+%% 可选保存：将false改为true，PNG和PDF写入本语言图像目录
+save_figures = false;
+if save_figures
+    figure_dir = fullfile(out_dir,'图像');
+    if ~isfolder(figure_dir)
+        mkdir(figure_dir);
+    end
+    exportgraphics(fig1,fullfile(figure_dir,'图1_配对率差精确与近似.png'),'Resolution',190);
+    exportgraphics(fig1,fullfile(figure_dir,'图1_配对率差精确与近似.pdf'),'ContentType','vector');
+    exportgraphics(fig2,fullfile(figure_dir,'图2_变化稀少.png'),'Resolution',190);
+    exportgraphics(fig2,fullfile(figure_dir,'图2_变化稀少.pdf'),'ContentType','vector');
 end

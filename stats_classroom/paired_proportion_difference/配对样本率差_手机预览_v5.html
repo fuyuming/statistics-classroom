@@ -1,0 +1,148 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>配对样本率差怎样分布？从个人变化到多项分布</title><style>*{box-sizing:border-box}body{margin:0;background:#f1f4f3;color:#27343a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:720px;margin:24px auto;padding:32px 36px 56px;background:#fff;border-top:5px solid #258dcc}.brand{display:flex;align-items:center;gap:12px;color:#258dcc;font-size:14px;letter-spacing:.04em}.brand img{width:48px;height:48px;border-radius:50%}h1{font-size:30px;line-height:1.45;color:#0000F5;margin:26px 0 20px}h2{font-size:22px;line-height:1.5;color:#0000F5;border-left:4px solid #58b9ed;padding-left:13px;margin:42px 0 20px}h3{font-size:19px;line-height:1.55;color:#0000F5;margin:30px 0 14px}p{font-size:17px;line-height:1.95;margin:19px 0;text-align:justify}strong{color:#27343a;font-weight:700}blockquote{margin:20px 0 30px;padding:10px 18px;background:#f0f8ff;border-left:2px solid #58b9ed}blockquote p{font-size:14px;line-height:1.9;margin:8px 0;color:#53666c}a{color:#258dcc;text-decoration:none;border-bottom:1px solid #b9def5}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;background:#f0f8ff;color:#1769aa;padding:1px 5px;border-radius:4px}pre{background:#f7faf9;border:1px solid #e4ecea;border-radius:6px;padding:12px 14px;overflow-x:auto}pre code{background:none;padding:0;font-size:14px;line-height:1.7}div.formula{background:#f7faf9;border-left:3px solid #58b9ed;padding:12px 16px;margin:20px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:17px;color:#1769aa;text-align:center;line-height:1.9}ul,ol{font-size:17px;line-height:1.95;margin:18px 0;padding-left:26px}li{margin:8px 0}table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px}th,td{border-bottom:1px solid #e4ecea;padding:9px 10px;text-align:left;line-height:1.7}th{background:#f0f8ff;color:#1769aa;font-weight:650}footer{border-top:1px solid #dfe8e6;margin-top:36px;padding-top:16px;font-size:12px;color:#758787;line-height:1.8}@media(max-width:600px){body{background:#fff}main{margin:0;padding:24px 22px 40px;border-top-width:4px}h1{font-size:27px}h2{font-size:21px}h3{font-size:18px}p,ul,ol{font-size:16px;line-height:1.95}table{font-size:14px}}main > p img{display:block;width:100%;height:auto;margin:24px 0 8px;border:1px solid #e4ecea}main > p:has(img){margin:25px -12px 4px}main > p:has(img) a{border:0;display:block}main > p > em:only-child{display:block;font-size:13px;line-height:1.8;font-style:normal;color:#657a7d;text-align:left;margin:0 0 28px}@media(max-width:600px){main > p:has(img){margin-left:-12px;margin-right:-12px}}a{overflow-wrap:anywhere}table{display:block;overflow-x:auto}blockquote p{font-size:16px}hr{border:0;border-top:1px solid #dfe8e6;margin:30px 0}p{text-align:left}pre{max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere}pre code{display:block;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}.detail-table{display:table;table-layout:fixed;font-size:13px}.detail-table th,.detail-table td{padding:7px 3px;word-break:normal;overflow-wrap:normal}.detail-table th:nth-child(1),.detail-table td:nth-child(1),.detail-table th:nth-child(2),.detail-table td:nth-child(2){width:13%}.detail-table th:nth-child(3),.detail-table td:nth-child(3){width:15%}.detail-table th:nth-child(4),.detail-table td:nth-child(4){width:34%}.detail-table th:nth-child(5),.detail-table td:nth-child(5){width:25%}.nowrap{white-space:nowrap;display:inline-block}.summary-table td:nth-child(2){font-size:13px;line-height:1.6}.summary-table .atom{white-space:nowrap}</style></head><body><main><div class="brand"><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E8%B4%A6%E5%8F%B7%E5%A4%B4%E5%83%8F.png" alt="账号头像">明哥的微生物世界 · 统计课堂 27</div><h1>配对样本率差怎样分布？从个人变化到多项分布</h1><blockquote><p>明哥的微生物世界 · 统计课堂 27</p><p>摘要　同一批人前后检测，率差怎样由每个人的变化形成？先用两个人列全9种变化组合，逐项计算率差和概率，再借助多项分布回到20人的例题，理解率差的精确分布、均值和方差。</p></blockquote>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/00_%E8%AF%BE%E5%A0%82%E5%B0%81%E9%9D%A2_%E7%AC%AC10%E6%AC%A1%E8%AF%BE.png" alt="本科第十次课：率差推断与四格表检验"></p>
+<p>大家好，我是明哥。</p>
+<p>下次课要讲率差的估计与假设检验。这里先说清楚：配对样本率差有哪些可能取值，每个值有多大概率，以及它在重复抽样中会怎样波动。</p>
+<p><a href="https://mp.weixin.qq.com/s/yFWPQNnmvm_OKQO4ZgsEBA" target="_blank" rel="noopener">统计课堂25</a>讨论过两个独立样本率之差。这次换成同一批人前后各测一次：前后率可以直接相减，但要判断这个差值的波动，就需要知道每个人怎样变了。</p>
+<h2>一、率差为−0.20，具体是什么意思？</h2>
+<p>假设从某个目标人群随机抽取20名成年人，相隔两周，用同一方法、同一判定标准各检测一次。每个人都有完整的两次记录，不同人的记录相互独立。结果为：</p>
+<ul><li>8人两次都是阳性。</li><li>6人两次都是阴性。</li><li>1人由阴性变为阳性。</li><li>5人由阳性变为阴性。</li></ul>
+<p>我们关注<strong>后测阳性率减前测阳性率</strong>，先算这批人的率差，再在给定的概率模型下研究：重新抽取同样人数时，率差可能取哪些值，各有多大概率；它的均值与方差是多少。</p>
+<p>前测有8 + 5 = 13人阳性，样本率为13/20 = 0.65；后测有8 + 1 = 9人阳性，样本率为9/20 = 0.45。两者相减，得到−0.20，即后测阳性率低20个百分点。</p>
+<p>这个差值也可以逐人计算。把阴性记为0、阳性记为1，每个人的后测结果减前测结果，记为Z：阴转阳是＋1，阳转阴是−1，两次相同是0。</p>
+<p>本例1人贡献＋1，5人各贡献−1，14人贡献0，合计−4。除以全部20人，仍然得到−0.20。一般样本量记为n，第i个人的前测、后测分别记为Xᵢ、Yᵢ。</p>
+<p><strong>Zᵢ = Yᵢ − Xᵢ，表示第i个人的后测结果减去前测结果。下标i标记第几个人。</strong></p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F01.png" alt="式（1） 配对样本率差等于个人前后差值的平均数"></p>
+<p><em>式（1）｜先对同一个人的两次结果作差，再对全部n个人求平均，得到样本率差D。</em></p>
+<p><strong>配对率差是个人变化的平均数。</strong> 两次未变的14人也在分母中。真正发生变化的有6人，占30%；净变化是减少4名阳性者，占20%。净下降与发生变化的人数比例，回答的是不同问题。</p>
+<p>若按同一设计重新抽20人，三类人数可能改变，D也会改变。本次观察值是−0.20；下面研究D的分布，就是研究重复抽样时各个可能率差出现的概率。</p>
+<h2>二、为什么这里会用到多项分布？</h2>
+<p>研究重复抽样，需要给个人变化指定概率。设一个人阴转阳、不变、阳转阴的总体概率分别为q₊、q₀、q₋。一个人只能属于其中一类，三种概率之和为1。</p>
+<p>总体后测率减前测率记为θ。两次均阳性者对前后两率贡献相同，相减后抵消；两次均阴性者对两边都贡献0。因此，<strong>θ等于阴转阳概率减去阳转阴概率</strong>。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F02.png" alt="式（2） 三种变化概率之和及总体率差"></p>
+<p><em>式（2）｜q₊、q₀、q₋描述个人变化，θ = q₊ − q₋描述总体净变化。</em></p>
+<p>例如，先给定q₊ = 0.05、q₀ = 0.70、q₋ = 0.25。这表示每个人有5%的概率阴转阳、70%的概率不变、25%的概率阳转阴，总体率差θ = −0.20。</p>
+<p>抽n个人后，阴转阳人数记为N₊，不变人数记为T，阳转阴人数记为N₋，三类人数相加为n。T合并了两次均阳性与两次均阴性的人数，因为这两种情况的个人差值都为0。</p>
+<p><strong>固定抽取n个人，每个人独立地按相同概率归入这些类别，各类人数共同服从多项分布，英文是multinomial distribution。</strong> 这里有三个类别，具体就是三类别的多项分布。它计算的是三类人数同时取到某个组合的概率，例如恰好出现“1人阴转阳、14人不变、5人阳转阴”的概率<sup>[1]</sup>。</p>
+<p>这组给定的总体概率用于演算分布。它们恰好等于本例观察到的三个样本比例，但真实研究中，总体概率仍未知，不能因此认定它们就是0.05、0.70、0.25。</p>
+<h2>三、两个人的9种结果，怎样变成率差的分布？</h2>
+<p>为了把所有可能结果列全，<u><strong>先看一个只抽取2个人的假想样本</strong></u>。<strong>每个人仍然各测前、后两次</strong>：第一人的前后差值为Z₁，第二人为Z₂。两人的记录相互独立，每个人都可能取−1、0或＋1，概率分别为0.25、0.70、0.05。</p>
+<p>现在n = 2，按式（1），D = (Z₁ + Z₂)/2。对每一对个人变化，先回答两件事：两个人的变化相加、再除以2，率差是多少；这对结果同时出现的概率是多少。</p>
+<p>例如，第一人阳转阴，Z₁ = −1；第二人不变，Z₂ = 0。此时D = (−1 + 0)/2 = −0.5。这对结果出现的概率是0.25 × 0.70 = 0.175。<strong>相乘用的是不同人的独立性，同一个人的前后关系已经包含在Z中。</strong></p>
+<p>第一人有3种可能，每一种又能与第二人的3种可能配成一对，共3 × 3 = 9种。第一人的变化写在前、第二人写在后，所以（−1，0）与（0，−1）分别列出。下表每一行都是一对具体的个人变化。</p>
+<p>两个样本率都在0至1之间，因此后测率减前测率所得的D在−1至1之间：最小是0 − 1 = −1，最大是1 − 0 = 1。D为正表示后测率更高，为负表示后测率更低，为0表示前后率相等。</p>
+<table class="detail-table"><thead><tr><th>第一人Z₁</th><th>第二人Z₂</th><th>样本率差D</th><th>概率怎样相乘</th><th>这对结果的概率</th></tr></thead><tbody><tr><td>−1</td><td>−1</td><td>−1</td><td>0.25 × 0.25</td><td>0.0625</td></tr><tr><td>−1</td><td>0</td><td>−0.5</td><td>0.25 × 0.70</td><td>0.175</td></tr><tr><td>−1</td><td>＋1</td><td>0</td><td>0.25 × 0.05</td><td>0.0125</td></tr><tr><td>0</td><td>−1</td><td>−0.5</td><td>0.70 × 0.25</td><td>0.175</td></tr><tr><td>0</td><td>0</td><td>0</td><td>0.70 × 0.70</td><td>0.49</td></tr><tr><td>0</td><td>＋1</td><td>0.5</td><td>0.70 × 0.05</td><td>0.035</td></tr><tr><td>＋1</td><td>−1</td><td>0</td><td>0.05 × 0.25</td><td>0.0125</td></tr><tr><td>＋1</td><td>0</td><td>0.5</td><td>0.05 × 0.70</td><td>0.035</td></tr><tr><td>＋1</td><td>＋1</td><td>1</td><td>0.05 × 0.05</td><td>0.0025</td></tr></tbody></table>
+<p>比如第一行，两人都由阳性变为阴性：前测率为2/2 = 1，后测率为0/2 = 0，率差为0 − 1 = −1。按个人变化计算时，两个人各贡献−1，要<strong>把两个变化相加后除以2</strong>，即D = [（−1）＋（−1）]/2 = −1，得到同样结果。这一行的概率为0.25 × 0.25 = 0.0625。</p>
+<p>最后一行，两人都由阴性变为阳性，前测率为0、后测率为1，D = 1 − 0 = 1；按个人变化计算，同样得到D = [（＋1）＋（＋1）]/2 = 1。这一行的概率为0.05 × 0.05 = 0.0025。</p>
+<p>但9行只产生了5个不同的D。有的结果不同，率差却相同。例如（−1，0）与（0，−1）都得到−0.5。一次抽样只能落在其中一行，这两种结果互斥，所以<strong>D = −0.5的概率是0.175 + 0.175 = 0.35</strong>。</p>
+<p>把得到同一个D的结果归在一行。先列出两个人的变化怎样算成D，再把对应的概率相加：</p>
+<table class="summary-table"><thead><tr><th>率差D</th><th>两人的变化怎样算成D</th><th>对应结果的概率怎样相加</th></tr></thead><tbody><tr><td>−1</td><td>[<span class="atom">（−1）</span>＋<span class="atom">（−1）</span>]/2<br>= −1</td><td>0.25 × 0.25<br>= 0.0625</td></tr><tr><td>−0.5</td><td>[<span class="atom">（−1）</span>＋0]/2 = −0.5<br>[0＋<span class="atom">（−1）</span>]/2 = −0.5</td><td>0.25 × 0.70<br>＋0.70 × 0.25<br>= 0.175＋0.175<br>= 0.35</td></tr><tr><td>0</td><td>[<span class="atom">（−1）</span>＋<span class="atom">（＋1）</span>]/2 = 0<br>(0＋0)/2 = 0<br>[<span class="atom">（＋1）</span>＋<span class="atom">（−1）</span>]/2 = 0</td><td>0.25 × 0.05<br>＋0.70 × 0.70<br>＋0.05 × 0.25<br>= 0.0125＋0.49＋0.0125<br>= 0.515</td></tr><tr><td>0.5</td><td>[0＋<span class="atom">（＋1）</span>]/2 = 0.5<br>[<span class="atom">（＋1）</span>＋0]/2 = 0.5</td><td>0.70 × 0.05<br>＋0.05 × 0.70<br>= 0.035＋0.035<br>= 0.07</td></tr><tr><td>1</td><td>[<span class="atom">（＋1）</span>＋<span class="atom">（＋1）</span>]/2<br>= 1</td><td>0.05 × 0.05<br>= 0.0025</td></tr></tbody></table>
+<p>第二列每个算式中的第一个变化属于第一人，第二个变化属于第二人；第三列按同样次序列出对应的概率乘积，再相加。现在每个D的概率都找到了，五项相加为1，这才得到两人样本率差的完整分布。</p>
+<p>这5个率差的概率求出后，还可以回头看看它们与三类人数的关系。以D = 0的三行为例：两人都不变是一组人数（N₊，T，N₋）＝（0，2，0），概率为0.49；两人分别取＋1和−1是另一组人数（1，0，1），虽然有两种先后安排，三类人数相同，合计概率为0.025。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F04_%E5%B1%95%E5%BC%80.png" alt="式（3） 两人率差等于0时的两组人数及其概率"></p>
+<p><em>式（3）｜0.49与0.025分别来自两组人数；合起来得到P(D = 0) = 0.515。</em></p>
+<p><strong>个人结果的排列可以不同，三类人数也可以不同，却产生同一个率差。</strong> 上面先列个人结果，再按D合并。人数增加后，直接按三类人数归组，能使计算更方便。</p>
+<h2>四、回到20人，怎样计算每组人数的概率？</h2>
+<p>两人时可以逐项列出人员安排。人数增加后，可以把“有多少种安排”和“一种安排的概率”分开计算。</p>
+<p>一般地，＋1有r人、0有t人、−1有s人，三者相加为n。个人变化的总和为r − s，所以D = (r − s)/n：三类人数确定后，率差也就确定了。这组三类人数的概率由式（4）给出<sup>[1]</sup>。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03.png" alt="式（4） 多项分布给出三类人数的联合概率"></p>
+<p><em>式（4）｜阶乘系数计算安排种数，q₊ʳq₀ᵗq₋ˢ计算一种指定人员安排的概率。</em></p>
+<h3>（一）这个阶乘系数怎样得到？</h3>
+<p>先用3个人看：甲、乙、丙中，2人取＋1，1人取0，没有人取−1。我们要数的是，这三类人可以怎样分配。</p>
+<p><strong>角度一：分步选人，把组合数相乘。</strong></p>
+<p>先从3个人中选2人取＋1，可以选甲乙、甲丙或乙丙，共有<span class="nowrap">C(3, 2)</span> = 3种选法。<span class="nowrap">C(3, 2)</span>表示“从3人中选2人”的组合数，只看选中了谁，甲乙与乙甲算同一种。</p>
+<p>再从剩下的1个人中选1人取0，有<span class="nowrap">C(1, 1)</span> = 1种选法。每一种第一步的选择，都能与这1种第二步的选择配在一起，所以共有<span class="nowrap"><span class="nowrap">C(3, 2)</span> × <span class="nowrap">C(1, 1)</span></span> = 3 × 1 = 3种类别分配。取−1的类别没有人，无须再选。</p>
+<p>推广到n个人，也是先从n人中选r人取＋1，再从剩下的n − r人中选t人取0；余下的s人全部取−1。因此，安排种数是<span class="nowrap">C(n, r)</span> × <span class="nowrap">C(n − r, t)</span>。</p>
+<p>把两个组合数写成阶乘形式，再相乘。这里s = n − r − t，分子、分母中共同的<span class="nowrap">(n − r)!</span>可以约去：</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03_%E7%BB%84%E5%90%88%E6%95%B0%E7%BA%A6%E5%88%86.png" alt="式（4）的系数推导：组合数相乘，约去分子与分母中共同的阶乘因子"></p>
+<p><em>式（4）的系数推导｜红色划线标出分子、分母中相同的<span class="nowrap">(n − r)!</span>；约去后，得到安排种数<span class="nowrap">n!/(r!t!s!)</span>。</em></p>
+<p><strong>角度二：先排列，再去掉重复。</strong></p>
+<p>也可以把甲、乙、丙排成一列，规定前两位取＋1，最后一位取0。三个人共有3! = 3 × 2 × 1 = 6种排列。</p>
+<table><thead><tr><th>人员排列</th><th>对应的实际结果</th></tr></thead><tbody><tr><td>甲乙丙、乙甲丙</td><td>甲乙取＋1，丙取0</td></tr><tr><td>甲丙乙、丙甲乙</td><td>甲丙取＋1，乙取0</td></tr><tr><td>乙丙甲、丙乙甲</td><td>乙丙取＋1，甲取0</td></tr></tbody></table>
+<p>两个取＋1的人交换顺序，类别分配没有改变，每种实际结果被数了2!次，所以要除以2!。取0的只有1人，内部有1! = 1种顺序；取−1的有0人，空类别有一种安排，约定0! = 1。这两项除数都是1。</p>
+<p>一般情况下，三个类别内部各有r!、t!、s!种人员排列。这些内部顺序可以相互搭配，同一个类别分配在全部n!种排列中被重复计算了r!t!s!次；除去这些重复，同样得到<span class="nowrap">n!/(r!t!s!)</span>。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03_%E7%B3%BB%E6%95%B0.png" alt="式（4）的系数示例：3人的6种排列去重后得到3种类别分配"></p>
+<p><em>系数示例｜r = 2、t = 1、s = 0，两种算法得到的安排种数都是3。</em></p>
+<p>每种指定人员安排的概率都是0.05 × 0.05 × 0.70 = 0.00175，乘以3，得到这组人数的概率0.00525。式（4）就是把安排种数乘以一种指定人员安排的概率。</p>
+<h3>（二）观察到的（1，14，5），概率是多少？</h3>
+<p>回到20人的模型，（1，14，5）按＋1、0、−1的人数排列。从20人选1人取＋1，有20种选法；从剩余19人选14人取0，有11628种；余下5人取−1。共有20 × 11628 = 232560种安排。</p>
+<p>每种指定安排的概率为0.05 × 0.70¹⁴ × 0.25⁵。乘以安排种数，得到约0.07701541。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/v2_%E5%85%AC%E5%BC%8F06_%E4%BA%BA%E6%95%B0%E6%A6%82%E7%8E%87.png" alt="式（5） 给定模型下观察到1人加1、14人不变、5人减1的概率"></p>
+<p><em>式（5）｜这是恰好出现（1，14，5）这组人数的概率。</em></p>
+<p>R的<code>dmultinom()</code>可以直接核对这项概率。三类人数与三种概率按＋1、0、−1的相同次序输入，<code>size</code>为总人数。</p>
+<pre><code># 类别顺序统一为：＋1、0、−1。
+dmultinom(c(1, 14, 5), size = 20, prob = c(0.05, 0.70, 0.25))</code></pre>
+<pre><code>[1] 0.07701541</code></pre>
+<p>这个调用回答的是“一组人数的概率是多少”。要得到D的分布，还需要合并产生相同D的人数组合。</p>
+<h3>（三）为什么D = −0.20的概率更大？</h3>
+<p>观察组（1，14，5）给出D = (1 − 5)/20 = −0.20。其他人数也可能给出这个率差：例如（0，16，4）和（2，12，6），＋1人数减去−1人数都为−4。</p>
+<p>符合这一条件的共有9组，从（0，16，4）、（1，14，5）一直到（8，0，12）。每次＋1与−1人数同时增加1，不变人数减少2，总人数仍为20，人数之差仍为−4。</p>
+<p>分别用式（4）计算这9组的概率，再相加，得到<strong>P(D = −0.20) ≈ 0.17484084</strong>。0.07701541只是一组人数的概率，0.17484084才是这个模型下D恰好取−0.20的概率。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F04.png" alt="式（6） 按同一个率差将三类人数概率归类相加"></p>
+<p><em>式（6）｜k是＋1人数减去−1人数；要使D = k/n，就将所有满足r − s = k的人数组合概率相加。</em></p>
+<p>全部可能的人数组合也能逐一列出。固定＋1人数：有0人＋1时，其余两类有21种分配；有1人＋1时有20种；依次减少，到20人都取＋1时只剩1种。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F10.png" alt="式（7） 20人的三类人数组合共有231种"></p>
+<p><em>式（7）｜21项从21减到1，平均为11，合计231组。</em></p>
+<p>231组人数的概率之和为1。再按D归类，就得到从−1到1、间隔1/20的41个率差及其概率，合计仍为1。配套基础入口分别保存了231组人数概率、9组同率差概率及41项率差分布，三套语言可以逐行对照。</p>
+<h2>五、率差的平均水平和波动怎样计算？</h2>
+<p>列出全部概率可以认识分布。如果只关心平均水平和波动，还可以直接从个人变化Z计算。</p>
+<h3>（一）先求一个人的均值和方差</h3>
+<p><strong>Zᵢ是第i个人“后测结果减前测结果”的差值，即Zᵢ = Yᵢ − Xᵢ；下标i表示第几个人。</strong> 阴转阳时取＋1，两次结果相同时取0，阳转阴时取−1，对应概率依次为q₊、q₀、q₋。</p>
+<p>将Zᵢ的每个可能取值乘以它的概率，再相加，就得到均值E(Zᵢ) = q₊ − q₋ = θ。</p>
+<p>还要计算E(Zᵢ²)，即差值平方后的平均数。<strong>平方的是差值的取值，概率仍是原来的概率。</strong> ＋1与−1平方后都变成1，0平方后仍为0，所以E(Zᵢ²) = q₊ + q₋。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F05.png" alt="式（8）前半：按三种取值及其概率求均值和平方均值"></p>
+<p><em>式（8）前半｜先求E(Zᵢ)，再求E(Zᵢ²)；后者将两个方向的变化概率相加。</em></p>
+<p>直接使用<a href="https://mp.weixin.qq.com/s/QkG1VROHLoOtyDgxEonrDw" target="_blank" rel="noopener">统计课堂08</a>讲过的方差性质：<strong>方差等于随机变量平方的期望，减去随机变量期望的平方。</strong> 前面已算出这两个期望，现在代入即可<sup>[2]</sup>。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F05_%E6%96%B9%E5%B7%AE%E4%BB%A3%E5%85%A5.png" alt="式（8）后半：将已算出的两个期望代入方差性质"></p>
+<p><em>式（8）后半｜代入E(Zᵢ²) = q₊ + q₋和E(Zᵢ) = q₊ − q₋，再用q₊ − q₋ = θ。</em></p>
+<p>这里，q₊ + q₋对应“随机变量平方的期望”，θ²对应“随机变量期望的平方”。因此，方差中减去的θ²就是均值的平方。</p>
+<h3>（二）再求平均数D的方差</h3>
+<p>D是n个个人差值的平均数。每个Zᵢ的均值都是θ，取平均后，D的均值仍为θ。</p>
+<p>方差要分两步算。<strong>把总和除以n，方差要乘以1/n²</strong>，用的是Var(aX) = a²Var(X)。再利用不同人的差值相互独立：他们之间的协方差为0，总和的方差就是n个个人方差相加，即n倍个人方差。</p>
+<p>这样，1/n²再乘以n，便剩下1/n。因此，D的方差等于个人差值方差除以n；最后对方差取平方根，得到标准误。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F06.png" alt="式（9） 配对样本率差的期望、方差及标准误"></p>
+<p><em>式（9）｜先提出1/n²，再将n个相同方差相加，得到个人方差的1/n；标准误是D的标准差。</em></p>
+<p>给定模型中，θ = 0.05 − 0.25 = −0.20，因此θ² = 0.04；E(Zᵢ²) = 0.05 + 0.25 = 0.30。两者相减，个人差值方差为0.30 − 0.04 = 0.26。</p>
+<p>抽20人时，D的方差为0.26/20 = 0.013；再取平方根，标准误约为0.114，即11.4个百分点。同样，抽2人时D的方差为0.13，抽1000人时为0.00026。人数增加，D仍围绕同一θ波动，分布会更集中。</p>
+<p><strong>同一个率差还不足以确定波动。</strong> θ只给出q₊ − q₋，方差还用到q₊ + q₋。实际数据中，除了净变化，也要保留两个方向各有多少人变化。若从前后两个率分别推导，方差中同样要保留两次测量之间的协方差<sup>[2]</sup>。</p>
+<h2>六、样本增加以后，分布怎样变化？</h2>
+<p>仍采用q₊ = 0.05、q₀ = 0.70、q₋ = 0.25，比较抽20人与1000人的分布。不同人的Z独立同分布、方差大于0时，随着n增加，标准化后的D分布趋近标准正态，这是中心极限定理的应用<sup>[3]</sup>。总人数是否足够，还要结合实际发生变化的概率判断。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F07.png" alt="式（10） 配对样本率差的正态近似"></p>
+<p><em>式（10）｜将式（9）的均值、方差用于大样本近似。</em></p>
+<p><strong>式（10）中N的第二个参数表示方差。</strong></p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%9B%BE1_%E9%85%8D%E5%AF%B9%E7%8E%87%E5%B7%AE%E7%B2%BE%E7%A1%AE%E4%B8%8E%E8%BF%91%E4%BC%BC.png" alt="图1 给定变化概率时20人与1000人的精确分布及正态近似"></p>
+<p><em>图1｜柱为精确概率，点为正态分布在对应单格区间内的概率；下图横轴局部放大。</em></p>
+<p>横轴是率差D。总差值k = −4、n = 20时，对应D = −0.20。D每相邻一格差1/n，将正态曲线下的面积对应到这一格时，左右边界分别离中心0.5/n。图中的正态单格概率按这两个边界计算。</p>
+<p>总人数大，也可能很少有人变化。图2把n固定为1000，改为q₊ = 0.001、q₀ = 0.997、q₋ = 0.002，平均只有3人变化。</p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%9B%BE2_%E5%8F%98%E5%8C%96%E7%A8%80%E5%B0%91.png" alt="图2 1000人但平均只有3人变化时的分布"></p>
+<p><em>图2｜变化概率不同，分布形状也不同，判断近似不能只看总人数。</em></p>
+<p>这个例子说明，变化概率也影响近似效果，不能只凭总人数判断。精确分布则仍可按前面的方法计算：将各人变化的概率合并，或枚举人数组合后按D归类。</p>
+<h2>七、用哪些现成函数计算？</h2>
+<p>R的<code>dmultinom()</code>、Python的<code>scipy.stats.multinomial.pmf()</code>和MATLAB的<code>mnpdf()</code>都能计算指定三类人数的概率。Python、MATLAB下面的调用，与第四节R的调用使用同样的（1，14，5）和三种概率<sup>[4,5]</sup>。</p>
+<pre><code>from scipy.stats import multinomial
+probability = multinomial.pmf([1, 14, 5], n=20, p=[0.05, 0.70, 0.25])
+print(f&quot;{probability:.8f}&quot;)</code></pre>
+<pre><code>0.07701541</code></pre>
+<pre><code>probability = mnpdf([1 14 5], [0.05 0.70 0.25]);
+fprintf(&#x27;%.8f\n&#x27;, probability);</code></pre>
+<pre><code>0.07701541</code></pre>
+<p>这些函数返回的是一组人数的概率，完整率差分布还需要按相同D相加。配套<code>distribution_basics.R/.py/.m</code>会列出两人的9种组合，再生成5个D的概率；回到20人后，还会分别保存231组人数概率、同一率差的9组结果与41项率差分布。</p>
+<p>人数更多时，可以逐人合并差值的概率。Python的<code>numpy.convolve()</code>与MATLAB的<code>conv()</code>用于这一步，R也有对应计算。配套主入口按同样的四组参数比较n = 2、20、1000，以及1000人但变化稀少的情形。正文两幅统计图由R生成，Python与MATLAB的对照图分别保存。</p>
+<p>MATLAB现成<code>mnpdf()</code>需要Statistics and Machine Learning Toolbox；基础分布练习同时保留直接按公式计算的版本，不要求这个工具箱。具体入口、依赖与输出见README。</p>
+<h2>八、本篇讲了哪些知识？</h2>
+<ol><li><strong>配对率差是个人变化的平均数。</strong> 后测减前测取＋1、0、−1，全部人都进入平均数的分母。</li><li><strong>先列具体结果，再按率差归类。</strong> 两人有9种个人变化组合，合并后得到5个D及其概率。</li><li><strong>多项分布描述各类人数的联合概率。</strong> 安排种数乘以一种安排的概率，得到某组人数出现的概率。</li><li><strong>一组人数的概率，还不是一个率差的全部概率。</strong> 20人例题中，9组人数都给出D = −0.20，需将它们的概率相加。</li><li><strong>均值看变化之差，方差还看变化总量。</strong> 给定模型下，人数增加会减小样本率差的方差；近似效果也与变化概率有关。</li></ol>
+<p>本篇从给定的三种概率出发，求出了样本率差的分布。实际研究中，这些总体概率未知，怎样根据观察资料估计总体率差及其区间，留到下一篇讨论。</p>
+<h2>配套练习</h2>
+<p>这次仍准备了R、Python、MATLAB三套对应脚本。先运行<code>distribution_basics</code>，对照两人的9行组合与5项率差概率，再看20人的归类计算；<code>package_functions</code>演示现成概率函数，<code>paired_rate</code>比较不同样本量并生成两幅图。选择熟悉的一种语言跑通即可，文件与输出说明见配套README。</p>
+<p>本篇完整项目：</p>
+<p><a href="https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/paired_proportion_difference" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/paired_proportion_difference</a></p>
+<p><a href="https://github.com/fuyuming/statistics-classroom/raw/refs/heads/main/stats_classroom/paired_proportion_difference/%E9%85%8D%E5%AF%B9%E6%A0%B7%E6%9C%AC%E7%8E%87%E5%B7%AE_%E5%AE%8C%E6%95%B4%E9%A1%B9%E7%9B%AE.zip" target="_blank" rel="noopener">下载本篇完整ZIP</a>。解压后进入<code>paired_proportion_difference</code>，先读README。</p>
+<p>系列仓库：<a href="https://github.com/fuyuming/statistics-classroom" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom</a></p>
+<p><a href="https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip" target="_blank" rel="noopener">下载整个仓库ZIP</a>，解压后进入<code>stats_classroom/paired_proportion_difference</code>。</p>
+<p>从每个人的变化出发，把每种结果的概率算出来，再将产生同一率差的结果归在一起，配对样本率差的分布就有了具体含义。</p>
+<p>这里是明哥的微生物世界，我们下次再见。</p>
+<h2>参考资料</h2>
+<p>[1] Chen Y-C. University of Washington STAT 512, Lecture 7: Multinomial distribution. <a href="https://faculty.washington.edu/yenchic/20A_stat512/Lec7_Multinomial.html" target="_blank" rel="noopener">https://faculty.washington.edu/yenchic/20A_stat512/Lec7_Multinomial.html</a></p>
+<p>[2] 明哥的微生物世界．期望、方差、协方差：统计公式是怎样一步步推出来的？统计课堂08。<a href="https://mp.weixin.qq.com/s/QkG1VROHLoOtyDgxEonrDw" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/QkG1VROHLoOtyDgxEonrDw</a></p>
+<p>[3] Penn State STAT 414. Lesson 27: The Central Limit Theorem. <a href="https://online.stat.psu.edu/stat414/Lesson27" target="_blank" rel="noopener">https://online.stat.psu.edu/stat414/Lesson27</a></p>
+<p>[4] SciPy官方文档，scipy.stats.multinomial。<a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.multinomial.html" target="_blank" rel="noopener">https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.multinomial.html</a></p>
+<p>[5] MathWorks官方文档，mnpdf。<a href="https://www.mathworks.com/help/stats/mnpdf.html" target="_blank" rel="noopener">https://www.mathworks.com/help/stats/mnpdf.html</a></p></main></body></html>
