@@ -1,4 +1,4 @@
-"""Re-render the five recent formula assets at the reference 20pt scale."""
+"""Re-render recent formula assets at the reference 20pt scale."""
 from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
@@ -106,6 +106,13 @@ def formula06_average():
     save(fig, "公式06.png")
 
 
+def formula07_normal():
+    fig, ax = new_canvas(1.95)
+    math(ax, r"D\,\dot{\sim}\,N\!\left(\theta,\frac{q_++q_--\theta^2}{n}\right)", .80)
+    math(ax, r"W=\frac{D-\theta}{\sqrt{(q_++q_--\theta^2)/n}}\,\dot{\sim}\,N(0,1)", .25)
+    save(fig, "公式07.png")
+
+
 if __name__ == "__main__":
     formula03_cancellation(); formula03_coefficient(); formula05_mean_square()
-    formula05_substitution(); formula06_average()
+    formula05_substitution(); formula06_average(); formula07_normal()
