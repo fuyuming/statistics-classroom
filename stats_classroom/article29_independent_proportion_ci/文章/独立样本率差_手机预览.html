@@ -96,7 +96,7 @@ lower, upper = confint_proportions_2indep(
 print(lower, upper)
 # -0.4555079... 0.1006339...</code></pre>
 <p>第一组传A，第二组传B；<code>compare=&quot;diff&quot;</code>计算第一组率减第二组率，即A减B，<code>alpha=0.05</code>对应95%置信水平，返回的<code>lower, upper</code>就是下限和上限。Wald和Agresti–Caffo分别用<code>method=&quot;wald&quot;</code>和<code>method=&quot;agresti-caffo&quot;</code>；Python中的<code>&quot;score&quot;</code>对应另一种得分构造，不能照搬R的名字。</p>
-<p>MATLAB入口为<code>代码/independent_ci.m</code>。本项目在MATLAB中逐步实现上述三个公式，用于教学核对；这是随项目提供的计算代码，不把它称为MATLAB内置率差函数，也没有调用R后端。</p>
+<p>MATLAB入口为<code>代码/independent_ci.m</code>，可逐节复算三种区间。</p>
 <p>三套脚本读取同一份<code>数据/independent_counts.csv</code>。默认在IDE中显示结果与图，保存开关关闭；打开Rproj或设置工作目录的具体步骤见README。</p>
 <p>跑通后做三个小练习，每次改完都重新从读取数据开始运行：</p>
 <ol><li>将共享CSV改为A组45/100、B组65/100，保持两个样本率不变。点估计仍是−20个百分点，区间会怎样变化？这是一组扩大样本量的假设资料，不是复制原来的40个人来增加信息。</li><li>恢复9/20和13/20，只把脚本中的<code>confidence</code>改成0.90。两侧留下的余地怎样改变？留意输出和图标题是否都已更新。</li><li>将两组都改成0/20，比较三种区间，检查Wald为什么退化为（0，0）。然后恢复原始数据，核对主例题。</li></ol>
