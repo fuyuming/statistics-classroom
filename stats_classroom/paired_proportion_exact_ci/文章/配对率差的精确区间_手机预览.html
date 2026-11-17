@@ -33,7 +33,7 @@ table.paired-counts{width:100%;table-layout:fixed;border-collapse:collapse;borde
 <h2>三、四种构造，各自怎样得到区间？</h2>
 <h3>（一）Wald：点估计加减“临界值乘标准误”</h3>
 <p>Wald用“点估计±临界值×标准误”构造区间。标准误描述样本率差的抽样波动；将上一篇配对方差中的总体概率换成样本比例，本例估计的标准误约为0.11402。双侧95%的正态临界值约为1.96，因此得到：</p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E6%AF%94%E8%BE%83%E5%85%AC%E5%BC%8F02_Wald%E5%8C%BA%E9%97%B4.png" alt="式（1） 本例的配对Wald区间"></p>
+<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E6%AF%94%E8%BE%83%E5%85%AC%E5%BC%8F02_Wald%E5%8C%BA%E9%97%B4.png" alt="式（1） D ± 1.96 × 标准误估计值，区间约为−0.4235至0.0235"></p>
 <p><em>式（1）｜在D＝−0.20两侧各加减约1.96倍标准误。本篇采用分母n的方差估计，与表2的Wald实现一致。</em></p>
 <p>这个算法简便，但小样本或变化人数很少时，正态近似和插件标准误的表现可能不好。例如样本中人人都不变，插件方差就会等于0，Wald区间也会缩成一点。<strong>本篇用Wald作理解公式的参照，不把它作为小样本配对资料的默认选择</strong><sup>[2,3]</sup>。</p>
 <h3>（二）配对Newcombe：从两个率的区间合并</h3>
@@ -46,7 +46,7 @@ table.paired-counts{width:100%;table-layout:fixed;border-collapse:collapse;borde
 <h3>（四）Wang：按有限样本概率控制漏失</h3>
 <p>Wang承接上一篇的有限样本分布：考虑各种可能的人数组合及其概率，同时处理未知的总体变化概率，确定使区间未包含真值的概率受到控制的端点<sup>[5]</sup>。</p>
 <p><strong>在本篇独立、同分布配对记录的有限样本模型下，精确Wang构造的双侧覆盖至少达到95%。</strong> 样本结果离散，实际覆盖还可能更高。本例得到−44.92至6.30个百分点。</p>
-<p>这里“精确”说的是有限样本模型下的覆盖要求。现成函数<code>PairedCI()</code>用数值搜索求端点，输出还受计算精度影响<sup>[5,6]</sup>。</p>
+<p>这里“精确”说的是有限样本模型下的覆盖要求。R包<code>ExactCIdiff</code>中的<code>PairedCI()</code>函数用数值搜索求端点，输出还受计算精度影响<sup>[5,6]</sup>。</p>
 <h2>四、用软件复算，三种语言各有哪些工具？</h2>
 <p>先用R复算表2的前三种区间。<code>ratesci::rdpairci()</code>要求四个格子按条件1、条件2组织。<strong>本题把条件1设为后测、条件2设为前测，b代表阴转阳，c代表阳转阴。</strong> 输入依次是：两次均阳性8人、仅后测阳性1人、仅前测阳性5人、两次均阴性6人<sup>[2]</sup>。</p>
 <pre><code>x &lt;- c(a = 8, b = 1, c = 5, d = 6)
@@ -70,9 +70,9 @@ wang$ExactCI</code></pre>
 <p><code>CItype = &quot;Two.sided&quot;</code>选择双侧形式；<code>$estimate</code>返回−0.20，<code>$ExactCI</code>返回约[−0.44923，0.06303]。把这行与前面三行合并，就得到表2。</p>
 <p><strong><u>针对本系列涉及的专门统计区间，R有较丰富的现成函数和参数选择，适合作为主要计算语言。</u></strong> 本篇用<code>rdpairci()</code>比较多种配对区间，用<code>PairedCI()</code>计算Wang区间；置信水平、区间侧别、校正设置或数值精度，也都能通过相应参数指定，便于围绕同一份资料组织计算<sup>[2,6]</sup>。</p>
 <p><strong>Python</strong>方面，statsmodels开发版的<code>confint_proportions_paired()</code>支持Wald和Newcombe两种构造，输入是配对四格表；用本篇资料核对，所得端点与表2相符。0.15.0正式版尚未包含该接口，所附Python脚本采用Wald公式复算；开发版接口可用于进一步扩展Newcombe计算<sup>[8]</sup>。</p>
-<p><strong>MATLAB</strong>的Statistics and Machine Learning Toolbox可用<code>norminv</code>计算Wald所需的正态分位数；<code>bootci</code>则可对整行配对记录重抽样，计算bootstrap区间<sup>[9,10]</sup>。所附MATLAB脚本用基础函数复算Wald，并比较置信水平变化；表2四种构造的完整比较由R入口完成。</p>
+<p><strong>MATLAB</strong>的Statistics and Machine Learning Toolbox可用<code>norminv</code>计算Wald所需的正态分位数；<code>bootci</code>则可对整行配对记录重抽样，计算bootstrap区间<sup>[9,10]</sup>。所附MATLAB脚本用基础函数复算Wald，并比较置信水平变化。</p>
 <h2>五、读表2的区间时，重点比较什么？</h2>
-<p><strong>先看区间容纳哪些总体差异。</strong> 本例四个区间都包含负值、0和正值：点估计提示下降20个百分点，资料仍容纳没有净变化及一定程度的上升，总体变化方向尚有不确定性。</p>
+<p><strong>先看区间是否包含0。</strong> 本例样本阳性率下降20个百分点，但四个95%置信区间都包含0。<strong>按相应的双侧检验，在5%的显著性水平下，这一下降不具有统计学显著性，尚不能据此认定总体阳性率下降。</strong></p>
 <p><strong>再看宽度，并同时看覆盖性质。</strong> 本例Wald最窄、Wang最宽，但窄区间的价值取决于它是否具有所要求的覆盖表现。一个方法若经常漏掉真值，即使区间较窄，也不能据此判为更好；另一方法在本例较宽，也不表示它在所有资料中都最宽。</p>
 <p><strong>比较要固定设计、方向、置信水平和校正设置。</strong> 方法选择应依据研究设计与覆盖要求事先说明，报告时写出所用构造、点估计和区间。</p>
 <h2>六、本篇讲了哪些知识？</h2>
