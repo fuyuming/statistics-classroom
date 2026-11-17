@@ -1,4 +1,4 @@
-%% 统计课堂32：RR、OR与log-Wald区间（MATLAB，UTF-8）
+%% 统计学堂32：RR、OR与log-Wald区间（MATLAB，UTF-8）
 % 数据为人为设定教学数据。先把项目根目录设为 Current Folder，再按各 %% 运行。
 
 %% 0 读取与检查

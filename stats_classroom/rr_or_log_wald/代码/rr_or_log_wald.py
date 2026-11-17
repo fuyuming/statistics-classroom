@@ -1,4 +1,4 @@
-# 统计课堂32：RR、OR与log-Wald区间（Python / Spyder，UTF-8）
+# 统计学堂32：RR、OR与log-Wald区间（Python / Spyder，UTF-8）
 # 数据为人为设定的教学数据，不是真实患者资料。按 # %% 从上到下运行。
 from pathlib import Path
 import os

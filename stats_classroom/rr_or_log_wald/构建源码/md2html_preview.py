@@ -78,7 +78,7 @@ def inline(source):
     return text
 
 
-def convert(source, output, footer='', avatar=None, brand='明哥的微生物世界 · 统计课堂'):
+def convert(source, output, footer='', avatar=None, brand='明哥的微生物世界 · 统计学堂'):
     source = Path(source).resolve()
     output = Path(output).resolve()
     lines = source.read_text(encoding='utf-8').splitlines()
@@ -221,7 +221,7 @@ if __name__ == '__main__':
     parser.add_argument('output')
     parser.add_argument('--footer', default='')
     parser.add_argument('--avatar')
-    parser.add_argument('--brand', default='明哥的微生物世界 · 统计课堂')
+    parser.add_argument('--brand', default='明哥的微生物世界 · 统计学堂')
     args = parser.parse_args()
     result = convert(args.source, args.output, args.footer, args.avatar, args.brand)
     print(json.dumps(result, ensure_ascii=False, indent=2))
