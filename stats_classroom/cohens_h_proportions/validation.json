@@ -1,0 +1,85 @@
+{
+  "status": "passed",
+  "scope": "当前Cohen h专题；课件例题1与原始率差参照",
+  "data": "data/lesson10_independent.csv",
+  "execution": {
+    "whole_file": {
+      "R": "passed",
+      "Python": "passed",
+      "MATLAB": "passed"
+    },
+    "clean_new_session_sections": {
+      "R": "passed",
+      "Python_without___file__": "passed",
+      "MATLAB": "passed"
+    }
+  },
+  "baseline": {
+    "RD": 0.2,
+    "h": 0.411516846067488,
+    "hSE": 0.1414213562373095,
+    "hCI_low": 0.134336081197553,
+    "hCI_high": 0.688697610937424
+  },
+  "comparisons": {
+    "baseline_h": {
+      "columns": [
+        "RD",
+        "h",
+        "hSE",
+        "hCI_low",
+        "hCI_high"
+      ],
+      "rows": 1,
+      "max_abs_difference": 4.996003610813204e-16
+    },
+    "fixed_RD_h": {
+      "columns": [
+        "p0",
+        "p1",
+        "RD",
+        "h"
+      ],
+      "rows": 4,
+      "max_abs_difference": 4.996003610813204e-16
+    },
+    "sample_size_h": {
+      "columns": [
+        "n",
+        "h",
+        "hCI_low",
+        "hCI_high",
+        "Q_manual",
+        "P_pearson"
+      ],
+      "rows": 3,
+      "max_abs_difference": 4.263256414560601e-14,
+      "max_relative_P_difference": 1.9317880628477724e-14
+    },
+    "h_variance_stability": {
+      "columns": [
+        "p",
+        "n",
+        "raw_SE",
+        "g_slope",
+        "transformed_SE",
+        "approx_variance",
+        "exact_increment",
+        "linear_increment"
+      ],
+      "rows": 3,
+      "max_abs_difference": 3.552713678800501e-15
+    }
+  },
+  "tolerance_abs": 1e-10,
+  "tolerance_relative_P": 1e-10,
+  "versions": {
+    "R": "4.6.1",
+    "effectsize": "1.0.3",
+    "Python": "3.12",
+    "SciPy": "1.17.1",
+    "MATLAB": "R2025a"
+  },
+  "evidence_dir": "work/h_only_check/",
+  "save_outputs_default": false
+}

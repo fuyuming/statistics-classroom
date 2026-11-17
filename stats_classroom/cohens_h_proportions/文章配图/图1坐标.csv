@@ -1,0 +1,4 @@
+group,p,g_p,metric,value
+new_plan,0.5,1.5707963267948968,RD,0.2
+control,0.3,1.1592794807274085,RD,0.2
+difference,,,h,0.4115168460674883
