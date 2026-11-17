@@ -11,7 +11,7 @@ root = Path(__file__).resolve().parents[1]
 source = root / "RR与OR_公众号稿.md"
 output = root / "手机预览.html"
 md2html_preview.convert(source, output,
-    brand="明哥的微生物世界 · 统计学堂 32")
+    brand="明哥的微生物世界 · 统计课堂 32")
 content = output.read_text(encoding="utf-8")
 # 使长标题各行长度均衡，避免一个字单独占行。
 content = content.replace("</style>", "h1{text-wrap:balance}p{text-align:left}@media(max-width:600px){h1{font-size:25px}}</style>")
