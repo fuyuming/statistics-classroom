@@ -1,31 +1,29 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>独立样本率之差：置信区间怎样算？</title><style>*{box-sizing:border-box}body{margin:0;background:#f1f4f3;color:#27343a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:720px;margin:24px auto;padding:32px 36px 56px;background:#fff;border-top:5px solid #258dcc}.brand{display:flex;align-items:center;gap:12px;color:#258dcc;font-size:14px;letter-spacing:.04em}.brand img{width:48px;height:48px;border-radius:50%}h1{font-size:30px;line-height:1.45;color:#0000F5;margin:26px 0 20px}h2{font-size:22px;line-height:1.5;color:#0000F5;border-left:4px solid #58b9ed;padding-left:13px;margin:42px 0 20px}h3{font-size:19px;line-height:1.55;color:#0000F5;margin:30px 0 14px}p{font-size:17px;line-height:1.95;margin:19px 0;text-align:justify}strong{color:#27343a;font-weight:700}blockquote{margin:20px 0 30px;padding:10px 18px;background:#f0f8ff;border-left:2px solid #58b9ed}blockquote p{font-size:14px;line-height:1.9;margin:8px 0;color:#53666c}a{color:#258dcc;text-decoration:none;border-bottom:1px solid #b9def5}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;background:#f0f8ff;color:#1769aa;padding:1px 5px;border-radius:4px}pre{background:#f7faf9;border:1px solid #e4ecea;border-radius:6px;padding:12px 14px;overflow-x:auto}pre code{background:none;padding:0;font-size:14px;line-height:1.7}div.formula{background:#f7faf9;border-left:3px solid #58b9ed;padding:12px 16px;margin:20px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:17px;color:#1769aa;text-align:center;line-height:1.9}ul,ol{font-size:17px;line-height:1.95;margin:18px 0;padding-left:26px}li{margin:8px 0}table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px}th,td{border-bottom:1px solid #e4ecea;padding:9px 10px;text-align:left;line-height:1.7}th{background:#f0f8ff;color:#1769aa;font-weight:650}footer{border-top:1px solid #dfe8e6;margin-top:36px;padding-top:16px;font-size:12px;color:#758787;line-height:1.8}@media(max-width:600px){body{background:#fff}main{margin:0;padding:24px 22px 40px;border-top-width:4px}h1{font-size:27px}h2{font-size:21px}h3{font-size:18px}p,ul,ol{font-size:16px;line-height:1.95}table{font-size:14px}}main > p img{display:block;width:100%;height:auto;margin:24px 0 8px;border:1px solid #e4ecea}main > p:has(img){margin:25px -12px 4px}main > p:has(img) a{border:0;display:block}main > p > em:only-child{display:block;font-size:13px;line-height:1.8;font-style:normal;color:#657a7d;text-align:left;margin:0 0 28px}@media(max-width:600px){main > p:has(img){margin-left:-12px;margin-right:-12px}}a{overflow-wrap:anywhere}table{display:block;overflow-x:auto}blockquote p{font-size:16px}hr{border:0;border-top:1px solid #dfe8e6;margin:30px 0}p code,li code,td code{overflow-wrap:anywhere;word-break:break-word}pre code{overflow-wrap:normal;word-break:normal}sup{font-size:.72em}</style></head><body><main><div class="brand">明哥的微生物世界 · 统计课堂 29</div><h1>独立样本率之差：置信区间怎样算？</h1><blockquote><p>明哥的微生物世界 · 统计课堂 29</p><p>摘要：两批独立的人，阳性率分别为45%和65%，总体率差有多大？用同一道题比较Wald、Newcombe和Agresti–Caffo三种置信区间，理解它们为什么不同，再用R、Python或MATLAB动手核对。</p></blockquote>
 <p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/00_%E8%AF%BE%E5%A0%82%E5%B0%81%E9%9D%A2_%E6%97%A0%E5%A7%93%E5%90%8D.png" alt="概率与生物医学统计课堂封面，无姓名版"></p>
 <p>大家好，我是明哥。</p>
-<p>前面讨论配对资料时，我们关心同一个人的两次结果怎样一起变化。这次换一个研究设计：<strong>A组和B组是两批独立的人，每个人只检测一次。</strong></p>
-<p>两种设计都能算出“两个率相减”，但换样本时的波动不同，区间也就要跟着设计改变。今天用一道完整例题，看看独立样本率差的区间怎样计算，以及同样写着“95%”，为什么端点还会不同。</p>
+<p>这次讨论两组独立样本：<strong>A组和B组是两批不同的人，每个人只检测一次。</strong> 拿到两组阳性率以后，我们既要算出相差多少，也要估计总体率差可能有多大。</p>
+<p>下面用同一道题比较Wald、Newcombe和Agresti–Caffo三种95%置信区间，看看它们怎样从同一份资料得到不同端点，再用R、Python或MATLAB复算。</p>
 <h2>一、先把题目读完整：两批人，A减B</h2>
 <p>假设从A、B两个目标人群中，分别独立随机抽取20人。两组人员互不重叠，各人之间相互独立；在同一评价时点，使用相同检测方法和阳性判定标准，每人记录一次阳性或阴性结果。得到：</p>
 <table><thead><tr><th>组别</th><th>阳性</th><th>阴性</th><th>合计</th></tr></thead><tbody><tr><td>A组</td><td>9</td><td>11</td><td>20</td></tr><tr><td>B组</td><td>13</td><td>7</td><td>20</td></tr></tbody></table>
 <p>我们要回答：<strong>A人群总体阳性率减去B人群总体阳性率，点估计是多少，双侧95%置信区间又是多少？</strong> 下面统一按“A减B”计算。</p>
 <p>记两个未知总体阳性率为p<sub>A</sub>和p<sub>B</sub>，待估参数为δ＝p<sub>A</sub>−p<sub>B</sub>。在本题的二项模型下，两组阳性人数分别服从二项分布，且彼此独立；每组内各人共享该组的阳性概率。</p>
 <p>本次样本给出A组9/20＝45%，B组13/20＝65%，所以样本率差d＝0.45−0.65＝<strong>−0.20，即−20个百分点</strong>。</p>
-<p>“低20个百分点”是两个百分数直接相减；若说“低了百分之多少”，分母还要选定，那是相对变化。本篇估计的是率差。</p>
+<p>这里的“20个百分点”表示两个百分数直接相减；相对变化则还需选定作为分母的基准率。</p>
 <p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/01_%E4%B8%A4%E6%89%B9%E7%8B%AC%E7%AB%8B%E6%A0%B7%E6%9C%AC.png" alt="图1：两批独立样本，A组9人阳性、B组13人阳性，每组20人"></p>
-<p><em>图1｜假设教学资料。每个圆点表示一人，蓝色表示阳性，浅灰表示阴性。两组共40名不同的人，图中的排列只为计数，没有一一配对关系。</em></p>
-<p>即使另一份配对资料也得到45%和65%，两个边际率也不足以确定配对率差的标准误；还需要同一个人两次结果的联合信息。本题的独立性则让两组样本率的协方差为0。</p>
+<p><em>图1｜每个圆点表示一人，蓝色表示阳性，浅灰表示阴性。A、B两组各20人。</em></p>
 <h2>二、点估计是−20，区间要多留多少余地？</h2>
 <p>d＝−20个百分点，是这次样本给出的点估计。若按同样设计重新抽样，两组阳性人数和d都会随抽样波动。区间估计把这种波动计入，用一个范围估计未知总体率差δ。</p>
 <p>先看熟悉的<strong>Wald正态近似</strong>。两组相互独立时，样本率差的方差等于两个样本率的方差相加。用各组样本率估计相应总体率，得到标准误，再取“点估计±1.96个标准误”：</p>
 <p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F01_Wald.png" alt="式（1）：独立样本率差的Wald标准误与双侧95%区间"></p>
 <p><em>式（1）｜p̂<sub>A</sub>、p̂<sub>B</sub>是本次样本率，n<sub>A</sub>、n<sub>B</sub>是各组人数。SE的估计值描述样本率差在重复抽样中的波动；1.96约为标准正态分布的0.975分位点，对应双侧各留2.5%的尾部。</em></p>
 <p>这里把两个方差<strong>相加</strong>，原因是作差时B组的系数为−1，而方差计算中系数要平方。代入本题，标准误约为0.15411，即15.41个百分点；误差限约为30.21个百分点。</p>
-<p>因此，Wald区间为<strong>（−50.21，10.21）个百分点</strong>。负值表示A低于B，正值表示A高于B；这个区间横跨0，说明按本方法，现有数据还不足以确定两总体率差的方向。</p>
-<p>这个区间从−50.21延伸到10.21个百分点，范围很宽，说明估计还不够精确。0是其中容许的一个值；区间同时也容许幅度不小的差异，因此，包含0并不等于证明两总体率相等或等效。</p>
-<p>“95%”描述的是构造方法在重复抽样中的覆盖表现：反复按同一设计取样、用同一方法算区间，希望约95%的区间覆盖固定的δ。<strong>本篇三种都是近似方法，实际覆盖率会随样本量和真实阳性率改变，并不保证处处恰好95%。</strong></p>
+<p>因此，Wald区间为<strong>（−50.21，10.21）个百分点</strong>。我们按A减B计算：负值表示A总体率较低，正值表示A总体率较高，0表示两总体率相同。</p>
+<p>区间横跨0，表示按这种区间构造，A总体率低于、等于或高于B的情形都与这份资料相容。<strong>包含0表示零差异仍是一个候选值，不能据此断定两总体率相等。</strong></p>
+<p>本篇采用双侧95%置信水平。它描述区间方法的重复抽样覆盖目标：按同一设计反复抽样，每次用同一方法计算区间，目标是使约95%的区间覆盖固定的总体率差δ。<strong>本篇三种方法采用近似构造，实际覆盖率随样本量和真实阳性率变化。</strong></p>
 <h2>三、三种构造，各自在处理什么？</h2>
 <h3>（一）Wald：把这次估计的标准误固定下来</h3>
-<p>Wald先算出d和一个标准误，然后在d两侧留出同样的余地。式（1）易懂，也便于手算，但阳性或阴性人数很少时，估计的标准误可能失真，覆盖表现较差<sup>[1]</sup>。</p>
-<p>本题四个观察计数为9、11、13、7，都大于5。它们满足常见的粗略经验检查，但这个门槛只能提醒我们留意稀疏计数，不能保证Wald区间可靠。</p>
+<p>Wald先算出d和一个标准误，再在d两侧各延伸1.96个标准误，得到式（1）的区间。阳性或阴性人数很少时，标准误的样本估计可能失真，区间覆盖表现较差<sup>[1]</sup>。</p>
 <p>R的DescTools包可以直接计算<sup>[2]</sup>：</p>
 <pre><code>xA &lt;- 9
 nA &lt;- 20
@@ -41,10 +39,10 @@ wald
 # [1,] -0.2 -0.5020507 0.1020507</code></pre>
 <p>前四个参数依次是A组阳性数、A组总人数、B组阳性数、B组总人数；<code>conf.level</code>给置信水平。返回矩阵中的<code>est</code>是样本率差，<code>lwr.ci</code>、<code>upr.ci</code>是区间下限和上限。端点乘100，就换成“百分点”。</p>
 <h3>（二）Newcombe：先照顾每组率的不确定性，再组合</h3>
-<p>单个率可以用<strong>Wilson得分区间</strong>估计。它把候选总体率放进标准误中考察，保留与数据相容的候选值，因此不像Wald那样只使用样本率处的一个标准误。</p>
+<p>单个率可以用<strong>Wilson得分区间</strong>估计。计算时，把候选总体率代入标准误，找出与样本率相容的候选值范围。</p>
 <p>Newcombe把两组Wilson区间提供的两侧距离组合起来，构造率差区间。这里采用其1998年独立样本论文中的<strong>方法10，不作连续性校正</strong><sup>[1]</sup>。</p>
 <p>本题两组各自的95% Wilson区间为：A组（25.82%，65.79%），B组（43.29%，81.88%）。从d向左延伸时，取“A样本率到A下限”和“B上限到B样本率”的距离，平方、相加、开平方，得到左侧误差限；向右延伸时，则组合“A上限到A样本率”和“B样本率到B下限”的距离。</p>
-<p>例如，左侧两段距离约为0.191802和0.168808，合成的左侧误差限约为0.255508；从−0.20减去它，下限就是−0.455508。这样得到的率差区间为<strong>（−45.55，10.06）个百分点</strong>。左右误差限可以不同。直接用“A下限减B上限、A上限减B下限”会得到另一条区间，不能把它当成这里的Newcombe区间。</p>
+<p>例如，左侧两段距离约为0.191802和0.168808，合成的左侧误差限约为0.255508；从−0.20减去它，下限就是−0.455508。这样得到的率差区间为<strong>（−45.55，10.06）个百分点</strong>。左右两侧分别合成距离，因此误差限可以不同。</p>
 <p>沿用前面的R变量，只需明确换方法：</p>
 <pre><code>newcombe &lt;- DescTools::BinomDiffCI(
   xA, nA, xB, nB,
@@ -53,11 +51,11 @@ wald
 newcombe
 #       est     lwr.ci    upr.ci
 # [1,] -0.2 -0.4555079 0.1006339</code></pre>
-<p><strong>这里的<code>method = &quot;score&quot;</code>是DescTools中的方法名</strong>，返回字段与前面相同。不同软件的名字不一定一一对应，下面Python的同一种构造要写<code>&quot;newcomb&quot;</code>。</p>
+<p><strong><code>method = &quot;score&quot;</code>对应这里的Newcombe构造</strong>，返回字段与前面相同。</p>
 <h3>（三）Agresti–Caffo：先作小幅调整，再套Wald形式</h3>
 <p>还有一种容易动手的办法：<strong>在计算中给每组各加1个阳性和1个阴性</strong>，也就是阳性数加1，总人数加2，再按调整后的率与人数计算Wald形式的区间。这是Agresti–Caffo调整<sup>[3]</sup>。</p>
 <p>本题用于计算的两个率变为10/22＝45.45%和14/22＝63.64%，调整后的差值约为−18.18个百分点。按调整后率差作为计算中心，得到<strong>（−47.11，10.75）个百分点</strong>。</p>
-<p>这些附加计数是区间计算规则，原始资料仍是9/20和13/20。因此，报告时仍可写原始样本率差−20个百分点，同时注明区间采用Agresti–Caffo方法；区间中心与原始点估计可以不同。</p>
+<p>下面用<code>method = &quot;ac&quot;</code>计算：</p>
 <pre><code>ac &lt;- DescTools::BinomDiffCI(
   xA, nA, xB, nB,
   conf.level = confidence, method = &quot;ac&quot;
@@ -65,23 +63,22 @@ newcombe
 ac
 #       est     lwr.ci    upr.ci
 # [1,] -0.2 -0.4711246 0.1074882</code></pre>
-<p>这个函数的<code>est</code>列仍返回<strong>原始样本率差−0.20</strong>，并非区间中心−0.181818。读软件输出时，字段的定义要和计算方法一起看。</p>
+<p>输出中，<strong><code>est</code>列是原始样本率差−0.20</strong>；这个区间的计算中心为−0.181818。</p>
 <h2>四、把结果放在一起，怎样读？</h2>
 <p>下表统一估计A减B，使用双侧95%置信水平；单位均为<strong>百分点</strong>。</p>
 <table><thead><tr><th>构造</th><th>95%区间</th><th>本题区间宽度</th></tr></thead><tbody><tr><td>Wald</td><td>−50.21～10.21</td><td>60.41</td></tr><tr><td>Newcombe</td><td>−45.55～10.06</td><td>55.61</td></tr><tr><td>Agresti–Caffo</td><td>−47.11～10.75</td><td>57.86</td></tr></tbody></table>
 <p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/02_%E4%B8%89%E7%A7%8D%E5%8C%BA%E9%97%B4%E6%AF%94%E8%BE%83.png" alt="图2：三种独立样本率差95%区间，方向为A减B，单位为百分点"></p>
 <p><em>图2｜每条横线是一种方法的95%区间，竖虚线表示总体率差为0。三行圆点均标原始样本率差−20个百分点，便于比较；Agresti–Caffo区间的计算中心另用菱形标出。</em></p>
-<p>图中的三个区间都跨过0：既包含A总体率低于B的负值，也包含A总体率高于B的正值。因此，三种方法给出的共同信息是：<strong>样本中A组低20个百分点，但总体差异的方向仍不确定。</strong> 以Newcombe结果为例，可以这样报告：</p>
-<blockquote><p>A组样本阳性率为45%，B组为65%。A减B的样本率差为−20个百分点，采用无连续性校正的Newcombe方法，双侧95%置信区间为−45.55至10.06个百分点；现有样本对差异方向及大小的估计仍不精确。</p></blockquote>
+<p>三种构造都给出了跨过0的区间。以Newcombe为例，结果可报告为：</p>
+<blockquote><p>A组20人中9人阳性（45%），B组20人中13人阳性（65%）。两组率差（A减B）的点估计为−20个百分点，95%置信区间为−45.55至10.06个百分点（Newcombe法，无连续性校正）。</p></blockquote>
 <p>本题中，Newcombe区间最窄。评价一种区间方法时，还要看它在不同样本量和真实阳性率下的覆盖率与区间长度；原始方法论文比较的正是这些重复抽样性质<sup>[1,3]</sup>。</p>
-<p>本篇以Newcombe为主要示范，把每组率的不确定性联系到率差；Agresti–Caffo用于观察计数调整怎样改变区间，Wald作为熟悉的对照。实际研究应根据设计、样本量和计数，预先选定方法，并说明是否作连续性校正。</p>
 <h2>五、使用前，先看设计与计数</h2>
-<p>首先，<strong>两组独立，而且组内观察也独立</strong>。同一人前后测量、一一匹配，或一个家庭、一个病区内结局相关，都需要采用能处理相关性的模型。本题两组人数相等只是方便演示；独立率差方法也允许人数不同。</p>
-<p>其次，每组的二项模型要与资料相符：固定样本量、一次二分类结局，以及组内共同的阳性概率。相同检测与评价标准有助于保证两组率含义可比；抽样偏倚、混杂和检测误差也会影响结果，区间本身只刻画所用模型下的抽样不确定性。</p>
-<p>最后，要特别留意0或接近全部阳性的情况。例如两组都为0/20时，原始样本率差为0，Wald会算出（0，0）。但各观察20人都未阳性，显然还不足以断定两个总体阳性率完全相同；同一资料用Newcombe得到的区间约为<strong>（−16.11，16.11）个百分点</strong>。</p>
-<p>Newcombe与Agresti–Caffo针对简单Wald的不足提供了另外两种构造，仍是近似区间。若研究方案要求有限样本下的覆盖保证，需要另选与<strong>独立率差</strong>对应的精确构造，并说明具体方法。</p>
+<p>这三种计算用于两组独立的二项资料。<strong>每组人数在抽样前确定，每个人记录一次阳性或阴性，同组观察相互独立并具有共同的阳性概率。</strong> 两组人数可以相同，也可以不同。</p>
+<p>本题中，两组采用相同的检测方法与判定标准，比较的是同一定义下的阳性率。</p>
+<p>计数接近0或全部阳性时，三种构造的差别尤其明显。例如两组都为0/20，原始样本率差为0，Wald会算出（0，0）；同一资料用Newcombe得到的区间约为<strong>（−16.11，16.11）个百分点</strong>。</p>
+<p>Wald把两个样本率0代入标准误后，两个方差项都变成0，区间随之缩成一个点。Newcombe先计算每组的Wilson区间，零计数时仍保留一个范围，再组合两侧距离得到率差区间。</p>
 <h2>六、用一种熟悉的语言跑通，再改参数</h2>
-<p>和前面的统计课堂一样，这次准备了R、Python和MATLAB三套脚本。先选自己熟悉的一种，逐节运行，看清楚“问题—思路—参数—分步计算—答案解释”。</p>
+<p>配套项目提供R、Python和MATLAB三个入口，可选择一种语言复算表中的三种区间。</p>
 <p>R入口为<code>代码/independent_ci.R</code>，三种区间调用DescTools。Python入口为<code>代码/independent_ci.py</code>，三种区间调用statsmodels。两者都有现成函数；下面是Python的Newcombe调用<sup>[4]</sup>：</p>
 <pre><code>from statsmodels.stats.proportion import confint_proportions_2indep
 
@@ -95,15 +92,14 @@ lower, upper = confint_proportions_2indep(
 )
 print(lower, upper)
 # -0.4555079... 0.1006339...</code></pre>
-<p>第一组传A，第二组传B；<code>compare=&quot;diff&quot;</code>计算第一组率减第二组率，即A减B，<code>alpha=0.05</code>对应95%置信水平，返回的<code>lower, upper</code>就是下限和上限。Wald和Agresti–Caffo分别用<code>method=&quot;wald&quot;</code>和<code>method=&quot;agresti-caffo&quot;</code>；Python中的<code>&quot;score&quot;</code>对应另一种得分构造，不能照搬R的名字。</p>
+<p>第一组传A，第二组传B；<code>compare=&quot;diff&quot;</code>计算第一组率减第二组率，即A减B，<code>alpha=0.05</code>对应95%置信水平，返回的<code>lower, upper</code>就是下限和上限。Wald和Agresti–Caffo分别用<code>method=&quot;wald&quot;</code>和<code>method=&quot;agresti-caffo&quot;</code>。</p>
 <p>MATLAB入口为<code>代码/independent_ci.m</code>，可逐节复算三种区间。</p>
-<p>三套脚本读取同一份<code>数据/independent_counts.csv</code>。默认在IDE中显示结果与图，保存开关关闭；打开Rproj或设置工作目录的具体步骤见README。</p>
+<p>三套脚本读取同一份<code>数据/independent_counts.csv</code>，结果显示在控制台和图窗口中。具体运行步骤见项目README。</p>
 <p>跑通后做三个小练习，每次改完都重新从读取数据开始运行：</p>
-<ol><li>将共享CSV改为A组45/100、B组65/100，保持两个样本率不变。点估计仍是−20个百分点，区间会怎样变化？这是一组扩大样本量的假设资料，不是复制原来的40个人来增加信息。</li><li>恢复9/20和13/20，只把脚本中的<code>confidence</code>改成0.90。两侧留下的余地怎样改变？留意输出和图标题是否都已更新。</li><li>将两组都改成0/20，比较三种区间，检查Wald为什么退化为（0，0）。然后恢复原始数据，核对主例题。</li></ol>
+<ol><li>将共享CSV改为A组45/100、B组65/100，每组人数扩大到100人，两个样本率保持不变。点估计仍是−20个百分点，区间会怎样变化？</li><li>恢复9/20和13/20，只把脚本中的<code>confidence</code>改成0.90。两侧留下的余地怎样改变？留意输出和图标题是否都已更新。</li><li>将两组都改成0/20，比较三种区间，检查Wald为什么退化为（0，0）。然后恢复原始数据，核对主例题。</li></ol>
 <p>这些改动分别考察样本量、置信水平和边界计数的影响。每次只改一项，比较起来更清楚。</p>
 <h2>七、本篇讲了哪些知识？</h2>
-<ul><li><strong>两组相互独立时，样本率差的方差等于两个样本率的方差之和。</strong></li><li><strong>率差的方向和单位要固定。</strong> A减B为−0.20，表示A低20个百分点；交换组别后，点估计变号，区间两端也随之变号并交换次序。</li><li><strong>置信水平相同，区间构造仍可以不同。</strong> Wald在样本估计处计算标准误；Newcombe组合两组Wilson区间的两侧距离；本篇Agresti–Caffo给每组加1阳性、1阴性后计算，区间中心可以偏离原始率差。</li><li><strong>近似区间的覆盖率依赖样本量与真实率。</strong> 四个观察计数都大于5只是粗略经验检查，不能保证Wald达到95%覆盖；零计数尤其需要留意。区间包含0表示资料尚与零差异相容，不能证明相等或等效。</li></ul>
-<p>回到开头的问题：A组的样本阳性率比B组低20个百分点，但三种95%置信区间都同时包含负值、0和正值。负值表示A总体率较低，正值表示A总体率较高，0表示两总体率相同。</p>
+<ul><li><strong>两组相互独立时，样本率差的方差等于两个样本率的方差之和。</strong></li><li><strong>率差的方向和单位要固定。</strong> 样本率差−0.20表示A组样本阳性率低20个百分点。交换组别后，点估计变号，区间端点变号并交换次序。</li><li><strong>置信水平相同，区间构造仍可以不同。</strong> Wald在样本估计处计算标准误；Newcombe组合两组Wilson区间的两侧距离；本篇Agresti–Caffo给每组加1阳性、1阴性后计算，区间中心可以偏离原始率差。</li><li><strong>本篇三种构造都是近似方法。</strong> 设定95%置信水平后，实际覆盖率会随样本量和总体阳性率变化。</li></ul>
 <h2>配套资料</h2>
 <p>本篇完整练习ZIP：</p>
 <p><a href="https://raw.githubusercontent.com/fuyuming/statistics-classroom/main/stats_classroom/article29_independent_proportion_ci/independent_proportion_ci_project.zip" target="_blank" rel="noopener">https://raw.githubusercontent.com/fuyuming/statistics-classroom/main/stats_classroom/article29_independent_proportion_ci/independent_proportion_ci_project.zip</a></p>
@@ -112,7 +108,7 @@ print(lower, upper)
 <p>解压本篇ZIP后，先读README，再选择一种语言，从准备与参数节开始运行。</p>
 <p>整个系列仓库入口：<a href="https://github.com/fuyuming/statistics-classroom" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom</a></p>
 <p>整个仓库ZIP下载入口：<a href="https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip</a></p>
-<p>从整个仓库解压后，进入<code>stats_classroom/article29_independent_proportion_ci</code>。需要回看配对资料的分布背景，可读前篇：<a href="https://mp.weixin.qq.com/s/HWRYFiDUJDqSPlONx8qCnw" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/HWRYFiDUJDqSPlONx8qCnw</a></p>
+<p>从整个仓库解压后，进入<code>stats_classroom/article29_independent_proportion_ci</code>。</p>
 <p>这里是“明哥的微生物世界”，一起把统计问题读清楚、算明白。</p>
 <h2>参考资料</h2>
 <p>[1] Newcombe RG. Interval estimation for the difference between independent proportions: comparison of eleven methods. <em>Statistics in Medicine</em>. 1998;17:873–890. <a href="https://doi.org/10.1002/%28SICI%291097-0258%2819980430%2917%3A8%3C873%3A%3AAID-SIM779%3E3.0.CO%3B2-I" target="_blank" rel="noopener">https://doi.org/10.1002/%28SICI%291097-0258%2819980430%2917%3A8%3C873%3A%3AAID-SIM779%3E3.0.CO%3B2-I</a></p>
