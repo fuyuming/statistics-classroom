@@ -72,30 +72,30 @@ for i,line in enumerate(lines):
 fig.savefig(FIG/'公式06a_条件概率.png',dpi=180)
 plt.close(fig)
 
-# 图1按实际卡片数量画出观察结果；每个点代表不同对象。
+# 图1按实际球数画出观察结果；每个点代表一个球。
 fig, ax = plt.subplots(figsize=(9,9))
 ax.set(xlim=(0,10),ylim=(0,10))
 ax.axis('off')
-for y, h, title in [(5.5,3.9,'Selected: 22 cards'),(.3,3.9,'Remaining: 11 cards')]:
+for y, h, title in [(5.5,3.9,'Drawn: 22 balls'),(.3,3.9,'Left: 11 balls')]:
     ax.add_patch(patches.FancyBboxPatch((.35,y),9.3,h,boxstyle='round,pad=0.02',
                                       facecolor='#F6F8FC',edgecolor='#CED8E5',linewidth=1.5))
     ax.text(.75,y+h-.5,title,fontsize=24,color=INK,weight='bold')
-def dots(count,start_x,y,positive):
+def dots(count,start_x,y,red):
     for i in range(count):
         col = i % 9
         row = i // 9
         ax.add_patch(patches.Circle((start_x+.82*col,y-.60*row),.17,
-                  facecolor=ORANGE if positive else '#E4EAF2',
-                  edgecolor=ORANGE if positive else '#72859C',linewidth=1.5))
+                  facecolor='#C93E3E' if red else '#FFFFFF',
+                  edgecolor='#C93E3E' if red else '#72859C',linewidth=1.5))
 dots(4,1.0,7.8,True)
-ax.text(5.1,7.7,'4 positive',fontsize=21,color=INK)
+ax.text(5.1,7.7,'4 red',fontsize=21,color=INK)
 dots(18,1.0,6.9,False)
-ax.text(1.0,5.85,'18 negative',fontsize=21,color=INK)
+ax.text(1.0,5.85,'18 white',fontsize=21,color=INK)
 dots(5,1.0,2.6,True)
-ax.text(5.7,2.5,'5 positive',fontsize=21,color=INK)
+ax.text(5.7,2.5,'5 red',fontsize=21,color=INK)
 dots(6,1.0,1.6,False)
-ax.text(1.0,.65,'6 negative',fontsize=21,color=INK)
-ax.text(5,4.7,'33 cards = 9 positive + 24 negative',ha='center',fontsize=21,color=INK)
+ax.text(1.0,.65,'6 white',fontsize=21,color=INK)
+ax.text(5,4.7,'33 balls = 9 red + 24 white',ha='center',fontsize=21,color=INK)
 fig.subplots_adjust(left=.01,right=.99,bottom=.01,top=.99)
 fig.savefig(FIG/'01_不放回抽取.png',dpi=180)
 plt.close(fig)
