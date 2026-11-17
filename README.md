@@ -29,6 +29,7 @@
 | 25 | 样本率与率差的抽样分布、正态近似及精确推断（R、Python、MATLAB配套） | [stats_classroom/proportion_sampling_difference](stats_classroom/proportion_sampling_difference/) |
 | 26 | 非参数重抽样与蒙特卡洛：Bootstrap与Permutation在模拟什么？ | [stats_classroom/article26_single_proportion_resampling](stats_classroom/article26_single_proportion_resampling/) |
 | 27 | 配对样本率差怎样分布？从个人变化到多项分布（新手三语言配套） | [stats_classroom/paired_proportion_difference](stats_classroom/paired_proportion_difference/) |
+| 31 | 超几何分布从哪里来？从不放回抽样到Fisher精确检验（两例三语言配套） | [stats_classroom/article31_hypergeometric](stats_classroom/article31_hypergeometric/) |
 
 请进入对应文件夹，再按该文件夹的 README 运行。
 
