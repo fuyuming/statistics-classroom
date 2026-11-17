@@ -24,6 +24,22 @@
 
 R三种区间调用DescTools::BinomDiffCI，方法参数依次`wald / score / ac`，输出`est, lwr.ci, upr.ci`。Python调用statsmodels的confint_proportions_2indep，方法依次`wald / newcomb / agresti-caffo`，`compare="diff"`表示第一组减第二组，返回下限、上限。Python的`score`不是R的同名Newcombe构造。MATLAB逐步实现Wald、Wilson/Newcombe和AC公式，是项目附带的教学代码，未调用R后端，也不声称存在同名内置函数。
 
+## 三种语言的实现方式
+
+R和Python这次都使用包中现成的率差区间函数，方法对应如下：
+
+| 构造 | R：DescTools::BinomDiffCI | Python：statsmodels的confint_proportions_2indep |
+| --- | --- | --- |
+| Wald | method="wald" | method="wald" |
+| Newcombe，无连续性校正 | method="score" | method="newcomb" |
+| Agresti–Caffo | method="ac" | method="agresti-caffo" |
+
+Python明确设置`compare="diff"`与`alpha=1-confidence`，返回第一组率减第二组率的下限和上限。R的同名score与Python的score不对应，按上表运行即可。
+
+MATLAB本项目按公式分步计算同样的三种区间，只用基础MATLAB函数，无需统计工具箱。先算Wald标准误，再算两组Wilson端点和Newcombe组合，最后计算AC调整后的中心、标准误与端点。
+
+Statistics and Machine Learning Toolbox提供的`binofit`计算单个二项率的Clopper–Pearson区间；它与本文三种独立率差区间的目标和构造不同。官方说明：https://www.mathworks.com/help/stats/binofit.html 。本项目未用它代替三种率差构造。
+
 ## 第二次改参数
 
 计数只改`数据/independent_counts.csv`，不要在脚本后面额外改几个中间变量。置信水平只改所选脚本顶部的`confidence`。每次只做一项，然后从准备/读取节起顺序运行：
