@@ -1,10 +1,10 @@
-# 统计课堂：RR、OR与log-Wald区间
+# 统计课堂32：RR、OR与log-Wald区间
 
 这是给初学者的三语配套项目。数据是人为设定的两组独立康复教学数据，不用于真实医学结论。推荐先打开项目目录，再按脚本分节从0到5运行；也可整文件运行。学生可任选一种语言。
 
 ## 运行入口
 
-- R：在RStudio打开 `统计课堂_RR_OR.Rproj`，确认Files面板位于项目根目录；从0节开始逐段运行（选中代码后Run），或Source整文件。需 `DescTools`；首次安装：`install.packages("DescTools")`。
+- R：在RStudio打开 `统计课堂32_RR_OR.Rproj`，确认Files面板位于项目根目录；从0节开始逐段运行（选中代码后Run），或Source整文件。需 `DescTools`；首次安装：`install.packages("DescTools")`。
 - Python：在Spyder把项目根目录设为工作目录，确认解释器是已安装 `requirements.txt` 的环境；打开 `代码/rr_or_log_wald.py`，按 `# %%` 的顺序逐节运行或F5整文件。命令行可运行 `python 代码/rr_or_log_wald.py`；依赖见 `requirements.txt`，可在该解释器中执行 `python -m pip install -r requirements.txt`。
 - MATLAB：在MATLAB把项目目录设为 Current Folder，打开 `代码/rr_or_log_wald.m`，按 `%%` 分节或Run整文件；脚本用基础 `erfcinv` 计算正态分位点，不需要工具箱。
 
@@ -37,3 +37,11 @@ Python在Spyder中先运行文件顶部的导入与目录设置，再从第0节�
 输入文件只接受new/control各唯一一行，success/failure是有限正整数，无缺失；本项目同时演示未经调整的RR与OR log-Wald，因此遇到零计数会在计算前给出说明，不自动加0.5。改变输入时保持每组患者数与教学问题一致。
 
 R脚本另外演示 `DescTools::RelRisk`、`OddsRatio`、默认 `delta=.5` 与 `delta=0` 的差别，以及 `fisher.test` 的条件OR区间；Fisher结果不是对Wald区间的验证。Python/MATLAB只使用本语言公式，不调用R。
+
+本篇完整项目：https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/rr_or_log_wald
+
+## 文章与配图
+
+[文章源稿](RR与OR_公众号稿.md) · [手机预览HTML](手机预览.html) · [下载本篇完整项目ZIP](RR_OR_完整项目.zip) · [只下载三语言练习](RR_OR_三语言练习.zip)
+
+完整项目ZIP解压后进入`rr_or_log_wald/`，先读本README；仅练习ZIP解压后进入`配套项目/`。`构建源码/build_assets.py`生成18幅公式和2幅科学示意图，`构建源码/build_preview.py`从正文生成预览。封面沿用第10课无姓名课堂封面。

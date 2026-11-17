@@ -1,4 +1,4 @@
-# 统计课堂：RR、OR与log-Wald区间（R / RStudio，UTF-8）
+# 统计课堂32：RR、OR与log-Wald区间（R / RStudio，UTF-8）
 # 数据是人为设定的教学数据，不是真实患者资料。按 0--5 节从上到下运行。
 # 改为TRUE可保存；环境变量用于教师批量核对。
 SAVE_RESULTS <- FALSE
