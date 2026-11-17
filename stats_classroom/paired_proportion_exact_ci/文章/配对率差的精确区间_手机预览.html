@@ -38,7 +38,7 @@ table.paired-counts{width:100%;table-layout:fixed;border-collapse:collapse;borde
 <p>这个算法简便，但小样本或变化人数很少时，正态近似和插件标准误的表现可能不好。例如样本中人人都不变，插件方差就会等于0，Wald区间也会缩成一点。<strong>本篇用Wald作理解公式的参照，不把它作为小样本配对资料的默认选择</strong><sup>[2,3]</sup>。</p>
 <h3>（二）配对Newcombe：从两个率的区间合并</h3>
 <p>本文选用Newcombe hybrid，即软件中的MOVER-NW。它先用Wilson得分区间描述前测率、后测率各自的不确定性，再合并为率差区间，并纳入配对相关性<sup>[3]</sup>。</p>
-<p>这里的配对信息来自四格表。它影响两个率之差的波动，因而也要进入区间构造。这部分计算与前后两次检测率的区间一并进入最终结果<sup>[2]</sup>。</p>
+<p>这里的配对信息来自四格表。它影响两个率之差的波动，因而也要进入区间构造。这部分计算与前后两次检测率的区间一并进入最终结果<sup>[2,7]</sup>。</p>
 <p>这也解释了为什么要保留完整的配对记录：仅知道前测65%、后测45%，可以算出−20个百分点，却还没有交代前后结果怎样配在同一个人身上。</p>
 <h3>（三）Tango：检验哪些总体率差与资料相容</h3>
 <p>Tango先假设一个总体率差，在这个限制下拟合其余总体概率，再用得分检验判断它与观察资料是否相容；保留通过检验的假设值，就得到区间<sup>[4]</sup>。</p>
@@ -92,4 +92,5 @@ wang$ExactCI</code></pre>
 <p>[3] Newcombe RG. Improved confidence intervals for the difference between binomial proportions based on paired data. Statistics in Medicine, 1998, 17(22):2635–2650。<a href="https://pubmed.ncbi.nlm.nih.gov/9839354/" target="_blank" rel="noopener">https://pubmed.ncbi.nlm.nih.gov/9839354/</a></p>
 <p>[4] Tango T. Equivalence test and confidence interval for the difference in proportions for the paired-sample design. Statistics in Medicine, 1998, 17(8):891–908。<a href="https://pubmed.ncbi.nlm.nih.gov/9595618/" target="_blank" rel="noopener">https://pubmed.ncbi.nlm.nih.gov/9595618/</a></p>
 <p>[5] Shan G, Wang W. ExactCIdiff: An R Package for Computing Exact Confidence Intervals for the Difference of Two Proportions. The R Journal, 2013, 5(2):62–70。<a href="https://journal.r-project.org/articles/RJ-2013-026/" target="_blank" rel="noopener">https://journal.r-project.org/articles/RJ-2013-026/</a></p>
-<p>[6] ExactCIdiff官方手册，PairedCI。<a href="https://cloud.r-project.org/web/packages/ExactCIdiff/ExactCIdiff.pdf" target="_blank" rel="noopener">https://cloud.r-project.org/web/packages/ExactCIdiff/ExactCIdiff.pdf</a></p></main></body></html>
+<p>[6] ExactCIdiff官方手册，PairedCI。<a href="https://cloud.r-project.org/web/packages/ExactCIdiff/ExactCIdiff.pdf" target="_blank" rel="noopener">https://cloud.r-project.org/web/packages/ExactCIdiff/ExactCIdiff.pdf</a></p>
+<p>[7] 陆梦洁，钟伟华，刘玉秀，等．配对二项资料两组率差置信区间估计方法与评价．中国临床药理学与治疗学，2016，21(8)：909–914。<a href="https://manu41.magtech.com.cn/Jweb_clyl/CN/Y2016/V21/I8/909" target="_blank" rel="noopener">https://manu41.magtech.com.cn/Jweb_clyl/CN/Y2016/V21/I8/909</a></p></main></body></html>
