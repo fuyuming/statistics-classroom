@@ -41,10 +41,14 @@ equations = [
   r'$\mathrm{E}(D\mid S=9)=0$',
   r'$\mathrm{Var}(D\mid S=9)=\dfrac{27}{968}\approx0.027893$'],
 
- [r'$\widehat{\mathrm{SE}}_0=\sqrt{0.40\times0.60\left(\dfrac{1}{100}+\dfrac{1}{100}\right)}$',
-  r'$\widehat{\mathrm{SE}}_0\approx0.069282$',
-  r'$Z=\dfrac{0.50-0.30}{\widehat{\mathrm{SE}}_0}\approx2.886751$',
-  r'$P_{\mathrm{normal}}=2\Phi(-|Z|)\approx0.00389242$'],
+ [r'$\hat{p}=\dfrac{50+30}{100+100}=0.40$',
+  r'$\widehat{\mathrm{SE}}_0=\sqrt{\hat{p}(1-\hat{p})\left(\dfrac{1}{n_1}+\dfrac{1}{n_0}\right)}$',
+  r'$=\sqrt{0.40\times0.60\left(\dfrac{1}{100}+\dfrac{1}{100}\right)}$',
+  r'$\approx0.069282$',
+  r'$Z=\dfrac{(\hat{p}_1-\hat{p}_0)-0}{\widehat{\mathrm{SE}}_0}$',
+  r'$=\dfrac{(0.50-0.30)-0}{0.0692820323}\approx2.886751$',
+  r'$P_{\mathrm{normal}}=2\Phi(-|Z|)$',
+  r'$\approx0.00389242$'],
  [r'$\Pr(A=a)=\dfrac{\binom{80}{a}\binom{120}{100-a}}{\binom{200}{100}}$',
   r'$a=0,1,\ldots,80$',
   r'$\Pr(A=50)\approx0.001798976$']
