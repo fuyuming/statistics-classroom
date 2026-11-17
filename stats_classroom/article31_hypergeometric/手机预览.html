@@ -70,7 +70,7 @@
 <p>式（6b）从“在33人中安排9名感染者”的角度数；前面的式（3）从“在33人中选择22人进入预防组”的角度数。两种计数角度给出相同的概率：</p>
 <p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F07.png" alt="式（7） 22选x乘11选(9-x)除33选9，等于9选x乘24选(22-x)除33选22"></p>
 <p><em>式（7）｜两种等价的组合数写法。左边按感染者的位置计数，右边按进入预防组的人员计数；均对应同一组固定边际。</em></p>
-<p>这也解释了为什么真实研究中，感染总数可以在不同重复样本间变化，而Fisher检验仍给定观察到的9：<strong>检验以观察到的总感染数9为条件，比较同样满足S = 9时，各组感染人数如何分配。</strong> 条件化改变了用于比较的样本集合，不要求研究开始前就规定必须发生9例感染。</p>
+<p>真实研究的感染总数可以在重复样本间变化。Fisher检验在分析时，以这次观察到的总感染数9为条件，<strong>比较同样满足S = 9时，各组感染人数如何分配。</strong></p>
 <h2>五、列出完整分布，再从一张表走向P值</h2>
 <p>现在把10个可行人数的概率全部算出来。R的<code>dhyper()</code>返回超几何计数恰好等于x的概率；其中<code>m</code>是总体阳性数，<code>n</code>是总体阴性数，<code>k</code>是抽取人数。注意，R参数名<code>n</code>在这里对应本文的N − K，抽取人数则由<code>k</code>指定<sup>[2]</sup>。</p>
 <pre><code>x &lt;- 0:9
@@ -118,24 +118,23 @@ fit$p.value
 # [1] 0.1210448</code></pre>
 <p>在两组总体感染率相等、并给定这些边际的模型下，按本篇双侧规则，观察到当前这样或更极端表的概率约为0.1210。按α = 0.05，本题不拒绝H₀；这33例数据对两组总体感染率有差别的证据尚不足。观察率差仍为−27.27个百分点，其幅度与检验的不确定性需要一起理解。</p>
 <p>这里的“精确”指直接使用有限样本的离散概率计算，过程不依赖正态或卡方近似。统计课堂21<a href="https://mp.weixin.qq.com/s/HKPL2P8PG3v6H652hFwSkA" target="_blank" rel="noopener">《Fisher精确检验：双侧P值为什么不能直接乘2？》</a>已展开比较不同双侧算法；需要继续理解尾部选择，可以接着阅读该篇<sup>[6]</sup>。</p>
-<h2>六、从率差到Fisher：同一零假设，怎样连接两种检验？</h2>
-<p><a href="https://mp.weixin.qq.com/s/yFWPQNnmvm_OKQO4ZgsEBA" target="_blank" rel="noopener">统计课堂25</a>中，两组样本量给定，两个感染计数分别变化。对于给定的p₁、p₀，先计算每个计数组合的联合概率，再将得到同一率差的组合归并。</p>
-<p>对本文的两独立组而言，率差的Z检验与Fisher检验都可以检验<strong>H₀：p₁ = p₀，也就是总体率差p₁ − p₀ = 0</strong>。要理解它们怎样连接，需要分别看清两件事：<strong>固定边际怎样把一格计数与率差联系起来，以及H₀怎样给出这一计数的概率分布。</strong></p>
-<p>先看计数关系。给定总感染数9后，只要预防组有x名感染者，非预防组就有9 − x名。这个约束来自人数合计，无论两组总体感染率是否相等，它都成立。</p>
-<table><thead><tr><th>比较对象</th><th>第25篇：独立二项抽样</th><th>本篇：给定边际后的抽样</th></tr></thead><tbody><tr><td>给定什么</td><td>两组样本量及模型中的p₁、p₀</td><td>两组样本量、总感染数</td></tr><tr><td>随机计数</td><td>X₁、X₀相互独立</td><td>X₁ = X，X₀ = 9 − X</td></tr><tr><td>总感染数</td><td>随两组计数一起变化</td><td>条件取值为9</td></tr><tr><td>率差概率</td><td>联合概率按相同率差归并</td><td>由超几何计数的概率换算</td></tr></tbody></table>
-<p>在本例固定边际下，样本率差D与X的关系为式（8）。</p>
+<h2>六、Fisher检验的两个等价角度：人数分配与率差</h2>
+<p>同一张HBV四格表，可以从两个角度描述。</p>
+<p><strong>从人数分配看：</strong>33人中共有9人感染，预防组22人中有4人感染，其余5名感染者在11人的非预防组。</p>
+<p><strong>从率差看：</strong>预防组感染率为4/22，非预防组为5/11，样本率差约为−27.27个百分点。</p>
+<p>给定两组人数22、11和总感染数9后，用X表示预防组感染人数，非预防组便有9 − X人感染。两组样本率相减，就得到式（8）中的D。</p>
 <p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F08.png" alt="式（8） D=X/22-(9-X)/11=3X/22-9/11；X=4时D=-3/11约-0.2727；条件期望0、条件方差27/968约0.027893"></p>
 <p><em>式（8）｜本例固定边际下的样本率差。方向为预防组减非预防组；在H₀下，用E(X) = 6、Var(X) = 1.5及线性变换性质，得到这一条件分布的均值与方差。</em></p>
-<p>每个x对应一个D，所以也可以把图2的横轴换成率差，柱高保持不变。比如x = 4对应D≈−0.2727，x = 6对应D = 0。<strong>H₀说的是两组总体率相等；样本率差D描述一次研究的观察结果，在H₀下也会随机波动。</strong></p>
-<p><strong>H₀的作用，是确定这些可行结果各有多大概率。</strong> 在H₀及独立二项模型下，33人的感染概率同为p。任意指定的9人感染、其余24人未感染，其概率都是式（6b）中的共同因子p⁹(1 − p)²⁴。因此，给定总感染数9后，每个具体的9人感染者集合等可能；再按预防组感染人数归并，就得到X的超几何条件分布。</p>
-<p>如果两组总体感染率不同，一个具体感染者集合的概率会随它在两组中的分配而改变。<strong>给定感染总数后，“这些感染者怎样分配到两组”仍然包含组间差异的信息。</strong></p>
-<p>在H₀下，X的条件均值为6，对应样本率差D的条件均值为0。观察到x = 4，也就是D≈−0.2727。Fisher检验利用上述条件分布，按第五节的规则判断观察表有多极端；率差的Z检验则在满足近似条件时，利用H₀下的正态近似计算P值。<strong>两种方法检验同一个“两总体率相等”的假设，计算P值所依据的分布与比较范围有所不同。</strong></p>
-<p>这与第25篇接上了：我们从两个独立二项计数出发，在H₀下进一步给定总感染数，便能得到样本率差的条件分布，并据此进行Fisher检验<sup>[5]</sup>。</p>
-<p>效应量区间估计则描述参数的不确定性。R的<code>fisher.test()</code>默认给出的区间针对优势比OR；若研究目标是总体率差的区间，还要采用相应的率差区间方法<sup>[5]</sup>。第25篇已介绍两个独立率之差的精确推断，这里不重复展开。</p>
+<p>X = 4对应D≈−0.2727，X = 6对应D = 0；反过来，知道D也能确定X。<strong>在固定边际下，感染人数X与样本率差D一一对应，是同一个结果的两种等价表达。</strong> 图2的横轴也可以从感染人数换成率差，各根概率柱的高度保持不变。</p>
+<p>检验时，两个角度回答同一个问题：<strong>两组总体感染率是否相等，即H₀：p₁ = p₀，也就是总体率差p₁ − p₀ = 0。</strong> 样本率差D描述一次研究的观察结果，在H₀下也会随机波动。</p>
+<p><strong>人数合计给出X与D的对应关系，H₀给出计算这些结果概率的模型。</strong> 在H₀及独立二项模型下，33人的感染概率同为p。任意指定的9人感染、其余24人未感染，其概率都是式（6b）中的共同因子p⁹(1 − p)²⁴。给定总感染数9后，每个具体的9人感染者集合等可能；按预防组感染人数归并，就得到X的超几何条件分布。在这一分布下，X的均值为6，对应D的均值为0。</p>
+<p>若两组总体感染率不同，具体感染者集合的概率会随其在两组中的分配而改变。<strong>总数固定后，两组各有多少人感染，仍能反映两组总体率的差别。</strong></p>
+<p>从人数角度检验，我们观察X = 4，并计算这张表在H₀下的条件概率；从率差角度检验，我们观察D≈−0.2727，对应的仍是同一张表、同一个条件概率。<strong>按第五节的双侧概率排序规则，两种表达纳入相同的表，得到同一个Fisher P值，约为0.1210。</strong><sup>[5]</sup></p>
+<p><a href="https://mp.weixin.qq.com/s/yFWPQNnmvm_OKQO4ZgsEBA" target="_blank" rel="noopener">统计课堂25</a>从两个独立二项计数出发，将产生相同率差的结果归并，得到率差的分布。<strong>本篇给定总感染数后，X的超几何条件分布也就给出了样本率差D的条件分布。</strong></p>
 <h2>七、先查期望频数：何时近似，何时精确？</h2>
 <p>现在回到课堂两道例题的方法选择。这里要检查的是<strong>H₀下四格的期望频数</strong>：每一格用“该行合计×该列合计÷总人数”计算。它描述两组总体率相同时，该格的平均计数，与这次实际观察到的格子人数有所区别。</p>
 <p>对于本文的两独立样本四格表，可以先用一句话作经验筛查：<strong>若有格子的期望频数小于5，本篇优先采用Fisher精确检验；四格期望频数均不少于5时，再核查所用近似的条件，满足时可使用率差的正态近似，大样本也可以继续用Fisher。</strong></p>
-<p>5是常用经验门槛之一。“小样本”不能只按总人数判断：总人数很多而事件罕见时，某格的期望人数仍可能很少。独立组设计也是这里的前提；同一患者前后配对的表，要回到配对率的模型。</p>
+<p>5是常用经验门槛之一。这类“小样本”判断着眼于期望频数：总人数很多而事件罕见时，某格的期望人数仍可能很少。独立组设计也是这里的前提；同一患者前后配对的表，要回到配对率的模型。</p>
 <h3>（一）33例HBV：一格期望只有3，采用Fisher</h3>
 <p>HBV例题的合并感染率为9/33。预防组的期望感染人数为22×9/33 = 6，非预防组为11×9/33 = 3；两组的期望未感染人数分别为16和8。四格依次为<strong>6、16、3、8</strong>，其中一格小于5。</p>
 <p>本篇因此采用Fisher条件精确检验，直接按超几何概率求和，得到双侧P≈0.12104。这个选择所依据的是计数较稀疏、常规近似的依据不足。</p>
@@ -171,7 +170,7 @@ data.frame(p_normal, p_fisher)
 #      p_normal    p_fisher
 # 1 0.003892417 0.005937341</code></pre>
 <p>两个P值分别来自近似计算与条件精确计算，数值可以不同。本例二者都小于0.05，均提供两总体达标率存在差异的证据；观察到的新方案达标率较高，率差为20个百分点。</p>
-<p><strong>大样本使近似方法有了使用依据，并不使Fisher检验失效。</strong> 对于本例这样的2×2表，精确计算也很容易。两种方法对抽样结果的处理有所区别，因此即使都适用，也不要求P值完全相等。</p>
+<p><strong>大样本同样可以使用Fisher精确检验。</strong> 本例的率差检验采用正态近似，Fisher则直接对固定边际下的离散概率求和；这张2×2表的精确计算也很容易。</p>
 <h2>本篇讲了哪些知识？</h2>
 <ul><li>在N和特征对象总数K已给定的有限总体中，等可能不放回抽取n个对象，样本特征计数服从<strong>超几何分布</strong>；n次独立、成功概率同为p的二分类试验，其成功数服从<strong>二项分布</strong>。</li><li>固定总体不放回抽样时，<strong>各位置的边际成功概率仍为K/N</strong>；已知先前结果后，<strong>后续的条件概率会随之改变</strong>，各次抽取因而相互依赖。</li><li><strong>条件概率把比较范围限制在已知条件B成立的结果中</strong>，用“目标与条件同时发生的概率÷条件本身的概率”计算。Fisher检验给定的条件是<strong>行列合计</strong>。</li><li>可行人数同时受<strong>样本量、特征对象总数和其余对象总数</strong>约束，其取值为式（4）支持集中的整数。</li><li>期望为<strong>nK/N</strong>，方差包含<strong>有限总体修正因子(N − n)/(N − 1)</strong>。抽取比例越大，不放回对波动的影响越明显；33人HBV例的均值为6、方差为1.5。</li><li>两组独立二项计数在H₀下共享未知p；<strong>给定观察到的总阳性数</strong>后，共同概率因子相消，得到<strong>超几何条件分布</strong>。</li><li>两独立样本四格表的方法选择要结合设计、H₀下的期望频数及近似条件。按本篇采用的经验规则，<strong>有格期望频数小于5时优先使用Fisher检验</strong>；<strong>满足近似条件时可用率差的正态近似</strong>；<strong>大样本同样可以使用Fisher精确检验</strong>。</li></ul>
 <h2>配套练习与下载</h2>
@@ -192,7 +191,7 @@ data.frame(p_normal, p_fisher)
 <p>[2] R官方文档．The Hypergeometric Distribution：概率函数、支持集、期望和方差。 <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Hypergeometric.html" target="_blank" rel="noopener">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Hypergeometric.html</a></p>
 <p>[3] OpenStax．Introductory Statistics 2e．§4.3 Binomial Distribution、§4.5 Hypergeometric Distribution：独立同p试验与固定总体不放回模型。 <a href="https://openstax.org/books/introductory-statistics-2e/pages/4-3-binomial-distribution" target="_blank" rel="noopener">https://openstax.org/books/introductory-statistics-2e/pages/4-3-binomial-distribution</a> ；<a href="https://openstax.org/books/introductory-statistics-2e/pages/4-5-hypergeometric-distribution" target="_blank" rel="noopener">https://openstax.org/books/introductory-statistics-2e/pages/4-5-hypergeometric-distribution</a></p>
 <p>[4] 颜艳、王彤主编．《医学统计学》第5版．人民卫生出版社，2020．例7-4，印刷第111页。</p>
-<p>[5] R官方文档．Fisher&#x27;s Exact Test for Count Data：固定边际、超几何条件分布、双侧概率排序及OR区间。 <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/fisher.test.html" target="_blank" rel="noopener">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/fisher.test.html</a></p>
+<p>[5] R官方文档．Fisher&#x27;s Exact Test for Count Data：固定边际、超几何条件分布及双侧概率排序。 <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/fisher.test.html" target="_blank" rel="noopener">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/fisher.test.html</a></p>
 <p>[6] 明哥的微生物世界．《Fisher精确检验：双侧P值为什么不能直接乘2？》．统计课堂21。 <a href="https://mp.weixin.qq.com/s/HKPL2P8PG3v6H652hFwSkA" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/HKPL2P8PG3v6H652hFwSkA</a></p>
 <p>[7] R官方文档．prop.test：两总体率相等检验与连续性校正设置。 <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/prop.test.html" target="_blank" rel="noopener">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/prop.test.html</a></p>
 <p>[8] SciPy官方文档．scipy.stats.hypergeom：总体M、特征对象数n、抽取人数N及概率质量函数。 <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.hypergeom.html" target="_blank" rel="noopener">https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.hypergeom.html</a></p>
