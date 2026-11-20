@@ -30,6 +30,7 @@
 | 26 | 非参数重抽样与蒙特卡洛：Bootstrap与Permutation在模拟什么？ | [stats_classroom/article26_single_proportion_resampling](stats_classroom/article26_single_proportion_resampling/) |
 | 27 | 配对样本率差怎样分布？从个人变化到多项分布（新手三语言配套） | [stats_classroom/paired_proportion_difference](stats_classroom/paired_proportion_difference/) |
 | 31 | 超几何分布从哪里来？从不放回抽样到Fisher精确检验（两例三语言配套） | [stats_classroom/article31_hypergeometric](stats_classroom/article31_hypergeometric/) |
+| 34 | 配对率差之外：两种检测的结果有多一致？（R、Python、MATLAB配套） | [stats_classroom/article34_paired_kappa](stats_classroom/article34_paired_kappa/) |
 
 请进入对应文件夹，再按该文件夹的 README 运行。
 
