@@ -88,3 +88,6 @@ Landis–Koch原表六档为：<0 poor、0.00—0.20 slight、0.21—0.40 fair�
 - MATLAB：`setenv('ARTICLE34_SAVE_RESULTS','1')`
 
 `results/`中的三语summary.csv保存相同的18个统计字段，bounds.csv保存`a,b,c,d,rd,po,kappa`枚举表。参考CSV可以与自己的计算逐项比较；三种语言分别写入各自前缀，互不覆盖。
+
+
+运行核验见[VALIDATION.md](VALIDATION.md)。
