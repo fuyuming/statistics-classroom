@@ -1,0 +1,7 @@
+"example","p","holm_candidate","holm"
+"stop",0.02,0.06,0.06
+"stop",0.023,0.046,0.06
+"stop",0.04,0.04,0.06
+"increasing",0.02,0.06,0.06
+"increasing",0.04,0.08,0.08
+"increasing",0.1,0.1,0.1
