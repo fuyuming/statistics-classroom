@@ -59,10 +59,6 @@ MATLAB:  setenv('ARTICLE36_SAVE_RESULTS','1')
 
 主练习 01 的结果 CSV 使用各语言的 `*_01_p_adjust.csv`、`*_01_summary.csv`、`*_01_mini_example.csv` 和 `*_01_therapies.csv` 文件名；不设置开关则不写文件。可将开关设为 `0` 恢复仅在会话查看。
 
-## 不属于本篇正文的可选扩展
-
-Storey q 值、`qvalue` 安装、λ/π̂₀ 敏感性、02 脚本、自编函数及其结果均保留，但不属于本篇正文，完全可以跳过。需要时请见[可选扩展运行说明](说明/可选扩展_运行说明.md)；其中也链接到 [Storey π₀ 估计补充](说明/Storey_pi0估计补充.md)。
-
 ## 方法来源
 
 - R 调整方法：https://search.r-project.org/R/refmans/stats/help/p.adjust.html
