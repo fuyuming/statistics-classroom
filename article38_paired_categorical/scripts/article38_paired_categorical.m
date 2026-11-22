@@ -1,5 +1,5 @@
 %% 统计课堂38：完整配对分类教学项目（UTF-8）
-% 两例均为假设教学计数：例1为n=60的三法二分类，例2为n=144的前后多分类。
+% 两例均为假设教学计数：例1为n=8的三法二分类，例2为n=144的前后多分类。
 % 对应问题：例1问三种检测的总体阳性率是否相同及配对差异；例2问前后边际是否同质、反向路径是否对称。
 % 本文Q/Friedman/SM/Bowker/精确二项/Holm均为明确标记的自编实现。
 % 使用MATLAB基础分布特殊函数gammainc、gammaln、betaincinv、erfinv，无需统计工具箱。
@@ -26,11 +26,11 @@ patterns = patterns(:, {'pattern','A','B','C','GroupCount'});
 patterns.Properties.VariableNames{'GroupCount'} = 'count';
 patterns = sortrows(patterns, 'pattern');
 transitions = readtable(fullfile(root, 'data', 'transition_counts.csv'));
-disp(records(1:10, :));
+disp(records(1:min(10,height(records)), :));
 disp(patterns);
 disp(transitions);
 labels = ["A", "B", "C"];
-% Y只取三结果列；每人一行、每法60条对应记录。
+% Y只取三结果列；每人一行、每法8条对应记录（例2转移表仍为144人）。
 assert(all(ismember(Y(:), [0 1])));
 M = zeros(3);
 for row = 1:height(transitions)
@@ -93,7 +93,8 @@ for u1 = 0:n1
         end
     end
 end
-q_conditional = table(configurations, probability_sum, p_exact);
+person_assignments = 3^n1;
+q_conditional = table(configurations, person_assignments, probability_sum, p_exact);
 disp(q_conditional);
 assert(abs(probability_sum-1) < 1e-10);
 fprintf('条件于每人行和；U/W分别是行和1/2对象的位置计数。\n');
@@ -113,13 +114,14 @@ for j = 1:size(pair_index, 1)
     pairwise = [pairwise; answer]; %#ok<AGROW>
 end
 pairwise.holm = holm_adjust(pairwise.p_raw);
+pairwise = pairwise(:, {'comparison','b','c','rate_diff','p_raw','holm'});
 disp(pairwise);
 pairwise_teaching_check = table(pairwise.comparison, pairwise.b, pairwise.c, ...
     pairwise.b+pairwise.c, 'VariableNames', {'comparison','b','c','m'});
 disp(pairwise_teaching_check);
 assert(sum(pairwise_teaching_check.m) == D);
 fprintf('例1三对不一致数m=b+c之和=%g，与Q节D相同。\n', sum(pairwise_teaching_check.m));
-fprintf('rate_diff及CI乘100为百分点；lo95/hi95逐项，Bonferroni列同时覆盖三对。\n');
+fprintf('例1 rate_diff乘100为百分点；小样本不输出Wald区间；例2 categories保留区间。\n');
 
 %% 5 同一方表的SM与Bowker（自编，无连续性校正）
 [SM, S, difference] = sm_formula(M);

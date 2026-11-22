@@ -1,5 +1,5 @@
 # %% 统计课堂38：完整教学项目（UTF-8）
-# 两例是假设教学计数：例1为n=60的三法二分类，例2为n=144的前后多分类。
+# 两例是假设教学计数：例1为n=8的三法二分类，例2为n=144的前后多分类。
 # 对应问题：例1问三种检测的总体阳性率是否相同及配对差异；例2问前后边际是否同质、反向路径是否对称。
 # 首次运行默认只显示；改SAVE_RESULTS=True可保存结果。依赖见requirements.txt。
 from pathlib import Path
@@ -32,7 +32,7 @@ print("逐人记录前10条（id及A/B/C）：\n", records.head(10).to_string(in
 print("由逐人记录重汇总的三检测模式：\n", patterns)
 print("前后转移：\n", transitions)
 labels = ["A", "B", "C"]
-# Y只取三结果列；每人一行、每法60条对应记录。
+# Y只取三结果列；每人一行、每法8条对应记录（例2转移表仍为144人）。
 M = transitions.pivot(index="before", columns="after", values="count").loc[labels, labels].to_numpy()
 assert np.isin(Y, [0, 1]).all()
 print("Y前六行（只保留三法结果）：\n", Y[:6])
@@ -46,12 +46,18 @@ def paired_summary(b, c_count, n):
     if discordant > 0:
         p_raw = stats.binomtest(c_count, discordant, p=0.5).pvalue
     rd = (c_count - b) / n
-    se = np.sqrt((discordant - n * rd**2) / (n * (n - 1)))
-    z95 = stats.norm.ppf(0.975)             # 双侧逐项95%
-    z_bonf = stats.norm.ppf(1 - 0.05 / 6)  # 三对同时区间的每端尾概率
+    # 例1小样本两两结果只报告精确P与率差；例2保留Wald区间。
+    if n == len(records):
+        se = np.nan
+        lo95 = hi95 = lo_bonf = hi_bonf = np.nan
+    else:
+        se = np.sqrt((discordant - n * rd**2) / (n * (n - 1)))
+        z95 = stats.norm.ppf(0.975)
+        z_bonf = stats.norm.ppf(1 - 0.05 / 6)
+        lo95, hi95 = rd-z95*se, rd+z95*se
+        lo_bonf, hi_bonf = rd-z_bonf*se, rd+z_bonf*se
     return dict(b=b, c=c_count, rate_diff=rd, se=se, p_raw=p_raw,
-                lo95=rd-z95*se, hi95=rd+z95*se,
-                lo_bonf=rd-z_bonf*se, hi_bonf=rd+z_bonf*se)
+                lo95=lo95, hi95=hi95, lo_bonf=lo_bonf, hi_bonf=hi_bonf)
 
 
 def sm_formula(tab):
@@ -124,6 +130,7 @@ for u1 in range(n1 + 1):
                 if int(np.sum(conditional_columns ** 2)) >= observed_sum_squares:
                     p_exact += probability
 q_conditional = pd.DataFrame([dict(configurations=configurations,
+                                   person_assignments=3**n1,
                                    probability_sum=probability_sum,
                                    p_exact=p_exact)])
 assert abs(probability_sum - 1) < 1e-10
@@ -144,13 +151,14 @@ for first, second in pairs:
 pairwise = pd.DataFrame(pair_rows)
 # 返回对象第2项(pvals_corrected，索引1)是调整P；method指定Holm。
 pairwise["holm"] = multipletests(pairwise.p_raw, method="holm")[1]
+pairwise = pairwise[["comparison", "b", "c", "rate_diff", "p_raw", "holm"]]
 print(pairwise.to_string(index=False))
 pairwise_teaching_check = pairwise[["comparison", "b", "c"]].copy()
 pairwise_teaching_check["m"] = pairwise_teaching_check["b"] + pairwise_teaching_check["c"]
 print(pairwise_teaching_check.to_string(index=False))
 assert pairwise_teaching_check["m"].sum() == D
 print(f"例1三对不一致数m=b+c之和={pairwise_teaching_check['m'].sum()}，与Q节D相同。")
-print("rate_diff/CI乘100为百分点；95%是逐项区间，Bonferroni列为三对同时区间。")
+print("例1 rate_diff乘100为百分点；小样本不输出Wald区间；例2 categories保留区间。")
 
 # %% 4 同一方表：SM问边际，Bowker问对称
 SM = sm_formula(M)

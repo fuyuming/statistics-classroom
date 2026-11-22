@@ -1,5 +1,5 @@
 # 统计课堂38：多次二分类、两次多分类（UTF-8） ----
-# 两例都是本篇假设教学计数，不是实测资料：例1为n=60的三法二分类，例2为n=144的前后多分类。
+# 两例都是本篇假设教学计数，不是实测资料：例1为n=8的三法二分类，例2为n=144的前后多分类。
 # 对应问题：例1问三种检测的总体阳性率是否相同及配对差异；例2问前后边际是否同质、反向路径是否对称。
 # RStudio打开本项目Rproj；从本节起依次运行。首次安装：install.packages("DescTools")。
 # 默认只显示结果；要保存CSV，改SAVE_RESULTS为TRUE。每个语言用独立结果目录。
@@ -36,7 +36,7 @@ cat("由逐人记录重汇总的三检测模式：\n")
 print(patterns, row.names = FALSE)
 print(transitions)
 levels_abc <- c("A", "B", "C")
-# Y只取三结果列；每人一行、每法60条对应记录。
+# Y只取三结果列；每人一行、每法8条对应记录（例2转移表仍为144人）。
 stopifnot(!anyNA(Y), all(Y %in% c(0, 1)))
 # 行为前，列为后，两轴采用完全相同的类别顺序。
 M <- matrix(0, 3, 3, dimnames = list(levels_abc, levels_abc))
@@ -55,12 +55,19 @@ paired_summary <- function(b, c_count, n) {
     p_raw <- binom.test(c_count, discordant, p = 0.5)$p.value
   }
   rd <- (c_count - b) / n
-  se <- sqrt((discordant - n * rd^2) / (n * (n - 1)))
-  z95 <- qnorm(0.975)            # 双侧95%，每端留2.5%
-  z_bonf <- qnorm(1 - 0.05 / 6) # 三个区间，每端留0.05/(2*3)
+  if (n == nrow(records)) {
+    se <- NA_real_
+    lo95 <- hi95 <- lo_bonf <- hi_bonf <- NA_real_
+  } else {
+    se <- sqrt((discordant - n * rd^2) / (n * (n - 1)))
+    z95 <- qnorm(0.975)
+    z_bonf <- qnorm(1 - 0.05 / 6)
+    lo95 <- rd - z95 * se; hi95 <- rd + z95 * se
+    lo_bonf <- rd - z_bonf * se; hi_bonf <- rd + z_bonf * se
+  }
   data.frame(b = b, c = c_count, rate_diff = rd, se = se, p_raw = p_raw,
-             lo95 = rd - z95 * se, hi95 = rd + z95 * se,
-             lo_bonf = rd - z_bonf * se, hi_bonf = rd + z_bonf * se)
+             lo95 = lo95, hi95 = hi95,
+             lo_bonf = lo_bonf, hi_bonf = hi_bonf)
 }
 sm_formula <- function(tab) {
   r <- nrow(tab)
@@ -143,12 +150,13 @@ for (u1 in 0:n1) {
     }
   }
 }
-q_conditional <- data.frame(configurations, probability_sum, p_exact)
+person_assignments <- 3^n1
+q_conditional <- data.frame(configurations, person_assignments, probability_sum, p_exact)
 print(q_conditional)
 stopifnot(abs(probability_sum - 1) < 1e-10)
 cat("条件于每人行和；U/W分别是行和1/2对象的位置计数。\n")
 
-# 5 全部三对方法：精确McNemar + Holm；效应分母n=60 ----
+# 5 全部三对方法：精确McNemar + Holm；效应分母n=8 ----
 pair_index <- combn(seq_len(k), 2)
 pair_rows <- list()
 for (j in seq_len(ncol(pair_index))) {
@@ -164,6 +172,7 @@ for (j in seq_len(ncol(pair_index))) {
 }
 pairwise <- do.call(rbind, pair_rows)
 pairwise$holm <- p.adjust(pairwise$p_raw, method = "holm")
+pairwise <- pairwise[c("comparison", "b", "c", "rate_diff", "p_raw", "holm")]
 print(pairwise)
 pairwise_teaching_check <- data.frame(comparison = pairwise$comparison,
                                       b = pairwise$b, c = pairwise$c,

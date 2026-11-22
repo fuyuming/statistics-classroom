@@ -12,28 +12,26 @@
 
 ## 数据结构与目标
 
-`data/binary_records.csv`是例1完整60人的逐人教学记录，包含`id,A,B,C`四列。`id`为受检者编号，一人一行；A/B/C为同一人在三种培养方案下的结果。例1假设从某体检中心随机抽取60名成年受检者，每人同次采集的粪便样本等分后交三种方案并行检测；培养后分离并鉴定到目标菌记1，未检出记0。三语主脚本直接读取这60行，并只取A/B/C构造Y；每种方案均有60份对应结果。
+`data/binary_records.csv`是例1完整8人的逐人教学记录，包含`id,A,B,C`四列。`id`为受检者编号，一人一行；A/B/C为同一人在三种培养方案下的结果。三语主脚本直接读取这8行，并只取A/B/C构造Y；每种方案均有8份对应结果。
 
-`data/binary_patterns.csv`为这60行按A/B/C组合汇总的频数对照表，字段为`pattern,A,B,C,count`。pattern保留`000`等模式文本，count为该组合的人数。主脚本每次从逐人记录重新汇总，在Console和工作区显示频数表；统计输入来自逐人CSV。
+`data/binary_patterns.csv`为这8行按A/B/C组合汇总的频数对照表，字段为`pattern,A,B,C,count`。pattern保留8种模式文本，count依次为1,6,0,0,0,0,0,1。主脚本每次从逐人记录重新汇总，在Console和工作区显示频数表；统计输入来自逐人CSV。
 
-正文表1展示前10人的记录，表2汇总全部60人。资料为本篇假设教学数据。逐人CSV可单独获取：
-https://raw.githubusercontent.com/fuyuming/statistics-classroom/main/article38_paired_categorical/data/binary_records.csv
-
-例1分为两问：先比较三法总体检出率；若总体比较提示差异，再对预设三对方案作两两比较，同时报告配对阳性率差及区间。总体结果见`key_results`，条件精确核对见`q_conditional`，两两比较的P值、率差及区间均见`pairwise`。每对率差均以全部60人为分母。
+正文表1展示全部8人的记录，表2汇总实际出现的3种模式（000、001、111）。资料为本篇假设教学数据。
+例1分为两问：先比较三法总体检出率；有总体证据后，再对预设三对方案作两两比较，报告精确P与配对阳性率差。总体结果见`key_results`，条件精确核对见`q_conditional`，两两比较见`pairwise`；每对率差均以全部8人为分母。区间练习集中在例2的`categories`表。
 
 `data/transition_counts.csv`包含`before,after,count`三列。例2假设随访144名成年居民，第0天和第28天各检测一次。为本例约定：甲、乙、丙三组指示菌群中，相对丰度最高者分别对应A/B/C型；并列按甲、乙、丙顺序归类，前后规则相同。这里A/B/C是无序菌群类别，行=第0天、列=第28天。每个人只进入一个联合格，前后两次记录共同组成配对输入。
 
 例2的四问依次比较总体构成、反向转移是否平衡，并估计逐类比例差和互转者中的方向概率。前两问见`key_results`，后两问见`categories`与`paths`；率差统一按第28天减第0天。
 
-题干规定比较族、家族错误率控制目标与区间覆盖目标。Holm和Bonferroni都用于控制家族错误率；本项目的示范计算选用Holm调整检验P值，用Bonferroni构造例1的Wald同时区间。具体计算选择体现在以下结果列中。
+题干规定比较族、家族错误率控制目标与区间覆盖目标。Holm用于调整三项检验P值；区间练习集中在例2 `categories`表。
 
 ## 按问题核对输出
 
 | 输出表 | 回答什么 |
 |---|---|
-| key_results | Q=21.0526315789、含并列校正Friedman同值；SM=0.3，Bowker=26.7142857143及各自df/P（`p_value`为卡方渐近P） |
-| q_conditional | 固定每人行和，用脚本中间变量U/W作多项计数归并三法重排，共43890对；概率和约1，`p_exact`为Q条件右尾P≈0.000015628 |
-| pairwise | 三对精确McNemar+Holm；后一法减前一法率差、SE、逐项95%与三对Bonferroni98.333%Wald区间 |
+| key_results | 例1 Q=12、含并列校正Friedman同值，df=2，χ²近似P=e⁻⁶；例2结果不变 |
+| q_conditional | 固定每人行和，用U/W归并28个汇总配置；另标明729种逐人安排，概率和约1，`p_exact`=1/243 |
+| pairwise | 三对精确McNemar+Holm；报告后一法减前一法的精确P与率差（分母8） |
 | categories | 各类别“该类/其余类”的前后配对比较；分母144，后减前，含逐项及同时区间列 |
 | paths | 三条反向路径的条件方向概率、精确二项P+Holm、CP逐项95%区间；分母为路径互转者 |
 | enumeration | 固定反向路径总数21/18/18，7942配置；概率和约1，`p_exact`为Bowker统计量条件右尾P≈1.00269005809e−6 |
@@ -43,9 +41,9 @@ https://raw.githubusercontent.com/fuyuming/statistics-classroom/main/article38_p
 
 | 字段/表 | 含义与分母/单位 |
 |---|---|
-| `pairwise`、`categories` 的 `rate_diff` | 后减前/后一法减前一法；分母分别为全体配对对象（例1=60、例2=144）；保存为概率，乘100为百分点 |
-| `pairwise`、`categories` 的 `se` | 由60或144份个人差值的样本方差计算的率差标准误；单位与率差相同 |
-| `pairwise`、`categories` 的 `lo95/hi95`、`lo_bonf/hi_bonf` | 率差区间；前者为逐项95%，后者为三项Bonferroni同时区间，仍用全体分母 |
+| `pairwise`、`categories` 的 `rate_diff` | 后减前/后一法减前一法；分母分别为全体配对对象（例1=8、例2=144）；保存为概率，乘100为百分点 |
+| `categories` 的 `se` | 由144份个人差值计算的率差标准误；单位与率差相同 |
+| `categories` 的 `lo95/hi95`、`lo_bonf/hi_bonf` | 例2率差区间；前者为逐项95%，后者为三项Bonferroni同时区间，仍用全体分母 |
 | `p_raw`、`holm` | 条件精确二项/McNemar原始P及本项目选用的Holm调整结果；率差估计和区间按相应公式另算 |
 | `paths` 的 `theta`、`lo95/hi95` | 反向路径中正向人数/互转总人数；分母为三条路径各自互转者21/18/18；CP区间估计互转者中的条件方向概率 |
 | 脚本中的 `U/W` | `U`为行和1对象的唯一阳性位置计数，`W`为行和2对象的唯一阴性位置计数；各有A/B/C三个分量 |
