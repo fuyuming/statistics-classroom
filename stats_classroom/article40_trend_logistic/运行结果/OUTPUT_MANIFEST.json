@@ -1,0 +1,22 @@
+{
+  "generated_basis": "2026-11-22新手顺序重排后的9入口实际运行；本轮仅调整文章版式、删除第10部分，并将三语一处控制台说明改为方差估计说明。数值计算语句、输入、参数与结果未变，复用该运行依据。",
+  "input": "数据/共享教学数据.csv",
+  "scripts": {
+    "代码/trend_logistic.m": "5c487ca6078c4316a80e7b88a8aa066bc3e1aef15bf070410d3a43504c0a3b0c",
+    "代码/趋势检验_Logistic.R": "51a645db690430196d022d632a5f6ce930b97e9d9fc4182caa4c5c98233a0245",
+    "代码/趋势检验_Logistic.py": "83874c0230a2230deddf78e20daec26343b6d3be871909685e3eaf3d4a6587a9"
+  },
+  "files": {
+    "数据/共享教学数据.csv": "272ca46d468b71240bc6d87c78bbd65c8de6f9b70a28c536c39a17b5d76d38dc",
+    "运行结果/MATLAB/MATLAB_group_predictions.csv": "b71f0d1e40cca44ec1ec9b4f80c4d354605093787451bb063298bac8de05a24f",
+    "运行结果/MATLAB/MATLAB_observed_fitted.png": "f6ad29e1f7d3c4ebb09a4501915de0e5bb26009b76483aa2c8b021fdb0302487",
+    "运行结果/MATLAB/MATLAB_summary.csv": "7115dc8b7e70f2f243d24131e2f14ab9e0a386d527b736179a29b6c2e858400b",
+    "运行结果/Python/Python_group_predictions.csv": "aec731d66bd0194f396ca3e2cbfa0808b4eb96511511197aaad23d458883ee10",
+    "运行结果/Python/Python_observed_fitted.png": "9e13094386828b56580c1b8158d655cb4f6efa5274d05940d667c3a764be2529",
+    "运行结果/Python/Python_summary.csv": "f96ccd1c6e63d055480225f72947030b0506ec7122abddac76686859f57214cf",
+    "运行结果/R/R_group_predictions.csv": "d4d057960cff5ce216b840f34f09bcf06ff41245d1026031c299da5ebe8f10ea",
+    "运行结果/R/R_observed_fitted.png": "044bbe160d94001b29993659132cd3013e0c7f5dda62f2ffb4e67c5ec0c842df",
+    "运行结果/R/R_summary.csv": "14f6fbabfa8c477ca41a0489292779d39a0eee33137db0212b68e4a4d99029a9"
+  },
+  "hash": "SHA-256"
+}

@@ -32,6 +32,7 @@
 | 31 | 超几何分布从哪里来？从不放回抽样到Fisher精确检验（两例三语言配套） | [stats_classroom/article31_hypergeometric](stats_classroom/article31_hypergeometric/) |
 | 34 | 配对率差之外：两种检测的结果有多一致？（R、Python、MATLAB配套） | [stats_classroom/article34_paired_kappa](stats_classroom/article34_paired_kappa/) |
 | 39 | 轻度判成中度，与轻度判成重度，能算同样的不一致吗？（R、Python、MATLAB配套） | [stats_classroom/article39_weighted_kappa](stats_classroom/article39_weighted_kappa/) |
+| 40 | 趋势检验为什么能写成Logistic回归？从一道例题认识模型与结果（R、Python、MATLAB配套） | [stats_classroom/article40_trend_logistic](stats_classroom/article40_trend_logistic/) |
 
 请进入对应文件夹，再按该文件夹的 README 运行。
 
