@@ -1,0 +1,10 @@
+before,after,count
+A,A,30
+A,B,18
+A,C,3
+B,A,3
+B,B,30
+B,C,15
+C,A,15
+C,B,3
+C,C,27
