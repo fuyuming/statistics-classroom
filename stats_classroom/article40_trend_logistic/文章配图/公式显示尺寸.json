@@ -1,0 +1,40 @@
+{
+  "font_family": "STIXGeneral",
+  "mathtext_fontset": "stix",
+  "font_pt": 24,
+  "dpi": 162,
+  "pixels_per_css": 3,
+  "nominal_math_css_px": 18.0,
+  "images": {
+    "公式01_胜算与logit.png": {
+      "pixel_width": 547,
+      "pixel_height": 315,
+      "display_width_css_px": 182.33333333333334,
+      "display_height_css_px": 105.0
+    },
+    "公式02_Logistic概率模型.png": {
+      "pixel_width": 520,
+      "pixel_height": 322,
+      "display_width_css_px": 173.33333333333334,
+      "display_height_css_px": 107.33333333333333
+    },
+    "公式03_OR与区间.png": {
+      "pixel_width": 645,
+      "pixel_height": 336,
+      "display_width_css_px": 215.0,
+      "display_height_css_px": 112.0
+    },
+    "公式04_趋势得分与方差.png": {
+      "pixel_width": 593,
+      "pixel_height": 306,
+      "display_width_css_px": 197.66666666666666,
+      "display_height_css_px": 102.0
+    },
+    "公式05_趋势Q.png": {
+      "pixel_width": 567,
+      "pixel_height": 460,
+      "display_width_css_px": 189.0,
+      "display_height_css_px": 153.33333333333334
+    }
+  }
+}

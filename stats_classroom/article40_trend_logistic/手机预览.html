@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>趋势检验为什么能写成Logistic回归？从一道例题认识模型与结果</title><style>*{box-sizing:border-box}body{margin:0;background:#f1f4f3;color:#27343a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:720px;margin:24px auto;padding:32px 36px 56px;background:#fff;border-top:5px solid #258dcc}.brand{display:flex;align-items:center;gap:12px;color:#258dcc;font-size:14px;letter-spacing:.04em}.brand img{width:48px;height:48px;border-radius:50%}h1{font-size:30px;line-height:1.45;color:#0000F5;margin:26px 0 20px}h2{font-size:22px;line-height:1.5;color:#0000F5;border-left:4px solid #58b9ed;padding-left:13px;margin:42px 0 20px}h3{font-size:19px;line-height:1.55;color:#0000F5;margin:30px 0 14px}p{font-size:17px;line-height:1.95;margin:19px 0;text-align:justify}strong{color:#27343a;font-weight:700}blockquote{margin:20px 0 30px;padding:10px 18px;background:#f0f8ff;border-left:2px solid #58b9ed}blockquote p{font-size:14px;line-height:1.9;margin:8px 0;color:#53666c}a{color:#258dcc;text-decoration:none;border-bottom:1px solid #b9def5}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;background:#f0f8ff;color:#1769aa;padding:1px 5px;border-radius:4px}pre{background:#f7faf9;border:1px solid #e4ecea;border-radius:6px;padding:12px 14px;overflow-x:auto}pre code{background:none;padding:0;font-size:14px;line-height:1.7}div.formula{background:#f7faf9;border-left:3px solid #58b9ed;padding:12px 16px;margin:20px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:17px;color:#1769aa;text-align:center;line-height:1.9}ul,ol{font-size:17px;line-height:1.95;margin:18px 0;padding-left:26px}li{margin:8px 0}table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px}th,td{border-bottom:1px solid #e4ecea;padding:9px 10px;text-align:left;line-height:1.7}th{background:#f0f8ff;color:#1769aa;font-weight:650}footer{border-top:1px solid #dfe8e6;margin-top:36px;padding-top:16px;font-size:12px;color:#758787;line-height:1.8}@media(max-width:600px){body{background:#fff}main{margin:0;padding:24px 22px 40px;border-top-width:4px}h1{font-size:27px}h2{font-size:21px}h3{font-size:18px}p,ul,ol{font-size:16px;line-height:1.95}table{font-size:14px}}main > p img{display:block;width:100%;height:auto;margin:24px 0 8px;border:1px solid #e4ecea}main > p:has(img){margin:25px -12px 4px}main > p:has(img) a{border:0;display:block}main > p > em:only-child{display:block;font-size:13px;line-height:1.8;font-style:normal;color:#657a7d;text-align:left;margin:0 0 28px}@media(max-width:600px){main > p:has(img){margin-left:-12px;margin-right:-12px}}a{overflow-wrap:anywhere}table{display:block;overflow-x:auto}blockquote p{font-size:16px}hr{border:0;border-top:1px solid #dfe8e6;margin:30px 0}p code,li code,td code{overflow-wrap:anywhere}pre code{white-space:pre-wrap;overflow-wrap:anywhere}sup{line-height:0}p{text-align:left}table:last-of-type td:first-child code{font-size:13px;white-space:nowrap}</style></head><body><main><div class="brand">明哥的微生物世界 · 统计课堂 40</div><h1>趋势检验为什么能写成Logistic回归？从一道例题认识模型与结果</h1><blockquote><p>摘要　干扰越强，心电检测算法的失败率会不会越高？本篇从一道完整假设题出发，先认识Logistic回归怎样描述失败概率，读懂系数、胜算比和预测结果，再用计数偏差和抽样波动说明趋势统计量的构造，看它怎样与模型检验对应。再对照近期真实研究，看看这类资料怎样用于实际分析。</p></blockquote>
+<p><img alt="第11次课无姓名课堂封面：概率与生物医学统计，本科第十一次课，分类资料的检验、关联与一致性" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/00_%E8%AF%BE%E5%A0%82%E5%B0%81%E9%9D%A2_%E7%AC%AC11%E6%AC%A1%E8%AF%BE.png"/></p>
+<p>大家好，我是明哥。</p>
+<p>准备第11课“分类资料的检验、关联与一致性”时，我重新整理了心电干扰这道例题：每段记录最后只有“检测失败”或“检测成功”两种判定，干扰强度则分为从低到高的四组。我们关心的是，失败率会不会随着干扰增强而上升。</p>
+<p>对这种“有序分组＋二分类结局”的资料，<strong>趋势检验</strong>先按组别顺序规定数值评分，再判断总体失败率是否沿评分呈上升或下降趋势。<strong>Logistic回归</strong>则建立一个描述二分类事件发生概率的数学关系；用数据估计其中的系数，就是拟合模型。拟合以后，可以估计不同评分下的失败概率，也能检验概率是否随评分变化<sup>[1]</sup>。</p>
+<p><a href="https://mp.weixin.qq.com/s/prfW3gQe7kXAUhqaisG6yw" rel="noopener" target="_blank">统计课堂13《t检验，原来也是回归》</a>从均数比较走到了模型系数。本篇换成失败或成功的结局，先看模型怎样用、结果怎样读，再回到趋势检验。</p>
+<h2>一、先把完整题目摆出来</h2>
+<p>假设有200名不同患者，每人各提供一段含100个已标注QRS波的心电记录。QRS波对应心室除极，是心电检测算法需要识别的波形之一。</p>
+<p>将这些记录随机分为四组，每组50段，分别叠加峰峰值为0、0.1、0.2、0.3 mV的50 Hz干扰。同一段记录只接受一种干扰强度，固定算法处理所有记录；一段中漏检<strong>超过5个QRS波</strong>，就把这段记为“检测失败”；漏检不超过5个则记为“检测成功”。不同患者的记录相互独立。</p>
+<p>这里每段记录只得到一次失败或成功判定。每段中的100个QRS波用于定义这个结局，因此分析单位是200段独立记录；计算各组失败率时，分母分别为50段。</p>
+<p>四组评分在分析前规定为0、1、2、3，因此<strong>一个评分单位对应0.1 mV</strong>。表1列出这道假设题的数据，后面的计算都使用这张表。</p>
+<p><em>表1｜不同干扰强度下的检测结果</em></p>
+<table><thead><tr><th>评分</th><th>峰峰值/mV</th><th>失败</th><th>成功</th><th>总段数</th></tr></thead><tbody><tr><td>0</td><td>0.0</td><td>5</td><td>45</td><td>50</td></tr><tr><td>1</td><td>0.1</td><td>10</td><td>40</td><td>50</td></tr><tr><td>2</td><td>0.2</td><td>18</td><td>32</td><td>50</td></tr><tr><td>3</td><td>0.3</td><td>27</td><td>23</td><td>50</td></tr></tbody></table>
+<p>本题要回答四个问题：</p>
+<ol><li>四组总体失败率是否沿预定评分呈趋势？</li><li>拟合模型后，干扰每增加0.1 mV，失败概率及相应的变化幅度怎样解释？</li><li>按评分构造的趋势检验，怎样与描述失败概率的Logistic模型对应？</li><li>为什么趋势检验与Logistic回归软件默认输出的P值会不同？</li></ol>
+<p>检验采用双侧备择，检验水准为0.05；变化幅度的区间采用双侧95%置信水平。</p>
+<p>围绕这四个问题，先把表1输入R。<code>data.frame()</code>把每组的评分、干扰强度、失败数和总数放在同一行；<code>n - failed</code>得到成功数，失败数除以总数得到样本失败率。</p>
+<pre><code>d &lt;- data.frame(
+  score = 0:3,
+  amplitude_mV = c(0, .1, .2, .3),
+  failed = c(5, 10, 18, 27),
+  n = rep(50, 4)
+)
+d$passed &lt;- d$n - d$failed
+d$observed_rate &lt;- d$failed / d$n
+d[, c("score", "failed", "passed", "observed_rate")]</code></pre>
+<p>实际得到的四组样本失败率依次为 <strong>10%、20%、36%、54%</strong>。接下来用模型描述这些样本率背后的总体失败概率。</p>
+<h2>二、先用模型算出四组失败概率</h2>
+<p>回到表1的四个观察率。Logistic回归要做的是，用评分建立一个估计失败概率的规则：输入0、1、2、3，返回各自的概率。我们先拟合模型，看看它实际给出什么结果。</p>
+<h3>（一）告诉R：事件是什么，输入是什么</h3>
+<p>R的<code>glm()</code>可以拟合本题模型。<code>~ score</code>指定按数值评分建立关系；<code>data = d</code>指定使用表1的数据。把要分析的计数写成<code>cbind(failed, passed)</code>，第一列是失败事件数，第二列是成功数。</p>
+<p><code>binomial(link = "logit")</code>选择二项分布和logit连接。每段只有成功/失败两种判定，同组概率相同且记录独立时，一组失败总数可用二项分布描述。logit是将“失败概率÷成功概率”取自然对数的变换，下一节用本题逐步说明<sup>[1]</sup>。</p>
+<p>拟合返回的对象保存在<code>fit</code>中；<code>coef()</code>读取系数，<code>summary()</code>提供标准误等结果。代码中的<code>ctrl</code>固定迭代精度，便于后面核对检验数值<sup>[2]</sup>。</p>
+<pre><code># fit保存按评分拟合的模型。
+# epsilon和maxit控制迭代收敛精度与最大次数。
+ctrl &lt;- glm.control(epsilon = 1e-12, maxit = 100)
+fit &lt;- glm(
+  cbind(failed, passed) ~ score, data = d,
+  family = binomial(link = "logit"),
+  control = ctrl
+)
+coef(fit)
+coef(summary(fit))["score", ]</code></pre>
+<h3>（二）直接看四组预测概率</h3>
+<p>R的<code>predict()</code>可以完成这一步。<code>newdata = d</code>要求对表1四组预测，<code>type = "response"</code>要求返回概率；默认的<code>type = "link"</code>则返回logit。</p>
+<pre><code>d$fitted_rate &lt;- predict(
+  fit, newdata = d, type = "response"
+)
+d[, c("amplitude_mV", "observed_rate", "fitted_rate")]</code></pre>
+<p>表2将预测概率与观察率并列。前者来自同一条模型关系，后者是各组失败数除以50。</p>
+<p><em>表2｜观察失败率与Logistic拟合失败概率</em></p>
+<table><thead><tr><th>峰峰值/mV</th><th>观察率</th><th>拟合概率</th></tr></thead><tbody><tr><td>0.0</td><td>10%</td><td>10.24%</td></tr><tr><td>0.1</td><td>20%</td><td>19.98%</td></tr><tr><td>0.2</td><td>36%</td><td>35.33%</td></tr><tr><td>0.3</td><td>54%</td><td>54.45%</td></tr></tbody></table>
+<p>图1把四组观察率和拟合概率画在一起，便于比较模型给出的概率变化与各组实际观察率。</p>
+<p><img alt="图1：四组观察失败率和Logistic拟合失败概率，横轴为50Hz干扰峰峰值mV，纵轴为失败概率" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%9B%BE01_%E8%A7%82%E5%AF%9F%E7%8E%87%E4%B8%8ELogistic%E6%8B%9F%E5%90%88.png"/></p>
+<p><em>图1｜课堂假设数据，每组50段独立记录。点为观察率，实线为模型拟合概率；曲线只画在本题干扰范围内。</em></p>
+<p>图中的拟合概率约从10.24%升到54.45%。我们先看到了模型给出的结果，下面再解释它怎样把评分连到概率。</p>
+<h2>三、回头读模型：胜算、斜率与OR</h2>
+<p>刚才已经得到四组拟合概率。现在回头看，模型怎样用同一个评分关系描述这些概率，斜率又表示什么。</p>
+<p>先约定两个符号：下标i表示四组中的某一组，s<sub>i</sub>是该组预定评分，p<sub>i</sub>是该组未知的总体失败概率。直接把概率写成评分的直线函数，延长后可能超出0到1；Logistic回归会先变换概率，再建立直线关系。</p>
+<p>变换分两步。<strong>失败胜算</strong>是失败概率除以成功概率；对这个比值取自然对数，得到<strong>logit，也叫对数胜算</strong>。式（1）给出这两个量。</p>
+<p><img alt="式1：失败胜算为失败概率除以成功概率，logit是胜算的自然对数" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F01_%E8%83%9C%E7%AE%97%E4%B8%8Elogit.png" style="display:block;width:182.333px;max-width:100%;height:auto;margin:18px auto;border:0;"/></p>
+<p><em>式（1）｜pᵢ是失败概率，1−pᵢ是成功概率；log表示自然对数。</em></p>
+<p>例如，给定失败概率为0.20，成功概率就是0.80，失败胜算为0.20/0.80＝0.25，也就是失败与成功的可能性之比为1∶4；再取自然对数，logit约为−1.386。</p>
+<p>概率介于0和1之间，logit则可以取任意实数。我们便可以在这个尺度上写直线：用截距α描述评分为0时的对数胜算，用斜率β描述评分每增加1时，对数胜算改变多少。式（2）同时写出这条直线，以及怎样将它还原为概率。</p>
+<p><img alt="式2：logit概率等于截距加斜率乘评分，逆变换得到失败概率" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F02_Logistic%E6%A6%82%E7%8E%87%E6%A8%A1%E5%9E%8B.png" style="display:block;width:173.333px;max-width:100%;height:auto;margin:18px auto;border:0;"/></p>
+<p><em>式（2）｜sᵢ是评分；α是截距，β是评分斜率。exp(x)表示e的x次方，第二行把模型结果还原到0到1的概率尺度。</em></p>
+<p>本题的一个评分单位是0.1 mV。β为正，模型中的失败概率就随评分升高；β为负，失败概率就随评分降低。下面把刚才的系数输出与这些符号对应起来。</p>
+<h3>（一）对照系数表读取斜率</h3>
+<p>先看<code>score</code>这一行：<code>Estimate</code>＝<strong>0.783203</strong>是斜率估计，<code>Std. Error</code>＝<strong>0.161909</strong>是它的标准误。<code>z value</code>＝4.837290是前两者之比，<code>Pr(&gt;|z|)</code>≈1.316×10⁻⁶是对应的双侧P值；第五节再看它为什么与趋势检验不同。</p>
+<p>截距估计α̂＝−2.170961，描述评分为0时的水平。截距行的P检验的是α＝0，也就是评分为0时的失败概率是否为0.5。本题问“是否随评分变化”，应读取<code>score</code>行。</p>
+<h3>（二）把斜率换成胜算比</h3>
+<p>斜率0.783203的单位是“每增加1评分，对数胜算的变化量”。把它取指数，就得到每评分单位的<strong>胜算比（odds ratio，OR）</strong>。</p>
+<p>我们还要说明这个估计有多精确。用斜率估计加减约1.96个标准误构造区间，再对两个端点取指数，就是本篇采用的双侧95% <strong>Wald置信区间</strong>。式（3）把这两步写在一起。</p>
+<p><img alt="式3：OR为斜率的指数，95%Wald区间由斜率估计加减正态临界值乘标准误后取指数" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03_OR%E4%B8%8E%E5%8C%BA%E9%97%B4.png" style="display:block;width:215.000px;max-width:100%;height:auto;margin:18px auto;border:0;"/></p>
+<p><em>式（3）｜β̂表示用数据得到的斜率估计；SE是其标准误；z₀.₉₇₅≈1.96是标准正态分布的97.5%分位点。区间使用大样本近似。</em></p>
+<pre><code>beta &lt;- unname(coef(fit)["score"])
+beta_se &lt;- coef(summary(fit))["score", "Std. Error"]
+# 双侧95%区间两端各留2.5%，所以取0.975分位点。
+cutoff &lt;- qnorm(.975)
+OR &lt;- exp(beta)
+OR_CI &lt;- exp(beta + c(-1, 1) * cutoff * beta_se)
+c(OR = OR, low = OR_CI[1], high = OR_CI[2])</code></pre>
+<p>本次得到 <strong>OR＝2.18847，双侧95% Wald置信区间［1.59339，3.00579］</strong>。按本模型，在0到0.3 mV的分析范围内，干扰峰峰值每增加0.1 mV，失败胜算估计乘以约2.19。</p>
+<p>这个2.19是胜算的倍数。表2的失败概率则由截距、斜率和评分一起代入式（2）得到。</p>
+<p>从0到0.1 mV，拟合概率约从10.24%升到19.98%；从0.2到0.3 mV，则约从35.33%升到54.45%。两次都增加0.1 mV，概率增量却不同。<strong>模型固定的是每步的胜算比，概率变化还取决于起点。</strong> 概率的倍数应由相应预测概率相除，和OR分别解释。</p>
+<h2>四、再看趋势检验：这个上升相对抽样波动有多强？</h2>
+<p>四个观察率从10%升到54%，模型斜率也是正的。要作统计判断，还需要一个共同的参照：<strong>假设四组总体失败概率相同，会怎样？</strong></p>
+<p>在式（2）中，这个零假设H₀就是β＝0。斜率为0后，评分不再改变概率，只有截距决定共同水平。表1合计60段失败、200段记录，合并失败率为0.30；在共同率模型下，每组预期失败50×0.30＝15段。</p>
+<h3>（一）把各组偏差按评分方向合起来</h3>
+<p>四组的“观察失败数−预期失败数”分别为−10、−5、3、12。低评分组比预期少失败，高评分组比预期多失败，两端都支持上升。</p>
+<p>为了把这种方向合起来，先将评分减去平均评分1.5，得到−1.5、−0.5、0.5、1.5。再将这些评分权重与各组计数偏差相乘：15、2.5、1.5、18，加起来得到 <strong>U＝37</strong>。U为正，表示偏离方向为上升。</p>
+<p>U本身的大小还受样本规模影响。我们需要估计它在共同率假设下会有多大波动。在独立、同概率的二项模型下，计数的方差为n p(1−p)；计数乘以某个权重，方差就乘权重的平方。四组独立，再把四项方差相加。</p>
+<p>式（4）将这两步写成通式。x<sub>i</sub>是观察失败数，n<sub>i</sub>是各组总段数，p̄是合并失败率，s̄是按各组总数加权的平均评分；本题各组一样大，s̄＝1.5。V₀估计的是U在H₀下的方差。</p>
+<p><img alt="式4：U为中心化评分加权的计数偏差和，V0为其原假设下方差估计" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F04_%E8%B6%8B%E5%8A%BF%E5%BE%97%E5%88%86%E4%B8%8E%E6%96%B9%E5%B7%AE.png" style="display:block;width:197.667px;max-width:100%;height:auto;margin:18px auto;border:0;"/></p>
+<p><em>式（4）｜本题p̄＝0.30，s̄＝1.5。脚本中对应的列名是I_eff，这里按U在H₀下的方差估计使用。</em></p>
+<p>代入本题，V₀＝0.30×0.70×50×(2.25＋0.25＋0.25＋2.25)＝<strong>52.5</strong>。下面仍用表1计算：</p>
+<pre><code>N &lt;- sum(d$n)
+p0 &lt;- sum(d$failed) / N
+score_mean &lt;- sum(d$n * d$score) / N
+t_score &lt;- d$score - score_mean
+U &lt;- sum(t_score * (d$failed - d$n * p0))
+I_eff &lt;- p0 * (1 - p0) * sum(d$n * t_score^2)
+c(U = U, I_eff = I_eff)</code></pre>
+<p>输出为<code>U = 37</code>、<code>I_eff = 52.5</code>。到这里，一个量描述沿评分的偏离，另一个量估计这种偏离的方差。</p>
+<h3>（二）用标准差衡量偏离，再得到Q</h3>
+<p>先对方差V₀开平方，得到标准差，再用U相除，得到有方向的标准化统计量Z。Z平方就是双侧趋势统计量Q，式（5）给出本题结果。</p>
+<p><img alt="式5：Z为U除以V0平方根，Q为Z平方，原假设下渐近卡方1" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F05_%E8%B6%8B%E5%8A%BFQ.png" style="display:block;width:189.000px;max-width:100%;height:auto;margin:18px auto;border:0;"/></p>
+<p><em>式（5）｜Z的正负保留趋势方向，Q衡量偏离强弱；P值取χ²₁分布的右尾，等价于对有方向的Z计算双侧正态尾部概率。</em></p>
+<p>本次 <strong>Q＝26.0762，双侧P≈3.282×10⁻⁷</strong>。在预定0.05水准下拒绝β＝0，再结合正Z，将趋势判断为上升。这里比较的是沿预定评分的整体趋势，没有逐对检验相邻组。</p>
+<p>为什么是1个自由度？从共同率模型到式（2），只增加了一个评分斜率β；我们检验的就是这一个参数。</p>
+<p>R的<code>prop.trend.test()</code>可以复算：<code>x</code>输入失败数，<code>n</code>输入各组总数，<code>score</code>输入分析前规定的评分。返回对象包含Q、自由度和P值<sup>[3]</sup>。</p>
+<pre><code>trend &lt;- prop.trend.test(
+  x = d$failed, n = d$n,
+  score = d$score
+)
+trend</code></pre>
+<p>实际输出为<code>X-squared = 26.076</code>、<code>df = 1</code>、<code>p-value = 3.282e-07</code>，与手算一致。</p>
+<p><strong>在本题的独立二项模型、相同预定评分和未作连续性校正的设置下，这个Q也正是Logistic模型检验β＝0的得分统计量。</strong> “得分检验”考察的是：从拟合好的共同率模型出发，沿斜率方向的偏离有多强。它也称Rao检验，下一节用软件直接核对。</p>
+<p>Q的χ²₁参照是大样本近似。Rosner教材对此趋势检验给出N p̄(1−p̄)≥5的经验建议，本例为42；这需要结合独立记录、预先评分及二项模型一起判断，不能当作近似精度的保证<sup>[4]</sup>。</p>
+<h2>五、为什么软件默认P与趋势检验不同？</h2>
+<p>第三节<code>score</code>行的P约为1.316×10⁻⁶，和趋势检验的P不同。原因在于软件摘要默认用的是<strong>Wald检验</strong>：用斜率估计除以其标准误，本题0.783203/0.161909≈4.8373，再按标准正态计算双侧P<sup>[2]</sup>。</p>
+<p>还可以比较两个模型对同一组数据的拟合。模型给这四组观察计数的联合概率称为似然；拟合寻找使它最大的参数。对最大似然取自然对数，得到最大对数似然。允许斜率自由变化后，这个值比共同率模型提高了多少，就是<strong>似然比检验</strong>要衡量的改善。</p>
+<p>现在拟合共同率模型<code>null</code>：<code>~ 1</code>表示只保留截距，四组概率相同。它是<code>fit</code>取β＝0的特例，因此二者是嵌套模型。把它们交给<code>anova()</code>，设置<code>test = "Rao"</code>核对得分检验，设置<code>test = "LRT"</code>作似然比检验<sup>[5]</sup>。</p>
+<pre><code>null &lt;- glm(
+  cbind(failed, passed) ~ 1, data = d,
+  family = binomial(link = "logit"),
+  control = ctrl
+)
+rao &lt;- anova(null, fit, test = "Rao")
+lrt &lt;- anova(null, fit, test = "LRT")
+# 读取第二行，即加入score相对于共同率模型的比较。
+c(Q_Rao = rao$Rao[2], P_Rao = rao$`Pr(&gt;Chi)`[2])
+c(Q_LRT = lrt$Deviance[2], P_LRT = lrt$`Pr(&gt;Chi)`[2])
+# glm摘要的score行给出Wald z及其双侧P。
+coef(summary(fit))["score", c("z value", "Pr(&gt;|z|)")]</code></pre>
+<p>表3汇总同一H₀的三种结果。Rao的Q及P与第四节趋势检验相同，正好把两种写法接起来。</p>
+<p><em>表3｜同一数据、同一H₀：β＝0，三种检验的结果</em></p>
+<table><thead><tr><th>方法</th><th>统计量</th><th>P值</th></tr></thead><tbody><tr><td>得分（Rao）</td><td>Q<sub>trend</sub>＝26.0762</td><td>3.282×10⁻⁷</td></tr><tr><td>Wald</td><td>z＝4.8373</td><td>1.316×10⁻⁶</td></tr><tr><td>似然比</td><td>Q<sub>LRT</sub>＝27.4439</td><td>1.617×10⁻⁷</td></tr></tbody></table>
+<p>表中的Q<sub>trend</sub>就是第四节的趋势Q；Q<sub>LRT</sub>是另一个似然比统计量。三者都问斜率是否为0，衡量偏离的方式各有侧重：得分检验从共同率模型出发，Wald看完整模型的斜率离0有多少个标准误，似然比则比较两个模型的最大对数似然。<strong>同一个原假设，有限样本P值可以不同。</strong></p>
+<p>R中还可以用<code>lmtest</code>包的<code>lrtest()</code>完成同一似然比比较，输入仍是同一数据上拟合的两个嵌套模型<sup>[6]</sup>。</p>
+<pre><code>course_lrt &lt;- lmtest::lrtest(null, fit)
+course_lrt</code></pre>
+<p>本次输出中，两行<code>LogLik</code>分别为−21.715889和−7.993942；两者之差的2倍约为27.4439，对应<code>Chisq</code>列。<code>Pr(&gt;Chisq)</code>给出P≈1.617×10⁻⁷，与<code>anova(..., test = "LRT")</code>一致。</p>
+<p>本例三种检验都提供反对β＝0的有力证据。报告时要交代采用哪一种检验，同时写出变化幅度和区间。本题可以这样报告：</p>
+<blockquote><p>在这份课堂假设数据中，200名不同患者各提供一段心电记录，四个干扰水平各50段。按预定0–3评分进行未校正趋势检验，Q＝26.0762，df＝1，双侧P≈3.282×10⁻⁷，支持失败率沿评分上升的趋势。二项Logistic模型估计，干扰峰峰值每增加0.1 mV，失败胜算比为2.188，双侧95% Wald置信区间为［1.593，3.006］。</p></blockquote>
+<h2>六、回头看：这为什么是二项GLM？</h2>
+<p>现在已经看过拟合、预测和检验，再把我们做的选择放在一起。</p>
+<p><strong>广义线性模型（generalized linear model，GLM）是一类描述响应均值怎样随输入变化的回归模型。</strong> 响应变量就是要解释的结果；本题是已知各组总数下的失败计数，成功数由总数减失败数得到。一个GLM包括三个部分<sup>[1]</sup>：</p>
+<ul><li><strong>响应分布</strong>：给定评分后，失败数怎样波动。本题是独立二项计数，每组总数已知。</li><li><strong>线性预测子</strong>：把输入与系数组合起来，本题是α＋βs。</li><li><strong>连接函数</strong>：把响应的均值与线性预测子连起来。本题将计数均值除以总数，得到失败概率p，再用logit连接到α＋βs。</li></ul>
+<p>回看<code>family = binomial(link = "logit")</code>，分布和连接都写在里面。第13篇的正态线性模型使用正态条件分布和恒等连接，即直接对均值写线性关系；本题选择二项分布和logit连接。分布决定均数—方差关系，连接函数决定均值怎样接到线性预测子。</p>
+<p>模型还需要检查。研究设计支持记录独立，观察率与曲线的比较帮助我们看拟合形态；实际应用中，还要判断logit随评分呈直线的设定是否合适。斜率检验回答β是否为0，不能代替对模型设定的检查。</p>
+<h2>七、真实研究怎样使用有序分组与二分类结局？</h2>
+<p>前面用课堂假设题走过了拟合、解释与检验，下面看同类资料在真实研究中怎样使用。</p>
+<p><strong>儿童肥胖：程度越重，代谢异常比例是否越高？</strong> Luo等的研究于2026年11月19日发表，目标是考察儿童肥胖分级与代谢异常的关系。研究纳入326名6–18岁肥胖儿童，只取首次诊断就诊的资料，依据论文采用的体重指数（BMI）标准，按肥胖程度分为1、2、3级。主要结局是有无“至少两项代谢异常”，即胰岛素抵抗、高尿酸血症、丙氨酸氨基转移酶升高三项中的至少两项同时存在。这里，<strong>肥胖级别是有序组，有至少两项异常是事件</strong><sup>[7]</sup>。</p>
+<p>三组的事件比例依次为49.7%、63.8%、75.8%，作者使用趋势检验考察变化。针对这一主要结局，作者直接拟合Logistic模型：将2、3级合为重度肥胖组，与1级比较，分别拟合仅含该分组的模型，以及同时纳入年龄、性别的模型。因此，这项研究的回归比较是“重度组对1级”，与前面三级趋势检验的分组方式有所不同<sup>[7]</sup>。</p>
+<p><a href="https://doi.org/10.3389/fped.2026.1974497" rel="noopener" target="_blank">论文原文：Luo等，2026</a></p>
+<p>这项研究与表1都可以整理成“有序组×事件/非事件”的计数表；回归怎样分组、怎样比较，要由研究问题确定。结合这道假设题和真实应用，我们可以归纳出下面几个要点。</p>
+<h2>八、本篇讲了哪些知识？</h2>
+<ul><li><strong>Logistic回归描述二分类事件的发生概率。</strong> 截距和评分斜率先决定对数胜算，再还原为概率。</li><li><strong>每0.1 mV的OR约为2.19。</strong> 它表示失败胜算的倍数；各组概率由截距、斜率和评分一起决定。</li><li><strong>趋势Q把有方向的偏离与其抽样波动相比较。</strong> 本题U＝37、方差估计V₀＝52.5，Q＝U²/V₀。</li><li><strong>本题趋势检验对应Logistic斜率为0的得分检验。</strong> 相同评分、二项方差与校正设置下，统计量构造一致；P值仍依赖大样本近似。</li><li><strong>得分、Wald和似然比都能检验β＝0。</strong> 报告时同时交代检验方法、效应估计及区间，GLM的分布和连接选择也要回到具体问题。</li></ul>
+<h2>九、从这道题到下学期《高级生态学》</h2>
+<p>这道心电题所用的建模思路，也适用于生态研究：先看观测单位和响应是什么，再选择分布、连接函数与预测变量。响应类型和数据的分组结构改变时，模型也要作相应调整。</p>
+<p>下学期，我将和胡老师共同开设《高级生态学》，本科生和研究生都可以选修。<strong>我负责的部分，主要讲怎样根据研究问题和数据特点选择统计模型、检查模型，并解释结果。</strong> 在本篇二项GLM的基础上，我们还会进一步学习泊松与负二项模型、混合模型以及贝叶斯建模。</p>
+<p>这些内容会沿着“数据与问题—模型—检查—解释”这条线展开。表4列出这部分教学中与本篇能够接上的几类工具。</p>
+<p><em>表4｜《高级生态学》统计模型部分与本篇衔接的R工具</em></p>
+<table><thead><tr><th>包与函数</th><th>主要用途</th></tr></thead><tbody><tr><td><code>stats</code><br/><code>glm()</code>、<code>predict()</code></td><td>拟合GLM，将模型结果还原为概率等响应尺度。</td></tr><tr><td><code>lmtest</code><br/><code>lrtest()</code></td><td>比较同一数据上的嵌套模型，解释增加参数带来的拟合改善。</td></tr><tr><td><code>performance</code><br/><code>check_model()</code><br/><code>DHARMa</code><br/><code>simulateResiduals()</code></td><td>结合模型类型查看诊断图、用模拟残差检查模型设定<sup>[8]</sup>。</td></tr><tr><td><code>sjPlot</code><br/><code>tab_model()</code></td><td>将模型估计和区间等结果整理成报告表格<sup>[9]</sup>。</td></tr><tr><td><code>lme4</code><br/><code>glmer()</code><br/><code>glmmTMB</code><br/><code>glmmTMB()</code></td><td>在存在样地、实验缸等分组结构时，进一步学习带随机效应的广义线性混合模型<sup>[10]</sup>。</td></tr><tr><td><code>brms</code><br/><code>brm()</code></td><td>进一步学习以先验和似然进行贝叶斯建模<sup>[10]</sup>。</td></tr></tbody></table>
+<p>这些工具各有分工。本文实际使用的是基础GLM、概率预测和似然比比较；诊断、随机效应和贝叶斯模型会在后续学习中进一步展开。</p>
+<p>欢迎大家来选修《高级生态学》，和我们一起学习高级统计模型，把分布、公式和函数与具体的科学问题连起来。</p>
+<h2>十、配套练习与延伸阅读</h2>
+<p>和前面的统计课堂一样，这次也准备了R、Python和MATLAB三套脚本，用自己熟悉的一种跑通即可。先按表1拟合模型，核对OR、区间与图1的预测结果，再计算U、方差和趋势Q，比较三种检验。</p>
+<p>R用自带的<code>glm()</code>拟合，用<code>prop.trend.test()</code>与<code>anova(..., test = "Rao")</code>核对得分检验，再用<code>lmtest::lrtest()</code>复现同一似然比比较；Python用<code>statsmodels.GLM</code>，MATLAB用<code>glmfit()</code>拟合同一二项模型。后两套脚本的得分统计量直接按式（4）和式（5）计算，Wald、似然比及预测由拟合结果得到。</p>
+<p>第一遍从01.1到01.5顺序运行：准备数据→拟合与OR→预测和图→趋势及三检验→汇总与保存。第二遍练习，把脚本开头的<code>mV_per_score</code>从0.1改为1，再从数据准备节顺序运行。这个参数表示模型中一个评分单位对应多少mV；改为1后，评分就是以mV计的干扰峰峰值。拟合概率和检验P应保持一致，斜率与OR的单位变为“每增加1 mV”。脚本还会将OR换算回“每增加0.1 mV”，便于核对原结果。这样能把单位变化与数据证据区分开。</p>
+<p>本篇完整项目：<a href="https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article40_trend_logistic" rel="noopener" target="_blank">https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article40_trend_logistic</a></p>
+<p>系列仓库入口：<a href="https://github.com/fuyuming/statistics-classroom" rel="noopener" target="_blank">https://github.com/fuyuming/statistics-classroom</a></p>
+<p>完整仓库ZIP下载：<a href="https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip" rel="noopener" target="_blank">https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip</a></p>
+<p>本地学生练习包解压后，进入<code>article40_trend_logistic/</code>，先读README，再打开R项目、Spyder文件夹项目或MATLAB对应脚本，从数据准备节顺序运行。完整仓库解压进入<code>stats_classroom/article40_trend_logistic/</code>即可找到同一套材料。</p>
+<p>延伸阅读：<a href="https://mp.weixin.qq.com/s/prfW3gQe7kXAUhqaisG6yw" rel="noopener" target="_blank">统计课堂13</a>回看均数比较与模型参数的对应；<a href="https://mp.weixin.qq.com/s?__biz=MzkxODE4ODY2OA==&amp;mid=2247484411&amp;idx=1&amp;sn=bae476cc01e8402397401c0b2ac30859" rel="noopener" target="_blank">统计课堂35</a>回看为什么检验结果要连同效应估计和置信区间一起报告。</p>
+<p>这里是“明哥的微生物世界”，一起把统计问题读清楚、算明白。</p>
+<h2>参考文献与官方说明</h2>
+<ol><li>R stats：<code>family()</code>、<code>glm()</code>，二项响应、连接函数与拟合。<a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/family.html" rel="noopener" target="_blank">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/family.html</a> ；<a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/glm.html" rel="noopener" target="_blank">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/glm.html</a> ；SAS/STAT：Generalized Linear Models，GLM三个组成部分。<a href="https://support.sas.com/documentation/cdl/en/statug/65328/HTML/default/statug_intromod_sect011.htm" rel="noopener" target="_blank">https://support.sas.com/documentation/cdl/en/statug/65328/HTML/default/statug_intromod_sect011.htm</a></li><li>R stats：<code>summary.glm()</code>，系数、标准误、z比与双侧P。<a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/summary.glm.html" rel="noopener" target="_blank">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/summary.glm.html</a></li><li>R stats：<code>prop.trend.test()</code>，有序组率趋势检验与log odds局部备择。<a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/prop.trend.test.html" rel="noopener" target="_blank">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/prop.trend.test.html</a></li><li>Rosner B. Fundamentals of Biostatistics. 8th ed. Cengage Learning, 2016. §10.6，p419，式10.20：二项比例的趋势统计量、双侧P与近似使用建议。</li><li>R stats：<code>anova.glm()</code>，同一数据的嵌套模型比较、Rao有效得分与似然比检验。<a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/anova.glm.html" rel="noopener" target="_blank">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/anova.glm.html</a></li><li>lmtest：<code>lrtest()</code>，嵌套模型的渐近似然比检验。<a href="https://cran.r-project.org/web/packages/lmtest/refman/lmtest.html#lrtest" rel="noopener" target="_blank">https://cran.r-project.org/web/packages/lmtest/refman/lmtest.html#lrtest</a></li><li>Luo Y, Liu Y, Su D, Liao M, Hong L. Association of AAP/CDC %BMIp95 obesity severity grades with metabolic abnormalities in Chinese children with obesity attending a tertiary pediatric outpatient clinic: a retrospective cross-sectional study. Front Pediatr. 2026;14:1974497. <a href="https://doi.org/10.3389/fped.2026.1974497" rel="noopener" target="_blank">https://doi.org/10.3389/fped.2026.1974497</a></li><li>performance：<code>check_model()</code>。<a href="https://easystats.github.io/performance/reference/check_model.html" rel="noopener" target="_blank">https://easystats.github.io/performance/reference/check_model.html</a> ；DHARMa：模拟残差与模型诊断。<a href="https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html" rel="noopener" target="_blank">https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html</a></li><li>sjPlot：<code>tab_model()</code>，模型结果HTML表。<a href="https://strengejacke.github.io/sjPlot/reference/tab_model.html" rel="noopener" target="_blank">https://strengejacke.github.io/sjPlot/reference/tab_model.html</a></li><li>lme4：<code>glmer()</code>。<a href="https://lme4.github.io/lme4/reference/glmer.html" rel="noopener" target="_blank">https://lme4.github.io/lme4/reference/glmer.html</a> ；glmmTMB：<code>glmmTMB()</code>。<a href="https://glmmTMB.github.io/glmmTMB/reference/glmmTMB.html" rel="noopener" target="_blank">https://glmmTMB.github.io/glmmTMB/reference/glmmTMB.html</a> ；brms：<code>brm()</code>。<a href="https://paulbuerkner.com/brms/reference/brm.html" rel="noopener" target="_blank">https://paulbuerkner.com/brms/reference/brm.html</a></li></ol></main></body></html>
