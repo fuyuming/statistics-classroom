@@ -8,7 +8,7 @@
 - **Python（Spyder / VS Code）**：在Spyder中通过“Projects→New Project”选择已有的本项目根目录，确认工作目录也指向这里；打开唯一主入口 scripts/article37_categorical_posthoc.py；Spyder中按# %%逐节用菜单“Run→Run cell”（macOS可用Cmd+Return，Windows/Linux可用Ctrl+Enter；需要移到下一节可用Shift+Enter），需要整文件时按F5。请使用安装依赖时的同一个Python环境。
 - **MATLAB**：将 Current Folder 设为本项目根目录，打开 scripts/article37_categorical_posthoc.m；每个 %% 为一节，点击 Run Section。添加搜索路径并不等于改变 Current Folder。
 
-三种入口均先检查 data/faults.csv 是否存在，避免在错误目录里读错数据。本篇每种语言只有一个主入口、6个helper和4张结果表；helpers是选读的自编函数，主脚本会调用所需函数。
+三种入口均先检查 data/faults.csv 是否存在，避免在错误目录里读错数据。本篇每种语言只有一个主入口和4张结果表；项目合计6个helper，由相应主脚本调用，helpers是选读的自编函数。
 
 ## 一次性安装依赖
 
@@ -59,10 +59,10 @@ faults.csv中 open、electrode、board 分别为接头开路、电极脱落、�
 | min_expected | 各对子表自己的最小预期频数 |
 | V、V_low、V_high | 未修正Cramér V及单项双侧95%非中心χ²近似区间 |
 | p1、p2、diff | 前组、后组的电极脱落比例，diff=p1-p2 |
-| diff_low、diff_high | 与R prop.test(correct=TRUE)一致的比例差单项95%近似区间 |
+| diff_low、diff_high | 带连续性校正的正态近似比例差单项95%区间，与R prop.test(correct=TRUE)一致 |
 | OR、OR_low、OR_high | 固定边际条件Fisher检验的条件优势比及单项双侧区间 |
 
-比例差乘100，单位是百分点。V、比例差和OR区间均为**单项区间**，没有构造三项同时区间；P值另按同一问题的三对结果作Holm判断。这里的条件OR采用前一组相对于后一组的合格优势，OR>1表示前一组的合格优势更高；区间跨1时不能据此明确方向。
+比例差乘100，单位是百分点。V、比例差和OR区间均为**单项区间**，没有构造三项同时区间；P值另按同一问题的三对结果作Holm判断。这里的条件OR采用前一组相对于后一组的合格优势，OR>1表示前一组的合格优势更高；区间跨1时不能据此明确方向。固定行、列合计后的条件OR估计，与直接用两组样本优势之比估计OR的数值可以不同：本例A–C前者为0.047619，Fisher条件OR为约0.0579，结果表使用后者。
 
 ## 显示与保存
 
