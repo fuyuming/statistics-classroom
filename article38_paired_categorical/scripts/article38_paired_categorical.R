@@ -91,7 +91,7 @@ bowker_formula <- function(tab) {
   sum(differences^2 / totals)
 }
 
-# 3 Cochran Q及Friedman：公式与真实包调用 ----
+# 3 Cochran Q：公式与真实包调用 ----
 n <- nrow(Y)
 k <- ncol(Y)
 C <- colSums(Y)
@@ -100,25 +100,16 @@ T <- sum(R)
 D <- sum(R * (k - R))
 Q <- k * (k - 1) * sum((C - T / k)^2) / D
 q_fit <- DescTools::CochranQTest(Y)
-f_fit <- stats::friedman.test(Y)
 cat("Q节教学输入：n=", n, "，k=", k, "；列和C=", paste(C, collapse = ","),
     "；T=", T, "，D=", D, "；df=", k - 1,
     "；渐近P=", format.pval(pchisq(Q, k - 1, lower.tail = FALSE)), "\n", sep = "")
 print(q_fit)
-print(f_fit)
-# 用平均秩和并列项再核对，不能把未校正的Friedman量当Q。
-ranks <- t(apply(Y, 1, rank, ties.method = "average"))
-V <- colSums(ranks) - n * (k + 1) / 2
-Ties <- sum(R^3 - R + (k - R)^3 - (k - R))
-f_manual <- 12 * sum(V^2) / (n * k * (k + 1) - Ties / (k - 1))
 q_function_comparison <- data.frame(
-  test = c("Cochran_Q", "Friedman_tie_corrected"),
-  formula = c(Q, f_manual),
-  `function` = c(unname(q_fit$statistic), unname(f_fit$statistic)),
-  abs_error = c(abs(Q - q_fit$statistic), abs(f_manual - f_fit$statistic)))
+  test = "Cochran_Q", formula = Q,
+  `function` = unname(q_fit$statistic),
+  abs_error = abs(Q - q_fit$statistic))
 print(q_function_comparison)
 stopifnot(abs(Q - q_fit$statistic) < 1e-10)
-stopifnot(abs(Q - f_fit$statistic) < 1e-10, abs(Q - f_manual) < 1e-10)
 cat("Q回答三法总体阳性概率是否相同；不说明准确性。\n")
 
 # 4 给定每人行和的Cochran Q条件精确枚举 ----
@@ -201,9 +192,9 @@ print(sm_function_comparison)
 stopifnot(abs(SM - sm_fit$statistic) < 1e-10)
 stopifnot(abs(Bowker - bow_fit$statistic) < 1e-10)
 key_results <- data.frame(
-  method = c("Cochran_Q", "Friedman", "Stuart_Maxwell", "Bowker"),
-  statistic = c(Q, f_manual, SM, Bowker),
-  df = c(k - 1, k - 1, nrow(M) - 1, nrow(M) * (nrow(M) - 1) / 2))
+  method = c("Cochran_Q", "Stuart_Maxwell", "Bowker"),
+  statistic = c(Q, SM, Bowker),
+  df = c(k - 1, nrow(M) - 1, nrow(M) * (nrow(M) - 1) / 2))
 # lower.tail=FALSE计算卡方分布右尾；均为渐近P。
 key_results$p_value <- pchisq(key_results$statistic, key_results$df, lower.tail = FALSE)
 print(key_results)

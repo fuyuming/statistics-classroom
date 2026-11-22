@@ -80,7 +80,7 @@ def bowker_formula(tab):
     return float(np.sum(difference**2 / totals))
 
 
-# %% 1 Cochran Q、平均秩与并列校正Friedman
+# %% 1 Cochran Q
 n, k = Y.shape
 columns = Y.sum(axis=0)
 rows = Y.sum(axis=1)
@@ -88,21 +88,15 @@ total = rows.sum()
 D = np.sum(rows * (k - rows))
 Q = k * (k - 1) * np.sum((columns - total/k)**2) / D
 q_native = cochrans_q(Y)                    # statsmodels原生Q，行=区组
-f_native = stats.friedmanchisquare(*Y.T)    # SciPy原生，输入每列一组
-ranks = stats.rankdata(Y, axis=1, method="average")
-centered_rank_sum = ranks.sum(axis=0) - n*(k+1)/2
-Ties = np.sum(rows**3 - rows + (k-rows)**3 - (k-rows))
-f_manual = 12*np.sum(centered_rank_sum**2) / (n*k*(k+1)-Ties/(k-1))
 print(f"Q节教学输入：n={n}，k={k}；列和C={columns.tolist()}；T={total}，D={D}；"
       f"df={k-1}；渐近P={stats.chi2.sf(Q, k-1):.12g}")
 q_function_comparison = pd.DataFrame({
-    "test": ["Cochran_Q", "Friedman_tie_corrected"],
-    "formula": [Q, f_manual],
-    "function": [q_native.statistic, f_native.statistic],
-    "abs_error": [abs(Q-q_native.statistic), abs(f_manual-f_native.statistic)]})
+    "test": ["Cochran_Q"], "formula": [Q],
+    "function": [q_native.statistic],
+    "abs_error": [abs(Q-q_native.statistic)]})
 print(q_function_comparison.to_string(index=False))
-assert np.allclose([q_native.statistic, f_native.statistic, f_manual], Q, atol=1e-10)
-print("Q、Friedman、并列项：", Q, f_manual, Ties)
+assert abs(q_native.statistic-Q) < 1e-10
+print("Q：", Q)
 print("Q回答总体阳性概率是否相同，不评价哪法准确。")
 
 # %% 2 给定每人行和的Cochran Q条件精确枚举
@@ -176,9 +170,9 @@ sm_function_comparison = pd.DataFrame({
     "abs_error": [abs(SM-sm_native.statistic), abs(Bowker-bow_native.statistic)]})
 print(sm_function_comparison.to_string(index=False))
 key_results = pd.DataFrame({
-    "method": ["Cochran_Q", "Friedman", "Stuart_Maxwell", "Bowker"],
-    "statistic": [Q, f_manual, SM, Bowker],
-    "df": [k-1, k-1, len(M)-1, len(M)*(len(M)-1)//2]})
+    "method": ["Cochran_Q", "Stuart_Maxwell", "Bowker"],
+    "statistic": [Q, SM, Bowker],
+    "df": [k-1, len(M)-1, len(M)*(len(M)-1)//2]})
 # sf是右尾概率，而不是把原始分类资料当正态。
 key_results["p_value"] = stats.chi2.sf(key_results.statistic, key_results.df)
 print(key_results.to_string(index=False))

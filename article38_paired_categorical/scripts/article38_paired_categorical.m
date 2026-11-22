@@ -1,7 +1,7 @@
 %% 统计课堂38：完整配对分类教学项目（UTF-8）
 % 两例均为假设教学计数：例1为n=8的三法二分类，例2为n=144的前后多分类。
 % 对应问题：例1问三种检测的总体阳性率是否相同及配对差异；例2问前后边际是否同质、反向路径是否对称。
-% 本文Q/Friedman/SM/Bowker/精确二项/Holm均为明确标记的自编实现。
+% 本文Q/SM/Bowker/精确二项/Holm均为明确标记的自编实现。
 % 使用MATLAB基础分布特殊函数gammainc、gammaln、betaincinv、erfinv，无需统计工具箱。
 % 默认显示结果；改SAVE_RESULTS=true可保存CSV，各语言输出互不覆盖。
 SAVE_RESULTS = strcmp(getenv('ARTICLE38_SAVE'), '1');
@@ -41,7 +41,7 @@ end
 disp(Y(1:6, :));
 disp(M); % 行=前，列=后，相同类别顺序
 
-%% 2 Q与含平均秩、并列校正的Friedman（自编公式）
+%% 2 Cochran Q（自编公式与df/P）
 n = size(Y, 1);
 k = size(Y, 2);
 column_sum = sum(Y, 1);
@@ -49,19 +49,9 @@ row_sum = sum(Y, 2);
 total = sum(row_sum);
 D = sum(row_sum .* (k-row_sum));
 Q = k*(k-1)*sum((column_sum-total/k).^2)/D;
-% 式5直接给出0/1完整区组的平均秩，逐行核对行秩和。
-ranks = (k-row_sum+1)/2 + (k/2)*Y;
-V = sum(ranks, 1) - n*(k+1)/2;
-Ties = sum(row_sum.^3-row_sum+(k-row_sum).^3-(k-row_sum));
-f_manual = 12*sum(V.^2)/(n*k*(k+1)-Ties/(k-1));
 fprintf('Q节教学输入：n=%d，k=%d；列和C=[%s]；T=%g，D=%g；df=%d；渐近P=%.12g\n', ...
     n, k, num2str(column_sum), total, D, k-1, gammainc(Q/2,(k-1)/2,'upper'));
-matlab_formula_check = table("Q_vs_tie_corrected_Friedman", Q, f_manual, abs(Q-f_manual), ...
-    'VariableNames', {'comparison','formula_1','formula_2','abs_error'});
-disp(matlab_formula_check);
-fprintf('两种自编公式分别使用列阳性人数与平均秩，得到相同的统计量。\n');
-assert(abs(Q-f_manual) < 1e-10);
-fprintf('Q=%.10f，Friedman=%.10f，Ties=%.0f\n', Q, f_manual, Ties);
+fprintf('Q=%.10f\n', Q);
 fprintf('Q比较总体阳性概率，不说明哪种检测准确。\n');
 
 %% 3 给定每人行和的Cochran Q条件精确枚举
@@ -128,9 +118,9 @@ fprintf('例1 rate_diff乘100为百分点；小样本不输出Wald区间；例2 
 Bowker = bowker_formula(M);
 disp(difference);
 disp(S);
-method = ["Cochran_Q"; "Friedman"; "Stuart_Maxwell"; "Bowker"];
-statistic = [Q; f_manual; SM; Bowker];
-df = [k-1; k-1; size(M, 1)-1; size(M, 1)*(size(M, 1)-1)/2];
+method = ["Cochran_Q"; "Stuart_Maxwell"; "Bowker"];
+statistic = [Q; SM; Bowker];
+df = [k-1; size(M, 1)-1; size(M, 1)*(size(M, 1)-1)/2];
 % gammainc的upper参数给出卡方右尾，不依赖chi2cdf工具箱。
 p_value = gammainc(statistic/2, df/2, 'upper');
 key_results = table(method, statistic, df, p_value);
