@@ -1,7 +1,7 @@
 % 统计课堂37：完整构成、指定类别比例、稀疏表检验（第11课教学例题计数，非真实调查）。
 % faults是每组80台已失效记录器的故障构成，sparse是每组10台的合格/不合格计数。
-% 依赖Statistics and Machine Learning Toolbox；UTF-8。Current Folder设为根目录后按八节运行，默认显示。
-% 设置ARTICLE37_SAVE_RESULTS=1后第8节保存四张表到results/MATLAB。
+% 依赖Statistics and Machine Learning Toolbox；UTF-8。Current Folder设为根目录后按九节运行，默认显示。
+% 设置ARTICLE37_SAVE_RESULTS=1后第9节保存四张表到results/MATLAB。
 %% 1. 数据与参数
 if ~isfile(fullfile('data', 'faults.csv'))
     error('请把Current Folder设为含data文件夹的本项目根目录。');
@@ -143,14 +143,45 @@ comparison = table(full_pairs.pair, full_pairs.p_holm, category_pairs.p_holm, ..
     'VariableNames', {'pair','full_p_holm','category_p_holm'});
 disp(comparison);
 disp('两列Holm P分别属于完整构成三对族与指定类别比例三对族。');
-%% 7. G-H效应量与区间报告
+%% 7. 独立检验练习：Hochberg
+% 这是单独给定的3项相互独立检验，不来自前面F-G、F-H、G-H共享数据的原例。
+% 原始P为test1/test2/test3=.020/.023/.040，按FWER=.05作判断。
+p_demo = [0.020; 0.023; 0.040];
+practice_labels = ["test1"; "test2"; "test3"];
+practice_alpha = 0.05;
+% Holm：先调用已有自编函数；Hochberg按升序排序后乘m,m-1,...,1。
+practice_holm = holm_adjust(p_demo);
+[sorted_p, sort_index] = sort(p_demo);
+% m_practice是本练习的检验数；sort_index记录排序前的位置。
+m_practice = numel(sorted_p);
+hochberg_candidate = sorted_p .* (m_practice:-1:1)';
+% 从最大原始P开始倒序，取累计最小值，再恢复升序并限制不超过1。
+candidate_reverse = flipud(hochberg_candidate);
+cummin_reverse = cummin(candidate_reverse);
+sorted_hochberg = flipud(cummin_reverse);
+sorted_hochberg = min(sorted_hochberg, 1);
+practice_hochberg = zeros(m_practice, 1);
+% sort_index把排序后的调整值放回test1/test2/test3原顺序。
+practice_hochberg(sort_index) = sorted_hochberg;
+practice_table = table(practice_labels, p_demo, practice_holm, practice_hochberg, ...
+    'VariableNames', {'test','raw','holm','hochberg'});
+disp(practice_table);
+practice_reject_holm = practice_table.test(practice_table.holm <= practice_alpha);
+practice_reject_hochberg = practice_table.test(practice_table.hochberg <= practice_alpha);
+disp('test1/test2/test3分别对应检验甲/乙/丙。');
+disp('Hochberg目标是控制FWER；适用于相互独立或符合特定正依赖条件的检验。');
+disp('本练习采用相互独立前提，原三组对分析继续使用Holm。');
+fprintf('Holm拒绝项数：%d；Hochberg拒绝项数：%d。\n', ...
+    numel(practice_reject_holm), numel(practice_reject_hochberg));
+
+%% 8. G-H效应量与区间报告
 gh_index = find(category_pairs.pair == "G-H");
 gh = category_pairs(gh_index, :);
 fprintf('G-H电极脱落比例差=%.6f（前组减后组），单项%.0f%% CI [%.6f, %.6f]，Holm P=%.6f。\n', ...
     gh.diff, conf_level * 100, gh.diff_low, gh.diff_high, gh.p_holm);
 disp('区间没有作三项同时覆盖调整；Holm只用于同一问题的三对P值。');
 
-%% 8. 可选保存
+%% 9. 可选保存
 % 默认不写文件。需保存时先运行 setenv('ARTICLE37_SAVE_RESULTS','1')，再运行本节。
 save_results = strcmp(getenv('ARTICLE37_SAVE_RESULTS'), '1');
 if save_results

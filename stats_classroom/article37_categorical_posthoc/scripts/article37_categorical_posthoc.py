@@ -1,7 +1,7 @@
 """统计课堂37：完整构成、指定类别比例、稀疏表检验（第11课教学例题计数，非真实调查）。
 faults是每组80台已失效记录器的故障构成，sparse是每组10台的合格/不合格计数。
-依赖NumPy/pandas/SciPy/statsmodels；UTF-8。Spyder/VS Code从根目录按八节运行，默认显示；
-设置ARTICLE37_SAVE_RESULTS=1后第8节保存四张表到results/Python。"""
+依赖NumPy/pandas/SciPy/statsmodels；UTF-8。Spyder/VS Code从根目录按九节运行，默认显示；
+设置ARTICLE37_SAVE_RESULTS=1后第9节保存四张表到results/Python。"""
 # %% 1. 数据与参数
 from pathlib import Path
 import itertools
@@ -154,7 +154,30 @@ comparison = pd.DataFrame({
 print(comparison.to_string(index=False))
 print("两列Holm P分别属于完整构成三对族与指定类别比例三对族。")
 
-# %% 7. G-H效应量与区间报告
+# %% 7. 独立检验练习：Hochberg
+# 这是单独给定的3项相互独立检验，不来自前面F-G、F-H、G-H共享数据的原例。
+# 原始P为test1/test2/test3=.020/.023/.040，按FWER=.05作判断。
+p_demo = np.array([0.020, 0.023, 0.040])
+practice_labels = ["test1", "test2", "test3"]
+practice_holm = multipletests(p_demo, method="holm")[1]
+# statsmodels的simes-hochberg对应R的p.adjust(method="hochberg").
+practice_hochberg = multipletests(p_demo, method="simes-hochberg")[1]
+practice_table = pd.DataFrame({
+    "test": practice_labels,
+    "raw": p_demo,
+    "holm": practice_holm,
+    "hochberg": practice_hochberg,
+})
+print(practice_table.to_string(index=False))
+practice_alpha = 0.05
+practice_reject_holm = practice_table.loc[practice_table["holm"] <= practice_alpha, "test"].tolist()
+practice_reject_hochberg = practice_table.loc[practice_table["hochberg"] <= practice_alpha, "test"].tolist()
+print("test1/test2/test3分别对应检验甲/乙/丙。")
+print("Hochberg目标是控制FWER；适用于相互独立或符合特定正依赖条件的检验。")
+print("本练习采用相互独立前提，原三组对分析继续使用Holm。")
+print(f"Holm拒绝项数：{len(practice_reject_holm)}；Hochberg拒绝项数：{len(practice_reject_hochberg)}。")
+
+# %% 8. G-H效应量与区间报告
 # 只报告一个示例组对，区间为单项区间，P值仍按三对家族调整。
 gh = category_pairs[category_pairs["pair"] == "G-H"].iloc[0]
 print(
@@ -164,7 +187,7 @@ print(
 )
 print("区间没有作三项同时覆盖调整；Holm只用于同一问题的三对P值。")
 
-# %% 8. 可选保存
+# %% 9. 可选保存
 # 默认不写文件。需保存时先运行 os.environ["ARTICLE37_SAVE_RESULTS"] = "1"，再运行本节。
 save_results = os.environ.get("ARTICLE37_SAVE_RESULTS") == "1"
 if save_results:

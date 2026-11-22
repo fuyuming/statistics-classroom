@@ -1,6 +1,6 @@
 # 统计课堂37：分类计数数据多重比较的方法怎样选择？
 
-本项目对应“明哥的微生物世界”统计课堂37。数据是第11课P31/P33的教学例题计数，不是现实调查；比较对象先确定，再计算原始P和整批调整结果。只需选择一种语言，从第1节顺序运行到第8节。
+本项目对应“明哥的微生物世界”统计课堂37。数据是第11课P31/P33的教学例题计数，不是现实调查；比较对象先确定，再计算原始P和整批调整结果。只需选择一种语言，从第1节顺序运行到第9节。
 
 ## 先打开项目
 
@@ -28,7 +28,7 @@ python -m pip install -r requirements.txt
 
 MATLAB需要 **Statistics and Machine Learning Toolbox**，用于 fishertest、chi2cdf、ncx2cdf、normcdf、norminv；fzero 是基础MATLAB函数。本项目不使用其他工具箱。
 
-## 八节练习与文章对应
+## 九节练习与文章对应
 
 | 节 | 操作 | 主要对象 / 应读结果 |
 | --- | --- | --- |
@@ -38,17 +38,18 @@ MATLAB需要 **Statistics and Machine Learning Toolbox**，用于 fishertest、c
 | 4 | 电极脱落与其他，两组比例比较 | category_pairs：Holm P为1、1、0.424934；G-H差12.5个百分点 |
 | 5 | 各10台的独立试验，用双侧Fisher | sparse_pairs：三对最小E为1.5、4、4.5 |
 | 6 | 并列比较两类问题的调整P | comparison：完整构成与指定类别比例的三对Holm P |
-| 7 | 报告G-H比例差效应量 | 比例差、单项区间与同一三对族的Holm P |
-| 8 | 可选保存四张结果表 | 默认不保存，启用后写到results/对应语言 |
+| 7 | 独立检验练习：并列比较Holm与Hochberg | `p_demo`给定test1/test2/test3的原始P=.020/.023/.040，输出raw/holm/hochberg；不来自F-G/F-H/G-H计数表 |
+| 8 | 报告G-H比例差效应量 | 比例差、单项区间与同一三对族的Holm P |
+| 9 | 可选保存四张结果表 | 默认不保存，启用后写到results/对应语言 |
 
 faults.csv中 open、electrode、board 分别为接头开路、电极脱落、主板连接故障。每行80台都是已失效记录器，每台只有一个主要故障；分析故障构成，不是全部投入使用设备的失效率。sparse.csv是另取30台独立记录器的试验，A硅胶灌封、B环氧灌封、C热缩套管各10台；每台弯折100次后连接心电模拟器记录10 min，期间无持续≥1 s的数据缺口判为合格。合格/不合格计数分别为1/9、2/8、7/3。三对合格率作为同一比较族，采用双侧检验、Holm调整及单项95%区间。
 
 ## 函数、参数和字段怎么读
 
-- R使用原生 chisq.test、prop.test、fisher.test、p.adjust；第2节另用 report::report 组织整体检验文字；第3—5节还实际调用正文的 rcompanion / rstatix 入口，与逐对子表结果核对。effectsize::cramers_v 的 adjust=FALSE 对应未作小样本偏差修正的课堂V，alternative="two.sided"请求双侧区间。
+- R使用原生 chisq.test、prop.test、fisher.test、p.adjust；第2节另用 report::report 组织整体检验文字；第3—5节还实际调用正文的 rcompanion / rstatix 入口，与逐对子表结果核对。第7节用 `stats::p.adjust(method = "hochberg")` 与 Holm 并列；Hochberg目标是控制FWER，适用于相互独立或符合特定正依赖条件的检验，本练习采用相互独立前提，原三组对分析继续使用Holm。effectsize::cramers_v 的 adjust=FALSE 对应未作小样本偏差修正的课堂V，alternative="two.sided"请求双侧区间。
 - 课堂单次两率比较与批量入口相接：pairwise_prop_test 经 pairwise.prop.test 逐对使用 prop.test；pairwise_fisher_test 经 rstatix::fisher_test，底层使用 stats::fisher.test。若分析方案选用无条件精确率差，可逐对用 exact2x2::uncondExact2x2（parmtype="difference", nullparm=0），再汇总原始P作p.adjust。该函数的率差方向为第二组减第一组，conf.int=TRUE请求率差区间；fisher.test的conf.int则针对优势比OR。本项目执行第4节的近似率比较和第5节的Fisher；无条件精确率差在正文作为课堂函数入口提示。
-- Python使用SciPy的chi2_contingency、fisher_exact、contingency.odds_ratio(kind="conditional")，statsmodels的multipletests；intervals.py提供比例差区间函数。
-- MATLAB使用原生fishertest得到精确P；fisher_or_ci、rate_difference_ci等是自编函数，其名称与文件一一对应；true/false决定2×2是否采用Yates校正。
+- Python使用SciPy的chi2_contingency、fisher_exact、contingency.odds_ratio(kind="conditional")，statsmodels的multipletests；第7节用 `multipletests(method="simes-hochberg")` 对应R的Hochberg；intervals.py提供比例差区间函数。
+- MATLAB使用原生fishertest得到精确P；第7节在本节内分步排序、乘m,m−1,…,1、反向累计最小并还原原序，不新增helper；fisher_or_ci、rate_difference_ci等是自编函数，其名称与文件一一对应；true/false决定2×2是否采用Yates校正。
 
 所有三对结果的顺序为F-G、F-H、G-H；稀疏表为A-B、A-C、B-C。
 
@@ -66,7 +67,7 @@ faults.csv中 open、electrode、board 分别为接头开路、电极脱落、�
 
 ## 显示与保存
 
-默认整文件或逐节运行仅显示结果，不修改项目文件。需要导出时，在各自控制台启用开关，再运行第8节：
+默认整文件或逐节运行仅显示结果，不修改项目文件。需要导出时，在各自控制台启用开关，再运行第9节：
 
 ~~~r
 Sys.setenv(ARTICLE37_SAVE_RESULTS = "1")
@@ -80,7 +81,7 @@ os.environ["ARTICLE37_SAVE_RESULTS"] = "1"
 setenv('ARTICLE37_SAVE_RESULTS', '1')
 ~~~
 
-第8节只保存 main_overall、full_pairs、category_pairs、sparse_pairs 四张CSV，每种语言的列名、标签、顺序一致。恢复默认分别用 Sys.unsetenv("ARTICLE37_SAVE_RESULTS")、os.environ.pop("ARTICLE37_SAVE_RESULTS", None)、setenv('ARTICLE37_SAVE_RESULTS','')。
+第9节只保存 main_overall、full_pairs、category_pairs、sparse_pairs 四张CSV，每种语言的列名、标签、顺序一致；第7节练习只在控制台显示，不新增CSV。恢复默认分别用 Sys.unsetenv("ARTICLE37_SAVE_RESULTS")、os.environ.pop("ARTICLE37_SAVE_RESULTS", None)、setenv('ARTICLE37_SAVE_RESULTS','')。
 
 终端整文件运行也要从项目根目录开始：
 
@@ -92,7 +93,8 @@ matlab -batch "addpath('scripts'); article37_categorical_posthoc"
 
 再跑一次时，可以做以下练习，先预测再核对：
 
-- **区间水平**：将第1节的 conf_level 从0.95改为0.99，从第1节顺序重跑到第7节。预期区间变宽，点估计与检验P值保持不变；控制台的置信水平标签也应显示99%。
+- **Hochberg练习**：在第7节把第三个原始P从`0.040`改为`0.060`，先预测再运行。预期Holm为`.060/.060/.060`，Hochberg为`.046/.046/.060`；这是独立教学向量的演算练习，不改变原三组对分析。
+- **区间水平**：将第1节的 conf_level 从0.95改为0.99，从第1节顺序重跑到第8节。预期区间变宽，点估计与检验P值保持不变；控制台的置信水平标签也应显示99%。
 - **作差方向**：将G–H单次比例比较的组序换成H–G。预期差为−12.5个百分点，95%区间变为［−28.63，3.63］个百分点，双侧P值不变。
 
 这两项练习分别改变区间水平与报告方向，保留原来的观察计数。

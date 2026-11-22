@@ -1,7 +1,7 @@
 # 统计课堂37：区分完整构成、指定类别比例和稀疏表检验（第11课教学例题计数，非真实调查）。
 # faults为每组80台已失效记录器的故障构成；sparse为每组10台的合格/不合格计数。
-# 依赖 effectsize/rcompanion/rstatix/report；UTF-8保存。打开Rproj后按八节运行，默认显示结果。
-# 设 ARTICLE37_SAVE_RESULTS=1 后第8节才保存四张表到 results/R。
+# 依赖 effectsize/rcompanion/rstatix/report；UTF-8保存。打开Rproj后按九节运行，默认显示结果。
+# 设 ARTICLE37_SAVE_RESULTS=1 后第9节才保存四张表到 results/R。
 # 1. 数据与参数 ----
 needed <- c("effectsize", "rcompanion", "rstatix", "report")
 for (pkg in needed) {
@@ -177,14 +177,34 @@ comparison <- data.frame(
 print(comparison)
 cat("两列Holm P分别属于完整构成三对族与指定类别比例三对族。\n")
 
-# 7. G-H效应量与区间报告 ----
+# 7. 独立检验练习：Hochberg ----
+# 这是单独给定的3项相互独立检验，不来自前面F-G、F-H、G-H共享数据的原例。
+# 原始P为test1/test2/test3=.020/.023/.040，按FWER=.05作判断。
+p_demo <- c(test1 = 0.020, test2 = 0.023, test3 = 0.040)
+practice_table <- data.frame(
+  test = unname(names(p_demo)),
+  raw = unname(p_demo),
+  holm = stats::p.adjust(p_demo, method = "holm"),
+  hochberg = stats::p.adjust(p_demo, method = "hochberg"),
+  row.names = seq_along(p_demo)
+)
+print(practice_table)
+practice_alpha <- 0.05
+practice_reject_holm <- practice_table$test[practice_table$holm <= practice_alpha]
+practice_reject_hochberg <- practice_table$test[practice_table$hochberg <= practice_alpha]
+cat("test1/test2/test3分别对应检验甲/乙/丙。\n")
+cat("Hochberg目标是控制FWER；适用于相互独立或符合特定正依赖条件的检验。\n")
+cat("本练习采用相互独立前提，原三组对分析继续使用Holm。\n")
+cat("Holm拒绝项数：", length(practice_reject_holm), "；Hochberg拒绝项数：", length(practice_reject_hochberg), "。\n", sep = "")
+
+# 8. G-H效应量与区间报告 ----
 # 只报告一个示例组对，区间为单项区间，P值仍按三对家族调整。
 gh <- category_pairs[category_pairs$pair == "G-H", ]
 cat(sprintf("G-H电极脱落比例差=%.6f（前组减后组），单项%.0f%% CI [%.6f, %.6f]，Holm P=%.6f。\n",
             gh$diff, conf_level * 100, gh$diff_low, gh$diff_high, gh$p_holm))
 cat("区间没有作三项同时覆盖调整；Holm只用于同一问题的三对P值。\n")
 
-# 8. 可选保存 ----
+# 9. 可选保存 ----
 # 默认不写文件。需保存时先运行 Sys.setenv(ARTICLE37_SAVE_RESULTS = "1")，再运行本节。
 save_results <- identical(Sys.getenv("ARTICLE37_SAVE_RESULTS"), "1")
 if (save_results) {
