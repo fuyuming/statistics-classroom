@@ -212,6 +212,26 @@ cat("Hochberg目标是控制FWER；适用于相互独立或符合特定正依赖
 cat("本练习采用相互独立前提，原三组对分析继续使用Holm。\n")
 cat("Holm拒绝项数：", length(practice_reject_holm), "；Hochberg拒绝项数：", length(practice_reject_hochberg), "。\n", sep = "")
 
+# 对照：最大P首关通过时全部拒绝，但各项调整P仍可不同。
+p_compare <- c(test1 = 0.001, test2 = 0.020, test3 = 0.040)
+compare_table <- data.frame(
+  test = unname(names(p_compare)),
+  raw = unname(p_compare),
+  hochberg = stats::p.adjust(p_compare, method = "hochberg"),
+  row.names = seq_along(p_compare)
+)
+compare_reject_hochberg <- compare_table$test[compare_table$hochberg <= practice_alpha]
+print(compare_table)
+if (max(p_compare) <= practice_alpha) {
+  cat("最大P=", max(p_compare), "≤", practice_alpha,
+      "，Hochberg首关通过，拒绝全部三项。\n", sep = "")
+} else {
+  cat("最大P=", max(p_compare), ">", practice_alpha,
+      "，首关未通过，继续按Hochberg规则判断。\n", sep = "")
+}
+cat("各项调整P由整组P从后往前取累计最小计算，不一定相同。\n")
+cat("对照例Hochberg拒绝项数：", length(compare_reject_hochberg), "。\n", sep = "")
+
 # 8. G-H效应量与区间报告 ----
 # 只报告一个示例组对，区间为单项区间，P值仍按三对家族调整。
 gh <- category_pairs[category_pairs$pair == "G-H", ]

@@ -191,6 +191,25 @@ print("Hochberg目标是控制FWER；适用于相互独立或符合特定正依�
 print("本练习采用相互独立前提，原三组对分析继续使用Holm。")
 print(f"Holm拒绝项数：{len(practice_reject_holm)}；Hochberg拒绝项数：{len(practice_reject_hochberg)}。")
 
+# 对照：最大P首关通过时全部拒绝，但各项调整P仍可不同。
+p_compare = np.array([0.001, 0.020, 0.040])
+compare_hochberg = multipletests(p_compare, method="simes-hochberg")[1]
+compare_table = pd.DataFrame({
+    "test": ["test1", "test2", "test3"],
+    "raw": p_compare,
+    "hochberg": compare_hochberg,
+})
+compare_reject_hochberg = compare_table.loc[
+    compare_table["hochberg"] <= practice_alpha, "test"
+].tolist()
+print(compare_table.to_string(index=False))
+if p_compare.max() <= practice_alpha:
+    print(f"最大P={p_compare.max():g}≤{practice_alpha:g}，Hochberg首关通过，拒绝全部三项。")
+else:
+    print(f"最大P={p_compare.max():g}>{practice_alpha:g}，首关未通过，继续按Hochberg规则判断。")
+print("各项调整P由整组P从后往前取累计最小计算，不一定相同。")
+print(f"对照例Hochberg拒绝项数：{len(compare_reject_hochberg)}。")
+
 # %% 8. G-H效应量与区间报告
 # 只报告一个示例组对，区间为单项区间，P值仍按三对家族调整。
 gh = category_pairs[category_pairs["pair"] == "G-H"].iloc[0]

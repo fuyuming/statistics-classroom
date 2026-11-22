@@ -187,6 +187,32 @@ disp('本练习采用相互独立前提，原三组对分析继续使用Holm。'
 fprintf('Holm拒绝项数：%d；Hochberg拒绝项数：%d。\n', ...
     numel(practice_reject_holm), numel(practice_reject_hochberg));
 
+% 对照：最大P首关通过时全部拒绝，但各项调整P仍可不同。
+p_compare = [0.001; 0.020; 0.040];
+compare_labels = ["test1"; "test2"; "test3"];
+compare_sorted_p = sort(p_compare);
+[~, compare_sort_index] = sort(p_compare);
+compare_m = numel(compare_sorted_p);
+compare_candidate = compare_sorted_p .* (compare_m:-1:1)';
+compare_reverse = flipud(compare_candidate);
+compare_cummin_reverse = cummin(compare_reverse);
+compare_sorted_hochberg = min(flipud(compare_cummin_reverse), 1);
+compare_hochberg = zeros(compare_m, 1);
+compare_hochberg(compare_sort_index) = compare_sorted_hochberg;
+compare_table = table(compare_labels, p_compare, compare_hochberg, ...
+    'VariableNames', {'test','raw','hochberg'});
+disp(compare_table);
+compare_reject_hochberg = compare_table.test(compare_table.hochberg <= practice_alpha);
+if max(p_compare) <= practice_alpha
+    fprintf('最大P=%.3g≤%.3g，Hochberg首关通过，拒绝全部三项。\n', ...
+        max(p_compare), practice_alpha);
+else
+    fprintf('最大P=%.3g>%.3g，首关未通过，继续按Hochberg规则判断。\n', ...
+        max(p_compare), practice_alpha);
+end
+disp('各项调整P由整组P从后往前取累计最小计算，不一定相同。');
+fprintf('对照例Hochberg拒绝项数：%d。\n', numel(compare_reject_hochberg));
+
 %% 8. G-H效应量与区间报告
 gh_index = find(category_pairs.pair == "G-H");
 gh = category_pairs(gh_index, :);
