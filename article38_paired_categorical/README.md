@@ -19,7 +19,7 @@
 正文表1展示前10人的记录，表2汇总全部60人。资料为本篇假设教学数据。逐人CSV可单独获取：
 https://raw.githubusercontent.com/fuyuming/statistics-classroom/main/article38_paired_categorical/data/binary_records.csv
 
-例1的三问依次为总体检出率、预设三对比较、配对阳性率差及区间：总体结果见`key_results`，条件精确核对见`q_conditional`，三对结果见`pairwise`。每对率差均以全部60人为分母。
+例1分为两问：先比较三法总体检出率；若总体比较提示差异，再对预设三对方案作两两比较，同时报告配对阳性率差及区间。总体结果见`key_results`，条件精确核对见`q_conditional`，两两比较的P值、率差及区间均见`pairwise`。每对率差均以全部60人为分母。
 
 `data/transition_counts.csv`包含`before,after,count`三列。例2假设随访144名成年居民，第0天和第28天各检测一次。为本例约定：甲、乙、丙三组指示菌群中，相对丰度最高者分别对应A/B/C型；并列按甲、乙、丙顺序归类，前后规则相同。这里A/B/C是无序菌群类别，行=第0天、列=第28天。每个人只进入一个联合格，前后两次记录共同组成配对输入。
 
