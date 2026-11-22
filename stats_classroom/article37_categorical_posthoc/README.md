@@ -5,7 +5,7 @@
 ## 先打开项目
 
 - **RStudio**：双击根目录的 Rproj，再打开 scripts/article37_categorical_posthoc.R。用 Run 逐行运行，或在章节右上角运行本节。章节标题以四个短横线结束，可在文档大纲中导航。
-- **Python（Spyder / VS Code）**：在Spyder中通过“Projects→New Project”选择已有的本项目根目录，确认工作目录也指向这里；打开唯一主入口 scripts/article37_categorical_posthoc.py；Spyder中按# %%逐节用菜单“Run→Run cell”（macOS可用Cmd+Return，Windows/Linux可用Ctrl+Enter；需要移到下一节可用Shift+Enter），需要整文件时按F5。请使用安装依赖时的同一个Python环境。
+- **Python（Spyder）**：在Spyder中通过“Projects→New Project”选择已有的本项目根目录，确认工作目录也指向这里；打开唯一主入口 scripts/article37_categorical_posthoc.py；Spyder中按# %%逐节用菜单“Run→Run cell”（macOS可用Cmd+Return，Windows/Linux可用Ctrl+Enter；需要移到下一节可用Shift+Enter），需要整文件时按F5。请使用安装依赖时的同一个Python环境。
 - **MATLAB**：将 Current Folder 设为本项目根目录，打开 scripts/article37_categorical_posthoc.m；每个 %% 为一节，点击 Run Section。添加搜索路径并不等于改变 Current Folder。
 
 三种入口均先检查 data/faults.csv 是否存在，避免在错误目录里读错数据。本篇每种语言只有一个主入口和4张结果表；项目合计6个helper，由相应主脚本调用，helpers是选读的自编函数。
@@ -63,7 +63,7 @@ faults.csv中 open、electrode、board 分别为接头开路、电极脱落、�
 | diff_low、diff_high | 带连续性校正的正态近似比例差单项95%区间，与R prop.test(correct=TRUE)一致 |
 | OR、OR_low、OR_high | 固定边际条件Fisher检验的条件优势比及单项双侧区间 |
 
-比例差乘100，单位是百分点。V、比例差和OR区间均为**单项区间**，没有构造三项同时区间；P值另按同一问题的三对结果作Holm判断。这里的条件OR采用前一组相对于后一组的合格优势，OR>1表示前一组的合格优势更高；区间跨1时不能据此明确方向。固定行、列合计后的条件OR估计，与直接用两组样本优势之比估计OR的数值可以不同：本例A–C前者为0.047619，Fisher条件OR为约0.0579，结果表使用后者。
+比例差乘100，单位是百分点。V、比例差和OR区间均为**单项区间**，没有构造三项同时区间；P值另按同一问题的三对结果作Holm判断。这里的条件OR采用前一组相对于后一组的合格优势，OR>1表示前一组的合格优势更高；区间跨1时不能据此明确方向。固定行、列合计后的条件OR估计，与直接用两组样本优势之比估计OR的数值可以不同：本例A–C的样本OR为0.047619，Fisher条件OR约为0.0579，结果表使用后者。
 
 ## 显示与保存
 
@@ -97,7 +97,7 @@ matlab -batch "addpath('scripts'); article37_categorical_posthoc"
 - **区间水平**：将第1节的 conf_level 从0.95改为0.99，从第1节顺序重跑到第8节。预期区间变宽，点估计与检验P值保持不变；控制台的置信水平标签也应显示99%。
 - **作差方向**：将G–H单次比例比较的组序换成H–G。预期差为−12.5个百分点，95%区间变为［−28.63，3.63］个百分点，双侧P值不变。
 
-这两项练习分别改变区间水平与报告方向，保留原来的观察计数。
+后两项练习分别改变区间水平与报告方向，保留原来的观察计数。
 
 ### 单次H–G比例比较（完成前面主脚本后执行）
 
