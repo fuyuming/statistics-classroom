@@ -178,6 +178,21 @@ print(comparison)
 cat("两列Holm P分别属于完整构成三对族与指定类别比例三对族。\n")
 
 # 7. 独立检验练习：Hochberg ----
+# 先用两项独立检验的模型演算Hochberg的FWER：各项H0为真时P~Uniform(0,1)。
+alpha_proof <- 0.05
+half_alpha <- alpha_proof / 2
+prob_any_small <- 1 - (1 - half_alpha)^2
+prob_both_middle <- (alpha_proof - half_alpha)^2
+fwer_two_null <- prob_any_small + prob_both_middle
+event_table <- data.frame(
+  event = c("至少一个P≤alpha/2", "两P都在(alpha/2, alpha]", "两项H0真时FWER"),
+  probability = c(prob_any_small, prob_both_middle, fwer_two_null),
+  row.names = NULL
+)
+print(event_table)
+cat("这是模型的理论误报概率，不是模拟结果或某一次观测的P值。\n")
+cat("若只有1项H0为真，误拒绝该项必须满足P≤alpha，因此上界为alpha。\n")
+
 # 这是单独给定的3项相互独立检验，不来自前面F-G、F-H、G-H共享数据的原例。
 # 原始P为test1/test2/test3=.020/.023/.040，按FWER=.05作判断。
 p_demo <- c(test1 = 0.020, test2 = 0.023, test3 = 0.040)

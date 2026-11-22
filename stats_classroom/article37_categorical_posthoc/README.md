@@ -38,7 +38,7 @@ MATLAB需要 **Statistics and Machine Learning Toolbox**，用于 fishertest、c
 | 4 | 电极脱落与其他，两组比例比较 | category_pairs：Holm P为1、1、0.424934；G-H差12.5个百分点 |
 | 5 | 各10台的独立试验，用双侧Fisher | sparse_pairs：三对最小E为1.5、4、4.5 |
 | 6 | 并列比较两类问题的调整P | comparison：完整构成与指定类别比例的三对Holm P |
-| 7 | 独立检验练习：并列比较Holm与Hochberg | `p_demo`给定test1/test2/test3的原始P=.020/.023/.040，输出raw/holm/hochberg；不来自F-G/F-H/G-H计数表 |
+| 7 | 独立检验练习：先演算再比较Holm与Hochberg | 先用两项独立检验理论演算FWER（.049375、.000625、合计.05），再以`p_demo`给定test1/test2/test3的原始P=.020/.023/.040输出raw/holm/hochberg；不来自F-G/F-H/G-H计数表 |
 | 8 | 报告G-H比例差效应量 | 比例差、单项区间与同一三对族的Holm P |
 | 9 | 可选保存四张结果表 | 默认不保存，启用后写到results/对应语言 |
 
@@ -46,7 +46,7 @@ faults.csv中 open、electrode、board 分别为接头开路、电极脱落、�
 
 ## 函数、参数和字段怎么读
 
-- R使用原生 chisq.test、prop.test、fisher.test、p.adjust；第2节另用 report::report 组织整体检验文字；第3—5节还实际调用正文的 rcompanion / rstatix 入口，与逐对子表结果核对。第7节用 `stats::p.adjust(method = "hochberg")` 与 Holm 并列；Hochberg目标是控制FWER，适用于相互独立或符合特定正依赖条件的检验，本练习采用相互独立前提，原三组对分析继续使用Holm。effectsize::cramers_v 的 adjust=FALSE 对应未作小样本偏差修正的课堂V，alternative="two.sided"请求双侧区间。
+- R使用原生 chisq.test、prop.test、fisher.test、p.adjust；第2节另用 report::report 组织整体检验文字；第3—5节还实际调用正文的 rcompanion / rstatix 入口，与逐对子表结果核对。第7节先用两项独立检验的P~Uniform(0,1)模型演算至少一个P≤.025、两P都在(.025,.05]及两项H0真时FWER，再用 `stats::p.adjust(method = "hochberg")` 与 Holm 并列；Hochberg目标是控制FWER，适用于相互独立或符合特定正依赖条件的检验，本练习采用相互独立前提，原三组对分析继续使用Holm。effectsize::cramers_v 的 adjust=FALSE 对应未作小样本偏差修正的课堂V，alternative="two.sided"请求双侧区间。
 - 课堂单次两率比较与批量入口相接：pairwise_prop_test 经 pairwise.prop.test 逐对使用 prop.test；pairwise_fisher_test 经 rstatix::fisher_test，底层使用 stats::fisher.test。若分析方案选用无条件精确率差，可逐对用 exact2x2::uncondExact2x2（parmtype="difference", nullparm=0），再汇总原始P作p.adjust。该函数的率差方向为第二组减第一组，conf.int=TRUE请求率差区间；fisher.test的conf.int则针对优势比OR。本项目执行第4节的近似率比较和第5节的Fisher；无条件精确率差在正文作为课堂函数入口提示。
 - Python使用SciPy的chi2_contingency、fisher_exact、contingency.odds_ratio(kind="conditional")，statsmodels的multipletests；第7节用 `multipletests(method="simes-hochberg")` 对应R的Hochberg；intervals.py提供比例差区间函数。
 - MATLAB使用原生fishertest得到精确P；第7节在本节内分步排序、乘m,m−1,…,1、反向累计最小并还原原序，不新增helper；fisher_or_ci、rate_difference_ci等是自编函数，其名称与文件一一对应；true/false决定2×2是否采用Yates校正。

@@ -144,6 +144,19 @@ comparison = table(full_pairs.pair, full_pairs.p_holm, category_pairs.p_holm, ..
 disp(comparison);
 disp('两列Holm P分别属于完整构成三对族与指定类别比例三对族。');
 %% 7. 独立检验练习：Hochberg
+% 先用两项独立检验的模型演算Hochberg的FWER：各项H0为真时P~Uniform(0,1)。
+alpha_proof = 0.05;
+half_alpha = alpha_proof / 2;
+prob_any_small = 1 - (1 - half_alpha)^2;
+prob_both_middle = (alpha_proof - half_alpha)^2;
+fwer_two_null = prob_any_small + prob_both_middle;
+event = ["至少一个P≤alpha/2"; "两P都在(alpha/2, alpha]"; "两项H0真时FWER"];
+probability = [prob_any_small; prob_both_middle; fwer_two_null];
+event_table = table(event, probability);
+disp(event_table);
+disp('这是模型的理论误报概率，不是模拟结果或某一次观测的P值。');
+disp('若只有1项H0为真，误拒绝该项必须满足P≤alpha，因此上界为alpha。');
+
 % 这是单独给定的3项相互独立检验，不来自前面F-G、F-H、G-H共享数据的原例。
 % 原始P为test1/test2/test3=.020/.023/.040，按FWER=.05作判断。
 p_demo = [0.020; 0.023; 0.040];
