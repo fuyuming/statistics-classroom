@@ -33,6 +33,7 @@
 | 34 | 配对率差之外：两种检测的结果有多一致？（R、Python、MATLAB配套） | [stats_classroom/article34_paired_kappa](stats_classroom/article34_paired_kappa/) |
 | 39 | 轻度判成中度，与轻度判成重度，能算同样的不一致吗？（R、Python、MATLAB配套） | [stats_classroom/article39_weighted_kappa](stats_classroom/article39_weighted_kappa/) |
 | 40 | 趋势检验为什么能写成Logistic回归？从一道例题认识模型与结果（R、Python、MATLAB配套） | [stats_classroom/article40_trend_logistic](stats_classroom/article40_trend_logistic/) |
+| 41 | 双向有序表怎样做条件模拟？从线性关联统计量到Monte Carlo P值（R、Python、MATLAB配套） | [stats_classroom/article41_ordinal_conditional_mc](stats_classroom/article41_ordinal_conditional_mc/) |
 
 请进入对应文件夹，再按该文件夹的 README 运行。
 
