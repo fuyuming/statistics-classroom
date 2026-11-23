@@ -27,13 +27,19 @@ Y = records[["A", "B", "C"]].to_numpy(dtype=int)
 patterns = (records.groupby(["A", "B", "C"], sort=False).size().reset_index(name="count"))
 patterns["pattern"] = patterns[["A", "B", "C"]].astype(str).agg("".join, axis=1)
 patterns = patterns[["pattern", "A", "B", "C", "count"]].sort_values("pattern").reset_index(drop=True)
+transition_records = pd.read_csv(ROOT / "data/transition_records.csv")
+assert transition_records.columns.tolist() == ["id", "before", "after"]
+assert transition_records["id"].is_unique and len(transition_records) == len(records)
+assert transition_records[["before", "after"]].isin(labels if "labels" in globals() else ["A", "B", "C"]).all().all()
 transitions = pd.read_csv(ROOT / "data/transition_counts.csv")
 print("逐人记录前10条（id及A/B/C）：\n", records.head(10).to_string(index=False))
 print("由逐人记录重汇总的三检测模式：\n", patterns)
 print("前后转移：\n", transitions)
 labels = ["A", "B", "C"]
 # Y只取三结果列；每人一行、每法8条对应记录（例2转移表仍为144人）。
-M = transitions.pivot(index="before", columns="after", values="count").loc[labels, labels].to_numpy()
+M = (transition_records.assign(count=1)
+     .pivot_table(index="before", columns="after", values="count", aggfunc="sum", fill_value=0)
+     .reindex(index=labels, columns=labels, fill_value=0).to_numpy())
 assert np.isin(Y, [0, 1]).all()
 print("Y前六行（只保留三法结果）：\n", Y[:6])
 print("行=前，列=后：\n", M)
@@ -46,18 +52,7 @@ def paired_summary(b, c_count, n):
     if discordant > 0:
         p_raw = stats.binomtest(c_count, discordant, p=0.5).pvalue
     rd = (c_count - b) / n
-    # 例1小样本两两结果只报告精确P与率差；例2保留Wald区间。
-    if n == len(records):
-        se = np.nan
-        lo95 = hi95 = lo_bonf = hi_bonf = np.nan
-    else:
-        se = np.sqrt((discordant - n * rd**2) / (n * (n - 1)))
-        z95 = stats.norm.ppf(0.975)
-        z_bonf = stats.norm.ppf(1 - 0.05 / 6)
-        lo95, hi95 = rd-z95*se, rd+z95*se
-        lo_bonf, hi_bonf = rd-z_bonf*se, rd+z_bonf*se
-    return dict(b=b, c=c_count, rate_diff=rd, se=se, p_raw=p_raw,
-                lo95=lo95, hi95=hi95, lo_bonf=lo_bonf, hi_bonf=hi_bonf)
+    return dict(b=b, c=c_count, rate_diff=rd, p_raw=p_raw)
 
 
 def sm_formula(tab):
@@ -131,7 +126,7 @@ assert abs(probability_sum - 1) < 1e-10
 print(q_conditional.to_string(index=False))
 print("条件于每人行和；U/W分别是行和1/2对象的位置计数。")
 
-# %% 3 三对二分类：条件精确McNemar、Holm、配对率差CI
+# %% 3 三对二分类：条件精确McNemar、Holm、配对率差
 pairs = list(itertools.combinations(range(k), 2))
 pair_rows = []
 for first, second in pairs:
@@ -152,7 +147,7 @@ pairwise_teaching_check["m"] = pairwise_teaching_check["b"] + pairwise_teaching_
 print(pairwise_teaching_check.to_string(index=False))
 assert pairwise_teaching_check["m"].sum() == D
 print(f"例1三对不一致数m=b+c之和={pairwise_teaching_check['m'].sum()}，与Q节D相同。")
-print("例1 rate_diff乘100为百分点；小样本不输出Wald区间；例2 categories保留区间。")
+print("rate_diff乘100为百分点；两例均以8人为分母。")
 
 # %% 4 同一方表：SM问边际，Bowker问对称
 SM = sm_formula(M)
@@ -177,7 +172,7 @@ key_results = pd.DataFrame({
 key_results["p_value"] = stats.chi2.sf(key_results.statistic, key_results.df)
 print(key_results.to_string(index=False))
 
-# %% 5 逐类别“此类/其他”：分母为所有144人
+# %% 5 逐类别“此类/其他”：分母为8人
 category_rows = []
 for i, label in enumerate(labels):
     leave = int(M[i, :].sum() - M[i, i])
@@ -227,10 +222,8 @@ assert abs(probability_sum-1) < 1e-10
 print(enumeration.to_string(index=False))
 print("自编右尾枚举与配置概率排序的exact检验不必返回相同P。")
 
-# %% 8 循环转移练习：复制矩阵，保留原例
-M2 = M.copy()
-M2[0, 1] = 15  # Python索引从0开始，对应A->B
-M2[2, 2] = 30  # C->C
+# %% 8 循环转移练习：另一组8人的M2
+M2 = np.array([[1, 2, 0], [0, 1, 2], [2, 0, 0]], dtype=float)
 exercise = pd.DataFrame([dict(SM=sm_formula(M2), Bowker=bowker_formula(M2))])
 print("改动后的行和/列和：", M2.sum(axis=1), M2.sum(axis=0))
 print(exercise.to_string(index=False))

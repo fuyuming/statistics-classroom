@@ -1,5 +1,5 @@
 # 统计课堂38：多次二分类、两次多分类（UTF-8） ----
-# 两例都是本篇假设教学计数，不是实测资料：例1为n=8的三法二分类，例2为n=144的前后多分类。
+# 两例都是本篇假设教学计数，不是实测资料：例1、例2均为n=8。
 # 对应问题：例1问三种检测的总体阳性率是否相同及配对差异；例2问前后边际是否同质、反向路径是否对称。
 # RStudio打开本项目Rproj；从本节起依次运行。首次安装：install.packages("DescTools")。
 # 默认只显示结果；要保存CSV，改SAVE_RESULTS为TRUE。每个语言用独立结果目录。
@@ -10,6 +10,9 @@ if (!file.exists("data/binary_records.csv")) {
 }
 if (!file.exists("data/transition_counts.csv")) {
   stop("未找到data/transition_counts.csv；请在RStudio打开Rproj并把工作目录设为项目根目录。")
+}
+if (!file.exists("data/transition_records.csv")) {
+  stop("未找到data/transition_records.csv；请在RStudio打开Rproj并把工作目录设为本项目根目录。")
 }
 if (!requireNamespace("DescTools", quietly = TRUE)) {
   stop("缺少DescTools；请在项目根目录的Console运行 install.packages(\"DescTools\")。")
@@ -29,6 +32,11 @@ patterns$pattern <- paste0(patterns$A, patterns$B, patterns$C)
 patterns <- patterns[c("pattern", "A", "B", "C", "count")]
 patterns <- patterns[order(patterns$pattern), ]
 rownames(patterns) <- NULL
+transition_records <- read.csv("data/transition_records.csv")
+stopifnot(identical(names(transition_records), c("id", "before", "after")),
+          length(unique(transition_records$id)) == nrow(transition_records),
+          nrow(transition_records) == nrow(records),
+          all(as.matrix(transition_records[c("before", "after")]) %in% c("A", "B", "C")))
 transitions <- read.csv("data/transition_counts.csv")
 cat("逐人记录前10条（id及A/B/C）：\n")
 print(head(records, 10), row.names = FALSE)
@@ -39,10 +47,9 @@ levels_abc <- c("A", "B", "C")
 # Y只取三结果列；每人一行、每法8条对应记录（例2转移表仍为144人）。
 stopifnot(!anyNA(Y), all(Y %in% c(0, 1)))
 # 行为前，列为后，两轴采用完全相同的类别顺序。
-M <- matrix(0, 3, 3, dimnames = list(levels_abc, levels_abc))
-for (i in seq_len(nrow(transitions))) {
-  M[transitions$before[i], transitions$after[i]] <- transitions$count[i]
-}
+M <- table(factor(transition_records$before, levels = levels_abc),
+           factor(transition_records$after, levels = levels_abc))
+M <- unclass(M)
 print(head(Y))
 print(M)
 
@@ -55,19 +62,7 @@ paired_summary <- function(b, c_count, n) {
     p_raw <- binom.test(c_count, discordant, p = 0.5)$p.value
   }
   rd <- (c_count - b) / n
-  if (n == nrow(records)) {
-    se <- NA_real_
-    lo95 <- hi95 <- lo_bonf <- hi_bonf <- NA_real_
-  } else {
-    se <- sqrt((discordant - n * rd^2) / (n * (n - 1)))
-    z95 <- qnorm(0.975)
-    z_bonf <- qnorm(1 - 0.05 / 6)
-    lo95 <- rd - z95 * se; hi95 <- rd + z95 * se
-    lo_bonf <- rd - z_bonf * se; hi_bonf <- rd + z_bonf * se
-  }
-  data.frame(b = b, c = c_count, rate_diff = rd, se = se, p_raw = p_raw,
-             lo95 = lo95, hi95 = hi95,
-             lo_bonf = lo_bonf, hi_bonf = hi_bonf)
+  data.frame(b = b, c = c_count, rate_diff = rd, p_raw = p_raw)
 }
 sm_formula <- function(tab) {
   r <- nrow(tab)
@@ -172,7 +167,7 @@ print(pairwise_teaching_check)
 stopifnot(sum(pairwise_teaching_check$m) == D)
 cat("例1三对不一致数m=b+c之和=", sum(pairwise_teaching_check$m),
     "，与Q节D相同。\n", sep = "")
-cat("rate_diff乘100是百分点；lo95/hi95为逐项区间，lo_bonf/hi_bonf为三对同时区间。\n")
+cat("rate_diff乘100是百分点；两例均以8人为分母。\n")
 
 # 6 同一张前后方表：SM问边际，Bowker问反向路径 ----
 sm <- sm_formula(M)
@@ -199,7 +194,7 @@ key_results <- data.frame(
 key_results$p_value <- pchisq(key_results$statistic, key_results$df, lower.tail = FALSE)
 print(key_results)
 
-# 7 逐类别“此类/其余类”：保持全体144人为分母 ----
+# 7 逐类别“此类/其余类”：分母为8人 ----
 category_rows <- list()
 for (i in seq_len(nrow(M))) {
   leave <- sum(M[i, ]) - M[i, i]
@@ -211,7 +206,7 @@ for (i in seq_len(nrow(M))) {
 categories <- do.call(rbind, category_rows)
 categories$holm <- p.adjust(categories$p_raw, method = "holm")
 print(categories)
-cat("此处率差为后减前，逐项CI仍用全体完整配对人数。\n")
+cat("此处率差为后减前。\n")
 
 # 8 每条反向路径：条件方向概率与Clopper-Pearson区间 ----
 path_rows <- list()
@@ -257,10 +252,9 @@ print(enumeration)
 stopifnot(abs(probability_sum - 1) < 1e-10)
 cat("这是自编的统计量右尾枚举；与配置概率排序的exact输出不必相同。\n")
 
-# 10 循环转移练习：保留原M，另作M2 ----
-M2 <- M
-M2[1, 2] <- 15
-M2[3, 3] <- 30
+# 10 循环转移练习：另一组8人的M2 ----
+M2 <- matrix(c(1,2,0, 0,1,2, 2,0,0), 3, 3, byrow = TRUE,
+             dimnames = list(levels_abc, levels_abc))
 exercise <- data.frame(SM = sm_formula(M2)$statistic, Bowker = bowker_formula(M2))
 print(rowSums(M2))
 print(colSums(M2))

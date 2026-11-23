@@ -1,5 +1,5 @@
 %% 统计课堂38：完整配对分类教学项目（UTF-8）
-% 两例均为假设教学计数：例1为n=8的三法二分类，例2为n=144的前后多分类。
+% 两例均为假设教学计数：例1、例2均为n=8。
 % 对应问题：例1问三种检测的总体阳性率是否相同及配对差异；例2问前后边际是否同质、反向路径是否对称。
 % 本文Q/SM/Bowker/精确二项/Holm均为明确标记的自编实现。
 % 使用MATLAB基础分布特殊函数gammainc、gammaln、betaincinv、erfinv，无需统计工具箱。
@@ -25,18 +25,22 @@ patterns.pattern = string(patterns.A)+string(patterns.B)+string(patterns.C);
 patterns = patterns(:, {'pattern','A','B','C','GroupCount'});
 patterns.Properties.VariableNames{'GroupCount'} = 'count';
 patterns = sortrows(patterns, 'pattern');
+transition_records = readtable(fullfile(root, 'data', 'transition_records.csv'));
+assert(isequal(transition_records.Properties.VariableNames, {'id','before','after'}));
+assert(numel(unique(transition_records.id)) == height(transition_records));
+assert(height(transition_records) == height(records));
 transitions = readtable(fullfile(root, 'data', 'transition_counts.csv'));
 disp(records(1:min(10,height(records)), :));
 disp(patterns);
 disp(transitions);
 labels = ["A", "B", "C"];
-% Y只取三结果列；每人一行、每法8条对应记录（例2转移表仍为144人）。
+% Y只取三结果列；每人一行、每法8条对应记录。
 assert(all(ismember(Y(:), [0 1])));
 M = zeros(3);
-for row = 1:height(transitions)
-    first = find(labels == string(transitions.before(row)));
-    second = find(labels == string(transitions.after(row)));
-    M(first, second) = transitions.count(row);
+for row = 1:height(transition_records)
+    first = find(labels == string(transition_records.before(row)));
+    second = find(labels == string(transition_records.after(row)));
+    M(first, second) = M(first, second) + 1;
 end
 disp(Y(1:6, :));
 disp(M); % 行=前，列=后，相同类别顺序
@@ -89,7 +93,7 @@ disp(q_conditional);
 assert(abs(probability_sum-1) < 1e-10);
 fprintf('条件于每人行和；U/W分别是行和1/2对象的位置计数。\n');
 
-%% 4 三对精确McNemar + Holm，配对率差及两套区间
+%% 4 三对精确McNemar + Holm，配对率差
 pair_index = nchoosek(1:k, 2);
 pairwise = table();
 for j = 1:size(pair_index, 1)
@@ -111,7 +115,7 @@ pairwise_teaching_check = table(pairwise.comparison, pairwise.b, pairwise.c, ...
 disp(pairwise_teaching_check);
 assert(sum(pairwise_teaching_check.m) == D);
 fprintf('例1三对不一致数m=b+c之和=%g，与Q节D相同。\n', sum(pairwise_teaching_check.m));
-fprintf('例1 rate_diff乘100为百分点；小样本不输出Wald区间；例2 categories保留区间。\n');
+fprintf('rate_diff乘100为百分点；两例均以8人为分母。\n');
 
 %% 5 同一方表的SM与Bowker（自编，无连续性校正）
 [SM, S, difference] = sm_formula(M);
@@ -127,7 +131,7 @@ key_results = table(method, statistic, df, p_value);
 disp(key_results);
 fprintf('SM比较边际同质性；Bowker比较每对相反联合转移概率。\n');
 
-%% 6 每一类与其余类：分母为全部144个对象
+%% 6 每一类与其余类：分母为8个对象
 categories = table();
 for i = 1:size(M, 1)
     leave = sum(M(i, :))-M(i, i);
@@ -138,7 +142,7 @@ for i = 1:size(M, 1)
 end
 categories.holm = holm_adjust(categories.p_raw);
 disp(categories);
-fprintf('此处后减前的率差与CI仍以全部完整配对对象为分母。\n');
+fprintf('此处率差为后减前。\n');
 
 %% 7 每条反向路径：精确二项P与CP逐项95%区间
 paths = table();
@@ -185,10 +189,8 @@ disp(enumeration);
 assert(abs(probability_sum-1) < 1e-10);
 fprintf('本篇采用统计量右尾排序，与配置概率排序的exact结果不必相同。\n');
 
-%% 9 循环转移练习：保留原M
-M2 = M;
-M2(1, 2) = 15;
-M2(3, 3) = 30;
+%% 9 循环转移练习：另一组8人的M2
+M2 = [1 2 0; 0 1 2; 2 0 0];
 exercise = table(sm_formula(M2), bowker_formula(M2), 'VariableNames', {'SM','Bowker'});
 disp(sum(M2, 2));
 disp(sum(M2, 1));
@@ -212,15 +214,8 @@ function answer = paired_summary(b, c_count, n)
     discordant = b+c_count;
     p_raw = exact_binomial_half(c_count, discordant);
     rate_diff = (c_count-b)/n;
-    se = sqrt((discordant-n*rate_diff^2)/(n*(n-1)));
-    z95 = sqrt(2)*erfinv(2*0.975-1);
-    z_bonf = sqrt(2)*erfinv(2*(1-0.05/6)-1);
-    lo95 = rate_diff-z95*se;
-    hi95 = rate_diff+z95*se;
-    lo_bonf = rate_diff-z_bonf*se;
-    hi_bonf = rate_diff+z_bonf*se;
-    answer = table(b, c_count, rate_diff, se, p_raw, lo95, hi95, lo_bonf, hi_bonf, ...
-        'VariableNames', {'b','c','rate_diff','se','p_raw','lo95','hi95','lo_bonf','hi_bonf'});
+    answer = table(b, c_count, rate_diff, p_raw, ...
+        'VariableNames', {'b','c','rate_diff','p_raw'});
 end
 
 function [statistic, reduced, d] = sm_formula(tab)

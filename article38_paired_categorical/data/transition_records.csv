@@ -1,0 +1,9 @@
+id,before,after
+1,A,A
+2,A,B
+3,A,B
+4,B,B
+5,B,C
+6,B,C
+7,C,A
+8,C,C
