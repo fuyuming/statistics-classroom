@@ -6,7 +6,7 @@
 
 完整下载解压，进入本目录，再选一种语言。首次只显示结果，默认不写文件；如需保存，把脚本顶部`SAVE_RESULTS`改为真（R为`TRUE`、Python为`True`、MATLAB为`true`）。自动整文件验证也支持环境变量`ARTICLE38_SAVE=1`。各语言各自写入`results/R`、`results/Python`、`results/MATLAB`。
 
-- **RStudio**：打开`article38_paired_categorical.Rproj`，工作目录即本目录。首次在Console执行`install.packages("DescTools")`。打开`scripts/article38_paired_categorical.R`，从输入与辅助函数开始按节选中运行，理解后可Source整文件。R不自动恢复/保存旧工作空间。Q与Stuart–Maxwell调用DescTools，Bowker调用基础R。
+- **RStudio**：打开`article38_paired_categorical.Rproj`，工作目录即本目录。首次在Console执行`install.packages("DescTools")`。打开`scripts/article38_paired_categorical.R`，从输入与辅助函数开始按节选中运行，理解后可Source整文件。R不自动恢复/保存旧工作空间。Q与Stuart–Maxwell调用DescTools，Bowker公式与3×3条件精确枚举由脚本自编函数完成。
 - **Python / Spyder**：在Spyder建立/打开本文件夹项目，把工作目录设为本目录，打开`scripts/article38_paired_categorical.py`。从第一节依次用“运行当前单元”执行，最后可F5整文件运行。在Spyder实际使用的解释器环境安装`requirements.txt`列出的numpy、pandas、scipy、statsmodels。可以在对应解释器的终端执行`python -m pip install -r requirements.txt`。命令行备选：在本目录运行`python scripts/article38_paired_categorical.py`。分节模式不要求`__file__`存在。
 - **MATLAB**：把本目录设为Current Folder，打开`scripts/article38_paired_categorical.m`，从第一节依次运行，或整文件Run。Current Folder决定相对数据位置，搜索路径用于定位函数。脚本末尾的本地辅助函数与前面的各节一同保存在完整脚本中，运行时请打开该脚本。本篇使用基础MATLAB的特殊函数，无需Statistics and Machine Learning Toolbox。
 
@@ -55,13 +55,15 @@ R和Python会并排显示Q公式值、函数值与绝对差。三语还显示各
 
 R调用`DescTools::CochranQTest`、`DescTools::StuartMaxwellTest`、`stats::mcnemar.test`、`binom.test`、`p.adjust`；控制台核对表覆盖Q和SM/Bowker的公式与原生函数。3×3的Bowker对称性检验由基础R `mcnemar.test`完成，连续性校正只作用于2×2。
 
-Python调用`statsmodels.stats.contingency_tables.cochrans_q`、`SquareTable.homogeneity(method="stuart_maxwell")`、`symmetry(method="bowker")`、SciPy二项检验及statsmodels Holm；控制台核对表覆盖Q和SM/Bowker的公式与原生函数。`shift_zeros=False`保留输入的原始计数；本例所有格子都有观测。
+Python调用`statsmodels.stats.contingency_tables.cochrans_q`、`SquareTable.homogeneity(method="stuart_maxwell")`、`symmetry(method="bowker")`、SciPy二项检验及statsmodels Holm；控制台核对表覆盖Q和SM/Bowker的公式与原生函数。`shift_zeros=False`保留输入的原始计数；本例保留零计数格，各反向格对合计均大于0。
 
-MATLAB按正文公式自编全部检验及Holm，分布概率/分位点由`gammainc`、`gammaln`、`betaincinv`、`erfinv`计算。三语Q条件计算均为自编的三法多项计数枚举，针对给定行和的可交换模型。三语条件Bowker枚举均为自编统计量右尾排序，与配置概率排序的精确检验不必同P。条件枚举对应Bowker的转移对称性零假设；Stuart–Maxwell的边际同质问题见正文。
+MATLAB按正文公式自编全部检验及Holm，分布概率/分位点由`gammainc`、`gammaln`、`betaincinv`、`erfinv`计算。三语Q条件计算均为自编的三法多项计数枚举，针对给定行和的可交换模型。R的`bowker_exact3(M)`仅接受3×3且三对反向合计均>0的表，按固定反向合计的二项条件分布对Bowker统计量作右尾精确枚举，不使用蒙特卡罗；本例结果为18个配置、概率和1、`p_exact`=0.25。条件枚举对应Bowker的转移对称性零假设；Stuart–Maxwell的边际同质问题见正文。
 
 基础R的`mcnemar.test`在反向两格合计为0时，计算中会出现0/0；`DescTools::StuartMaxwellTest`提供渐近检验接口。含零反向格对或奇异协方差的表，需要另选具有相应处理的实现。
 
 本篇自编SM/Bowker函数用于给定非退化教学数据。反向格对合计为0、协方差奇异时会停止。此时需根据有效格对和矩阵秩确定自由度，再选择适合该表的计算方法。
+
+R脚本末尾附有可选的ANSM5精确核对代码（默认不安装新依赖）。首次手动执行`install.packages("ANSM5")`后，可将`max.exact.perms`设为300000运行8×3例1；默认上限100000，而本例穷举门槛为6^7=279936。若超过上限而输出`pval.mc`，不能视作穷举精确值。已实跑的`fit_exact$pval.exact`为0.00411522633744865。
 
 ## 第二次运行的练习
 

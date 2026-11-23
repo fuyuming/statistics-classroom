@@ -85,6 +85,21 @@ bowker_formula <- function(tab) {
   stopifnot(all(totals > 0)) # 本篇仅实现非零反向格对；零对另审有效df。
   sum(differences^2 / totals)
 }
+# 仅适用于3×3，且三对反向格合计均>0；按固定反向合计的二项条件分布，
+# 对Bowker统计量做右尾精确枚举（无蒙特卡罗）。
+bowker_exact3 <- function(M) {
+  stopifnot(identical(dim(M), c(3L, 3L)))
+  use <- upper.tri(M)
+  m <- (M + t(M))[use]
+  stopifnot(length(m) == 3L, all(m > 0))
+  observed <- sum((M - t(M))[use]^2 / m)
+  configurations <- expand.grid(lapply(m, function(n) 0:n))
+  statistic <- apply(configurations, 1, function(x) sum((2 * x - m)^2 / m))
+  probability <- apply(configurations, 1, function(x) prod(dbinom(x, m, prob = 0.5)))
+  list(statistic = observed, configurations = nrow(configurations),
+       probability_sum = sum(probability),
+       p.value = sum(probability[statistic >= observed - 1e-12]))
+}
 
 # 3 Cochran Q：公式与真实包调用 ----
 n <- nrow(Y)
@@ -230,27 +245,14 @@ cat("theta的分母只含该路径的互转者；CP区间为逐项95%，不是�
 # 9 自编条件枚举：固定反向格对总数，采用Bowker统计量右尾 ----
 # 本例恰有三条路径；各方向在对称H0下条件独立二项(总数,1/2)。
 sizes <- paths$total
-probability_sum <- 0
-p_exact <- 0
-configurations <- 0
-for (a in 0:sizes[1]) {
-  for (b in 0:sizes[2]) {
-    for (cc in 0:sizes[3]) {
-      counts <- c(a, b, cc)
-      statistic <- sum((2 * counts - sizes)^2 / sizes)
-      probability <- prod(dbinom(counts, sizes, prob = 0.5))
-      probability_sum <- probability_sum + probability
-      configurations <- configurations + 1
-      if (statistic >= Bowker - 1e-12) {
-        p_exact <- p_exact + probability
-      }
-    }
-  }
-}
-enumeration <- data.frame(configurations, probability_sum, p_exact)
+bowker_exact <- bowker_exact3(M)
+enumeration <- data.frame(configurations = bowker_exact$configurations,
+                          probability_sum = bowker_exact$probability_sum,
+                          p_exact = bowker_exact$p.value)
 print(enumeration)
-stopifnot(abs(probability_sum - 1) < 1e-10)
-cat("这是自编的统计量右尾枚举；与配置概率排序的exact输出不必相同。\n")
+stopifnot(abs(bowker_exact$probability_sum - 1) < 1e-10,
+          abs(bowker_exact$statistic - Bowker) < 1e-10)
+cat("这是自编的统计量右尾精确枚举；无蒙特卡罗。\n")
 
 # 10 循环转移练习：另一组8人的M2 ----
 M2 <- matrix(c(1,2,0, 0,1,2, 2,0,0), 3, 3, byrow = TRUE,
@@ -272,3 +274,13 @@ if (SAVE_RESULTS) {
     write.csv(result_tables[[name]], file.path(output_dir, paste0(name, ".csv")), row.names = FALSE)
   }
 }
+
+# 可选：首次手动安装 install.packages("ANSM5") 后，用ANSM5穷举核对例1Q。
+# 默认上限为100000；本例8×3需6^7=279936，故显式设为300000以保证穷举。
+# 超过上限时可能输出pval.mc，不应视作穷举精确值。
+# fit_exact <- ANSM5::cochran.q(
+#   y = as.vector(Y),
+#   groups = factor(rep(colnames(Y), each = nrow(Y))),
+#   blocks = factor(rep(seq_len(nrow(Y)), times = ncol(Y))),
+#   do.exact = TRUE, do.asymp = FALSE, max.exact.perms = 300000)
+# fit_exact$pval.exact  # 例1实跑：0.00411522633744865
