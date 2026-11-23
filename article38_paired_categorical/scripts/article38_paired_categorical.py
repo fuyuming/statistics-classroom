@@ -1,5 +1,5 @@
 # %% 统计课堂38：完整教学项目（UTF-8）
-# 两例是假设教学计数：例1为n=8的三法二分类，例2为n=144的前后多分类。
+# 两例均为n=8的假设教学计数：例1为三法二分类，例2为前后多分类。
 # 对应问题：例1问三种检测的总体阳性率是否相同及配对差异；例2问前后边际是否同质、反向路径是否对称。
 # 首次运行默认只显示；改SAVE_RESULTS=True可保存结果。依赖见requirements.txt。
 from pathlib import Path
@@ -36,7 +36,7 @@ print("逐人记录前10条（id及A/B/C）：\n", records.head(10).to_string(in
 print("由逐人记录重汇总的三检测模式：\n", patterns)
 print("前后转移：\n", transitions)
 labels = ["A", "B", "C"]
-# Y只取三结果列；每人一行、每法8条对应记录（例2转移表仍为144人）。
+# Y只取三结果列；每人一行、每法8条对应记录。
 M = (transition_records.assign(count=1)
      .pivot_table(index="before", columns="after", values="count", aggfunc="sum", fill_value=0)
      .reindex(index=labels, columns=labels, fill_value=0).to_numpy())

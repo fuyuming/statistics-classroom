@@ -44,7 +44,7 @@ cat("由逐人记录重汇总的三检测模式：\n")
 print(patterns, row.names = FALSE)
 print(transitions)
 levels_abc <- c("A", "B", "C")
-# Y只取三结果列；每人一行、每法8条对应记录（例2转移表仍为144人）。
+# Y只取三结果列；每人一行、每法8条对应记录。
 stopifnot(!anyNA(Y), all(Y %in% c(0, 1)))
 # 行为前，列为后，两轴采用完全相同的类别顺序。
 M <- table(factor(transition_records$before, levels = levels_abc),
