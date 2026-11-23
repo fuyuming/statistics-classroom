@@ -6,7 +6,7 @@
 
 完整下载解压，进入本目录，再选一种语言。首次只显示结果，默认不写文件；如需保存，把脚本顶部`SAVE_RESULTS`改为真（R为`TRUE`、Python为`True`、MATLAB为`true`）。自动整文件验证也支持环境变量`ARTICLE38_SAVE=1`。各语言各自写入`results/R`、`results/Python`、`results/MATLAB`。
 
-- **RStudio**：打开`article38_paired_categorical.Rproj`，工作目录即本目录。首次在Console执行`install.packages("DescTools")`。打开`scripts/article38_paired_categorical.R`，从输入与辅助函数开始按节选中运行，理解后可Source整文件。R不自动恢复/保存旧工作空间。Q与Stuart–Maxwell调用DescTools，Bowker公式与3×3条件精确枚举由脚本自编函数完成。
+- **RStudio**：打开`article38_paired_categorical.Rproj`，工作目录即本目录。首次在Console执行`install.packages(c("DescTools", "ANSM5"))`。打开`scripts/article38_paired_categorical.R`，从输入与辅助函数开始按节选中运行，理解后可Source整文件。R不自动恢复/保存旧工作空间。Q与Stuart–Maxwell调用DescTools，Q的MC调用ANSM5，Bowker的χ²近似调用基础R，条件精确枚举与MC调用脚本自编函数。
 - **Python / Spyder**：在Spyder建立/打开本文件夹项目，把工作目录设为本目录，打开`scripts/article38_paired_categorical.py`。从第一节依次用“运行当前单元”执行，最后可F5整文件运行。在Spyder实际使用的解释器环境安装`requirements.txt`列出的numpy、pandas、scipy、statsmodels。可以在对应解释器的终端执行`python -m pip install -r requirements.txt`。命令行备选：在本目录运行`python scripts/article38_paired_categorical.py`。分节模式不要求`__file__`存在。
 - **MATLAB**：把本目录设为Current Folder，打开`scripts/article38_paired_categorical.m`，从第一节依次运行，或整文件Run。Current Folder决定相对数据位置，搜索路径用于定位函数。脚本末尾的本地辅助函数与前面的各节一同保存在完整脚本中，运行时请打开该脚本。本篇使用基础MATLAB的特殊函数，无需Statistics and Machine Learning Toolbox。
 
@@ -36,6 +36,7 @@
 | paths | 三条反向路径的条件方向概率、精确二项P+Holm、CP逐项95%区间；路径总数2/1/2 |
 | enumeration | 固定反向路径总数2/1/2，18配置；概率和约1，`p_exact`=0.25 |
 | exercise | 另一组8人转移表，SM=0、Bowker=6 |
+| monte_carlo | 固定行和/反向路径总数的H0条件蒙特卡罗尾概率估计 |
 
 ### 字段与分母速查
 
@@ -48,8 +49,11 @@
 | 脚本中的 `U/W` | `U`为行和1对象的唯一阳性位置计数，`W`为行和2对象的唯一阴性位置计数；各有A/B/C三个分量 |
 | `q_conditional` 的 `probability_sum`、`p_exact` | 全部配置的概率和应约1；`p_exact`为Q至少达到观测值的条件右尾概率 |
 | `enumeration` 的 `probability_sum`、`p_exact` | 固定反向路径总数2/1/2的配置概率和与Bowker统计量右尾P |
+| `monte_carlo` 的字段 | `test,B,seed,exceedances,p_mc,mcse,exact_reference`；本轮B=100000、seed=20261123，`p_mc`为条件精确尾概率的模拟估计，`mcse=sqrt(p_mc*(1-p_mc)/B)` |
 
 R和Python会并排显示Q公式值、函数值与绝对差。三语还显示各对`m=b+c`与`D`的关系；首次在Console查看，需要时再保存结果。
+
+三语主入口默认执行一节条件蒙特卡罗，并显示/可保存`monte_carlo.csv`。Python/MATLAB提供同名自编函数`cochran_q_mc(Y,B,seed)`和`bowker_mc(M,B,seed)`；R的Q调用`ANSM5::cochran.q`，Bowker使用自编`bowker_mc(M,B,seed)`。以`B=100000`、`seed=20261123`调用后，将两行结果合并并补入`exact_reference`。Cochran Q模拟在每人内部随机重排0/1，保持每人行和；Bowker模拟固定三条反向路径总数，从独立Binomial(m, 1/2)生成方向。不同语言的随机序列不要求一致。`p_mc`是条件精确尾概率的Monte Carlo估计，`mcse`是其标准误，不是另一种χ²近似；不提供SM的MC。分类逐人记录与原有七张确定性结果表不变。
 
 ## 原生接口与自编计算
 
@@ -63,7 +67,7 @@ MATLAB按正文公式自编全部检验及Holm，分布概率/分位点由`gamma
 
 本篇自编SM/Bowker函数用于给定非退化教学数据。反向格对合计为0、协方差奇异时会停止。此时需根据有效格对和矩阵秩确定自由度，再选择适合该表的计算方法。
 
-R脚本末尾附有可选的ANSM5精确核对代码（默认不安装新依赖）。首次手动执行`install.packages("ANSM5")`后，可将`max.exact.perms`设为300000运行8×3例1；默认上限100000，而本例穷举门槛为6^7=279936。若超过上限而输出`pval.mc`，不能视作穷举精确值。已实跑的`fit_exact$pval.exact`为0.00411522633744865。
+R脚本末尾附有可选的ANSM5精确核对代码。`max.exact.perms`设为300000可运行8×3例1；默认上限100000，而本例穷举门槛为6^7=279936。若超过上限而输出`pval.mc`，不能视作穷举精确值。已实跑的`fit_exact$pval.exact`为0.00411522633744865。
 
 ## 第二次运行的练习
 

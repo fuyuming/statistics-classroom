@@ -187,23 +187,34 @@ end
 enumeration = table(configurations, probability_sum, p_exact);
 disp(enumeration);
 assert(abs(probability_sum-1) < 1e-10);
-fprintf('本篇采用统计量右尾排序，与配置概率排序的exact结果不必相同。\n');
+fprintf('本篇采用统计量右尾精确枚举；无蒙特卡罗。\n');
 
-%% 9 循环转移练习：另一组8人的M2
+%% 9 条件蒙特卡罗：固定每人行和/固定反向路径总数，在H0下模拟
+% B=100000、seed=20261123；两个local helper各自独立设seed。
+% p_mc估计条件精确尾概率，mcse为Monte Carlo标准误，不是另一χ²近似；不模拟SM。
+B = 100000;
+seed = 20261123;
+q_mc = cochran_q_mc(Y, B, seed);
+bowker_mc_fit = bowker_mc(M, B, seed);
+monte_carlo = struct2table([q_mc; bowker_mc_fit]);
+monte_carlo.exact_reference = [q_conditional.p_exact; enumeration.p_exact];
+disp(monte_carlo);
+
+%% 10 循环转移练习：另一组8人的M2
 M2 = [1 2 0; 0 1 2; 2 0 0];
 exercise = table(sm_formula(M2), bowker_formula(M2), 'VariableNames', {'SM','Bowker'});
 disp(sum(M2, 2));
 disp(sum(M2, 1));
 disp(exercise);
 
-%% 10 可选保存：每个语言独立目录
+%% 11 可选保存：每个语言独立目录
 if SAVE_RESULTS
     output_dir = fullfile(root, 'results', 'MATLAB');
     if ~isfolder(output_dir)
         mkdir(output_dir);
     end
-    names = {'key_results','q_conditional','pairwise','categories','paths','enumeration','exercise'};
-    tables = {key_results,q_conditional,pairwise,categories,paths,enumeration,exercise};
+    names = {'key_results','q_conditional','pairwise','categories','paths','enumeration','exercise','monte_carlo'};
+    tables = {key_results,q_conditional,pairwise,categories,paths,enumeration,exercise,monte_carlo};
     for i = 1:numel(names)
         writetable(tables{i}, fullfile(output_dir, [names{i} '.csv']));
     end
@@ -281,4 +292,53 @@ function adjusted = holm_adjust(p_values)
         previous = max(previous, candidate);
         adjusted(order(i)) = previous;
     end
+end
+
+function answer = cochran_q_mc(Y, B, seed)
+    % Y为完整配对0/1矩阵；H0下每人内部随机重排，保持行和。
+    % 独立设置seed；右尾计数给出p_mc及MCSE。
+    rng(seed, 'twister');
+    [n, k] = size(Y);
+    row_total = sum(Y, 2);
+    total = sum(row_total);
+    D = sum(row_total .* (k-row_total));
+    observed = k*(k-1)*sum((sum(Y,1)-total/k).^2)/D;
+    sim_columns = zeros(B, k);
+    for i = 1:n
+        [~, order] = sort(rand(B, k), 2);
+        for j = 1:row_total(i)
+            selected = false(B, k);
+            selected(sub2ind([B, k], (1:B)', order(:, j))) = true;
+            sim_columns = sim_columns + selected;
+        end
+    end
+    sim_statistic = k*(k-1)*sum((sim_columns-total/k).^2, 2)/D;
+    exceedances = sum(sim_statistic >= observed-1e-12);
+    p_mc = exceedances/B;
+    answer = struct('test', "Cochran_Q", 'B', B, 'seed', seed, ...
+        'exceedances', exceedances, 'p_mc', p_mc, ...
+        'mcse', sqrt(p_mc*(1-p_mc)/B));
+end
+
+function answer = bowker_mc(M, B, seed)
+    % M为完整前后转移表；H0下固定反向格对总数，方向独立Binomial(m,.5)。
+    % 独立设置seed；Bowker右尾计数及MCSE均由模拟样本计算。
+    assert(isequal(size(M), [3 3]));
+    use = triu(true(3), 1);
+    symmetric = M+M';
+    difference = M-M';
+    m = symmetric(use)';
+    assert(all(m > 0));
+    observed = sum(difference(use).^2 ./ m(:));
+    rng(seed, 'twister');
+    sim_counts = zeros(B, numel(m));
+    for j = 1:numel(m)
+        sim_counts(:, j) = sum(rand(B, m(j)) < 0.5, 2);
+    end
+    sim_statistic = sum((2*sim_counts-m).^2 ./ m, 2);
+    exceedances = sum(sim_statistic >= observed-1e-12);
+    p_mc = exceedances/B;
+    answer = struct('test', "Bowker", 'B', B, 'seed', seed, ...
+        'exceedances', exceedances, 'p_mc', p_mc, ...
+        'mcse', sqrt(p_mc*(1-p_mc)/B));
 end

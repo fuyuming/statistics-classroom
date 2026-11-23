@@ -6,10 +6,18 @@
 
 例2 `categories` 的(leave,enter)为(2,1)、(2,2)、(1,2)，率差为−0.125、0、0.125，精确P及Holm均为1；`paths`正反为(2,0)、(0,1)、(2,0)，theta为1、0、1，原始P为0.5、1、0.5，Holm全1，CP区间分别为[0.158113883008,1]、[0,0.975]、[0.158113883008,1]。Bowker条件枚举路径总数2/1/2，共18配置，概率和1，右尾P=0.25。M2为另一组8人矩阵[[1,2,0],[0,1,2],[2,0,0]]，SM=0、Bowker=6。
 
-三语主入口均直接读取例2逐人记录；七张结果表保留。新复制、无旧results、不同cwd新进程运行的退出码、源码/输入SHA、七表跨语言比较及例1不变核对见 `work/small_example2/project_acceptance.json`。
+三语主入口均直接读取例2逐人记录；七张结果表保留。独立副本、不同cwd新进程运行、源码/输入SHA、七表跨语言比较及例1不变核对均已完成。
 
 ## 本轮R条件枚举变更（2026-11-23）
 
 R脚本将Bowker三层循环替换为自编`bowker_exact3(M)`：仅接受3×3且三对反向格合计均>0，按固定合计的二项条件分布对观测统计量作右尾精确枚举，不使用蒙特卡罗；`enumeration`字段与数值保持不变（18、1、0.25）。README同步说明了可选ANSM5核对及300000上限（默认100000；本例门槛6^7=279936）。
 
-本轮仅在新副本`work/exact_r_addition/worker_run`中执行`ARTICLE38_SAVE=1 /usr/local/bin/Rscript scripts/article38_paired_categorical.R`，退出码0。七张R结果表与当前`outputs/.../results/R`基线按数值误差≤1e-10比较全部通过（各表最大绝对误差0）；运行日志、源码/输入SHA、比较JSON及退出码记录在`work/exact_r_addition/`。ANSM5数值为既有实跑记录，非本轮新增执行。
+本轮在独立副本中执行`ARTICLE38_SAVE=1 Rscript scripts/article38_paired_categorical.R`，退出码0。七张R结果表与当前基线按数值误差≤1e-10比较全部通过（各表最大绝对误差0）。ANSM5完整枚举值沿用既有实跑；本轮蒙特卡罗另见下节。
+
+## 本轮条件Monte Carlo扩展（2026-11-23）
+
+三语主入口新增默认可执行的条件蒙特卡罗节：B=100000、seed=20261123。R的Q调用ANSM5原生MC，R/Python/MATLAB的Bowker使用同名自编`bowker_mc(M,B,seed)`；Python/MATLAB另提供`cochran_q_mc(Y,B,seed)`。Cochran Q保持行和；Bowker固定三条反向路径总数，从独立Binomial(m, 1/2)生成方向；`monte_carlo.csv`字段为`test,B,seed,exceedances,p_mc,mcse,exact_reference`。MCSE按`sqrt(p_mc*(1-p_mc)/B)`计算；MC估计条件精确尾概率，不是另一χ²近似，也不模拟SM。
+
+在独立副本中分别运行R、Python和MATLAB，三者退出码均为0。R结果：Q `406/100000=0.00406`（MCSE 0.0002010850），Bowker `25042/100000=0.25042`（MCSE 0.0013700723）；Python：Q `412/100000=0.00412`（MCSE 0.0002025593），Bowker `24929/100000=0.24929`（MCSE 0.0013680077）；MATLAB：Q `415/100000=0.00415`（MCSE 0.0002032923），Bowker `25183/100000=0.25183`（MCSE 0.0013726312）。所有语言两项与各自`exact_reference`差异均≤5×理论MCSE。
+
+三语原有七张确定性CSV逐数值比较（阈值1e-10）全部不变；新增三份`results/*/monte_carlo.csv`。本轮函数封装后再次核对，七表最大绝对误差均为0。

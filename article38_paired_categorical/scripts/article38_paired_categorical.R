@@ -1,7 +1,7 @@
 # 统计课堂38：多次二分类、两次多分类（UTF-8） ----
 # 两例都是本篇假设教学计数，不是实测资料：例1、例2均为n=8。
 # 对应问题：例1问三种检测的总体阳性率是否相同及配对差异；例2问前后边际是否同质、反向路径是否对称。
-# RStudio打开本项目Rproj；从本节起依次运行。首次安装：install.packages("DescTools")。
+# RStudio打开本项目Rproj；从本节起依次运行。首次安装：install.packages(c("DescTools", "ANSM5"))。
 # 默认只显示结果；要保存CSV，改SAVE_RESULTS为TRUE。每个语言用独立结果目录。
 options(stringsAsFactors = FALSE)
 SAVE_RESULTS <- identical(Sys.getenv("ARTICLE38_SAVE"), "1")
@@ -14,8 +14,8 @@ if (!file.exists("data/transition_counts.csv")) {
 if (!file.exists("data/transition_records.csv")) {
   stop("未找到data/transition_records.csv；请在RStudio打开Rproj并把工作目录设为本项目根目录。")
 }
-if (!requireNamespace("DescTools", quietly = TRUE)) {
-  stop("缺少DescTools；请在项目根目录的Console运行 install.packages(\"DescTools\")。")
+if (!requireNamespace("DescTools", quietly = TRUE) || !requireNamespace("ANSM5", quietly = TRUE)) {
+  stop("缺少DescTools或ANSM5；请在项目根目录的Console运行 install.packages(c(\"DescTools\", \"ANSM5\"))。")
 }
 
 # 1 读取逐人记录，汇总模式与转移计数 ----
@@ -99,6 +99,23 @@ bowker_exact3 <- function(M) {
   list(statistic = observed, configurations = nrow(configurations),
        probability_sum = sum(probability),
        p.value = sum(probability[statistic >= observed - 1e-12]))
+}
+bowker_mc <- function(M, B, seed) {
+  # M为完整前后转移表；H0下固定每个反向格对总数，方向独立Binomial(m,.5)。
+  # 独立设置seed；Bowker右尾计数及MCSE均由模拟样本计算。
+  set.seed(seed)
+  stopifnot(identical(dim(M), c(3L, 3L)))
+  use <- upper.tri(M)
+  m <- (M + t(M))[use]
+  stopifnot(all(m > 0))
+  observed <- sum((M - t(M))[use]^2 / m)
+  simulated <- sapply(m, function(total) rbinom(B, total, prob = 0.5))
+  statistic <- rowSums((2 * simulated - rep(m, each = B))^2 / rep(m, each = B))
+  exceedances <- sum(statistic >= observed - 1e-12)
+  p_mc <- exceedances / B
+  data.frame(test = "Bowker", B = B, seed = seed,
+             exceedances = exceedances, p_mc = p_mc,
+             mcse = sqrt(p_mc * (1 - p_mc) / B))
 }
 
 # 3 Cochran Q：公式与真实包调用 ----
@@ -254,7 +271,27 @@ stopifnot(abs(bowker_exact$probability_sum - 1) < 1e-10,
           abs(bowker_exact$statistic - Bowker) < 1e-10)
 cat("这是自编的统计量右尾精确枚举；无蒙特卡罗。\n")
 
-# 10 循环转移练习：另一组8人的M2 ----
+# 10 条件蒙特卡罗：固定每人行和/固定反向路径总数，在H0下模拟 ----
+# B=100000、seed=20261123；Q调用ANSM5原生MC，Bowker调用自编helper并独立设seed。
+# p_mc是条件精确尾概率的模拟估计，mcse是其Monte Carlo标准误，不是另一χ²近似；不模拟SM。
+B <- 100000L
+seed <- 20261123L
+q_fit_mc <- ANSM5::cochran.q(
+  y = as.vector(Y),
+  groups = factor(rep(colnames(Y), each = nrow(Y))),
+  blocks = factor(rep(seq_len(nrow(Y)), times = ncol(Y))),
+  do.exact = TRUE, do.asymp = FALSE, max.exact.perms = 0,
+  nsims.mc = B, seed = seed)
+q_p_mc <- q_fit_mc$pval.mc
+q_mc <- data.frame(test = "Cochran_Q", B = B, seed = seed,
+                   exceedances = as.integer(round(q_p_mc * B)),
+                   p_mc = q_p_mc, mcse = sqrt(q_p_mc * (1 - q_p_mc) / B))
+bowker_mc_fit <- bowker_mc(M, B, seed)
+monte_carlo <- rbind(q_mc, bowker_mc_fit)
+monte_carlo$exact_reference <- c(q_conditional$p_exact, enumeration$p_exact)
+print(monte_carlo)
+
+# 11 循环转移练习：另一组8人的M2 ----
 M2 <- matrix(c(1,2,0, 0,1,2, 2,0,0), 3, 3, byrow = TRUE,
              dimnames = list(levels_abc, levels_abc))
 exercise <- data.frame(SM = sm_formula(M2)$statistic, Bowker = bowker_formula(M2))
@@ -262,14 +299,15 @@ print(rowSums(M2))
 print(colSums(M2))
 print(exercise)
 
-# 11 可选保存：不覆盖其他语言结果 ----
+# 12 可选保存：不覆盖其他语言结果 ----
 if (SAVE_RESULTS) {
   output_dir <- "results/R"
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
   result_tables <- list(key_results = key_results, q_conditional = q_conditional,
                         pairwise = pairwise,
                         categories = categories, paths = paths,
-                        enumeration = enumeration, exercise = exercise)
+                        enumeration = enumeration, exercise = exercise,
+                        monte_carlo = monte_carlo)
   for (name in names(result_tables)) {
     write.csv(result_tables[[name]], file.path(output_dir, paste0(name, ".csv")), row.names = FALSE)
   }

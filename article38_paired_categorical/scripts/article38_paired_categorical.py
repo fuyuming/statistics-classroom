@@ -75,6 +75,47 @@ def bowker_formula(tab):
     return float(np.sum(difference**2 / totals))
 
 
+def cochran_q_mc(Y, B, seed):
+    """完整配对Y的MC：H0下每行随机重排，保持该人的行和；argsort选择随机位置。
+    统计Q右尾超越次数，返回p_mc、MCSE及seed，便于单独复现调用。
+    """
+    rng = np.random.default_rng(seed)
+    n, k = Y.shape
+    row_totals = Y.sum(axis=1)
+    total = row_totals.sum()
+    D = np.sum(row_totals * (k - row_totals))
+    observed = k * (k - 1) * np.sum((Y.sum(axis=0) - total/k)**2) / D
+    sim_columns = np.zeros((B, k), dtype=int)
+    for row_sum in row_totals.astype(int):
+        scores = rng.random((B, k))
+        sim_columns += np.argsort(scores, axis=1) < row_sum
+    sim_statistic = k * (k - 1) * np.sum((sim_columns - total/k)**2, axis=1) / D
+    exceedances = int(np.sum(sim_statistic >= observed - 1e-12))
+    p_mc = exceedances / B
+    return {"test": "Cochran_Q", "B": B, "seed": seed,
+            "exceedances": exceedances, "p_mc": p_mc,
+            "mcse": np.sqrt(p_mc * (1 - p_mc) / B)}
+
+
+def bowker_mc(M, B, seed):
+    """完整转移表M的MC：H0下固定反向格对总数，方向为独立Binomial(m,.5)。
+    统计Bowker右尾超越次数，返回p_mc、MCSE及seed，便于单独复现调用。
+    """
+    rng = np.random.default_rng(seed)
+    assert M.shape == (3, 3)
+    index = np.triu_indices(3, 1)
+    totals = (M + M.T)[index]
+    assert np.all(totals > 0)
+    observed = np.sum((M - M.T)[index]**2 / totals)
+    sim_counts = rng.binomial(totals.astype(int), 0.5, size=(B, len(totals)))
+    sim_statistic = np.sum((2 * sim_counts - totals)**2 / totals, axis=1)
+    exceedances = int(np.sum(sim_statistic >= observed - 1e-12))
+    p_mc = exceedances / B
+    return {"test": "Bowker", "B": B, "seed": seed,
+            "exceedances": exceedances, "p_mc": p_mc,
+            "mcse": np.sqrt(p_mc * (1 - p_mc) / B)}
+
+
 # %% 1 Cochran Q
 n, k = Y.shape
 columns = Y.sum(axis=0)
@@ -220,21 +261,37 @@ enumeration = pd.DataFrame([dict(configurations=configurations,
                                   probability_sum=probability_sum, p_exact=p_exact)])
 assert abs(probability_sum-1) < 1e-10
 print(enumeration.to_string(index=False))
-print("自编右尾枚举与配置概率排序的exact检验不必返回相同P。")
+print("自编统计量右尾精确枚举；无蒙特卡罗。")
 
-# %% 8 循环转移练习：另一组8人的M2
+# %% 8 条件蒙特卡罗：固定行和/固定反向路径总数，在H0下模拟
+# B=100000、seed=20261123；两个helper各自独立设seed。
+# p_mc估计条件精确尾概率，mcse为Monte Carlo标准误，不是另一χ²近似；不模拟SM。
+B = 100000
+seed = 20261123
+q_mc = cochran_q_mc(Y, B, seed)
+bowker_mc_fit = bowker_mc(M, B, seed)
+monte_carlo = pd.DataFrame({
+    "test": [q_mc["test"], bowker_mc_fit["test"]], "B": B, "seed": seed,
+    "exceedances": [q_mc["exceedances"], bowker_mc_fit["exceedances"]],
+    "p_mc": [q_mc["p_mc"], bowker_mc_fit["p_mc"]],
+    "mcse": [q_mc["mcse"], bowker_mc_fit["mcse"]],
+    "exact_reference": [q_conditional.p_exact.iloc[0], enumeration.p_exact.iloc[0]]})
+print(monte_carlo.to_string(index=False))
+
+# %% 9 循环转移练习：另一组8人的M2
 M2 = np.array([[1, 2, 0], [0, 1, 2], [2, 0, 0]], dtype=float)
 exercise = pd.DataFrame([dict(SM=sm_formula(M2), Bowker=bowker_formula(M2))])
 print("改动后的行和/列和：", M2.sum(axis=1), M2.sum(axis=0))
 print(exercise.to_string(index=False))
 
-# %% 9 可选保存：三语输出隔离
+# %% 10 可选保存：三语输出隔离
 if SAVE_RESULTS:
     output_dir = ROOT / "results/Python"
     output_dir.mkdir(parents=True, exist_ok=True)
     result_tables = dict(key_results=key_results, q_conditional=q_conditional,
                          pairwise=pairwise,
                          categories=categories, paths=paths,
-                         enumeration=enumeration, exercise=exercise)
+                         enumeration=enumeration, exercise=exercise,
+                         monte_carlo=monte_carlo)
     for name, table in result_tables.items():
         table.to_csv(output_dir / (name+".csv"), index=False)
