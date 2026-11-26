@@ -1,0 +1,7 @@
+"scenario","group","n","method","statistic","p","status"
+"A","A1",5,"Shapiro_Wilk",0.956939928244798,0.786530424055485,"not_rejected"
+"A","A1",5,"Anderson_Darling",,,"not_run_n_lt_8"
+"A","A2",5,"Shapiro_Wilk",0.814004315683188,0.104874821306183,"not_rejected"
+"A","A2",5,"Anderson_Darling",,,"not_run_n_lt_8"
+"A","A3",5,"Shapiro_Wilk",0.886643933969824,0.340509024263967,"not_rejected"
+"A","A3",5,"Anderson_Darling",,,"not_run_n_lt_8"

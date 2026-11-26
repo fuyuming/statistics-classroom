@@ -1,0 +1,7 @@
+scenario,group,n,method,statistic,p,status
+A,A1,5,Shapiro_Wilk,0.9569399282447981,0.7865304240554851,not_rejected
+A,A1,5,Anderson_Darling,,,not_run_n_lt_8
+A,A2,5,Shapiro_Wilk,0.8140043156831889,0.10487482130618392,not_rejected
+A,A2,5,Anderson_Darling,,,not_run_n_lt_8
+A,A3,5,Shapiro_Wilk,0.8866439339698245,0.34050902426396723,not_rejected
+A,A3,5,Anderson_Darling,,,not_run_n_lt_8
