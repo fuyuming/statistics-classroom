@@ -1,0 +1,5 @@
+setting,value
+alpha,0.05
+target_power,0.8
+high_target_power,0.9
+n_check,5

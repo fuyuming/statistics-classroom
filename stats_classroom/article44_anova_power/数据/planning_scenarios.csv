@@ -1,0 +1,9 @@
+scenario,group,mean_MPa,sd_MPa
+large,A,30,5
+large,B,35,5
+large,C,40,5
+large,D,45,5
+small,A,36,5
+small,B,37,5
+small,C,38,5
+small,D,39,5
