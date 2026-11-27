@@ -1,0 +1,51 @@
+每行一只兔；drug为药物，score为改善差（分）：
+           drug  score
+0  Indomethacin      2
+1  Indomethacin      3
+2  Indomethacin      3
+3  Indomethacin      3
+4  Indomethacin      3
+        drug  n  rank_sum  mean_rank
+Indomethacin  6      97.5  16.250000
+     Aspirin  6      85.0  14.166667
+   Piroxicam  6      91.5  15.250000
+      BW755C  6      26.0   4.333333
+B=546.583333333, SS_T=1065.000000000, s_r2=46.304347826
+C=0.926086956522, H_raw=10.931666667, H=11.804147105, chi2_P=0.008085087714
+Vbase=50.000000000000, Tbase=1150.000000000000
+tie frequencies= [1, 5, 5, 4, 9] losses= [0.0, 10.0, 10.0, 5.0, 60.0]
+Tactual=1065.000000000000, Vactual=46.304347826087, C=Vactual/Vbase=0.926086956522
+group mean-rank variances= [5.788043478260869, 5.788043478260869, 5.788043478260869, 5.788043478260869]
+covariance between any two distinct groups=-1.929347826087
+       contrast  difference       SE         Z  Z_squared_contribution
+          m1-m2    2.083333 3.928713  0.530284                0.281201
+   (m1+m2)/2-m3   -0.041667 3.402365 -0.012246                0.000150
+(m1+m2+m3)/3-m4   10.888889 3.207780  3.394524               11.522796
+contrast Z^2 sum=11.804147104851; H=11.804147104851
+scipy.stats.kruskal: KruskalResult(statistic=np.float64(11.804147104851351), pvalue=np.float64(0.008085087713793933))
+χ²近似判断： 拒绝同分布H0。
+每行一独立培养瓶，浓度单位mg/L：
+   condition  concentration_mg_L
+0         A                   1
+1         A                   2
+2         B                   3
+3         B                   4
+4         C                   5
+5         C                   6
+       H  frequency  probability
+0.000000          6     0.066667
+0.285714         12     0.133333
+0.857143         12     0.133333
+1.142857         12     0.133333
+2.000000         12     0.133333
+2.571429          6     0.066667
+3.428571         12     0.133333
+3.714286         12     0.133333
+4.571429          6     0.066667
+辅助 H=4.571428571, total=90, tail=6
+exact_P=0.066666666667, chi2_P=0.101701392304
+精确枚举判断： 不足以拒绝同分布H0。
+MC B=199999, seed=20261130, exceedances=679
+P_plus1=0.003400000, MCSE=0.000130163
+条件置换判断： 拒绝同分布H0。
+这是整体分布比较；具体药物组对需要另作多重比较。
