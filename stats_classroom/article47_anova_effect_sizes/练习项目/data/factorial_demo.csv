@@ -1,0 +1,9 @@
+design,temperature,modulus
+D1,low,9
+D1,low,11
+D2,low,11
+D2,low,13
+D1,high,13
+D1,high,15
+D2,high,15
+D2,high,17
