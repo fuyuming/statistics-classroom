@@ -1,0 +1,189 @@
+% 式（1）
+\[
+\begin{gathered}
+\bar r=\frac{1+2+\cdots+N}{N}=\frac{N+1}{2} \\
+N=24,\qquad \bar r=12.5
+\end{gathered}
+\]
+
+% 式（2）
+\[
+\begin{gathered}
+B=\sum_{i=1}^{k}n_i(\bar r_i-\bar r)^2 \\
+B=6(16.25-12.5)^2+\cdots \\
+\quad +6(4.3333\ldots-12.5)^2 \\
+B=546.5833\ldots
+\end{gathered}
+\]
+
+% 式（3）
+\[
+\begin{gathered}
+s_r^2=\frac{1}{N-1}\sum_{j=1}^{N}(r_j-\bar r)^2 \\
+\operatorname{E}_0(Y_a)=\bar r \\
+\operatorname{Var}_0(Y_a)=\frac{N-1}{N}s_r^2
+\end{gathered}
+\]
+
+% 式（3a）
+\[
+\begin{gathered}
+0=\operatorname{Var}_0\!\left(\sum_{a=1}^{N}Y_a\right) \\
+\quad=N\operatorname{Var}_0(Y_1) \\
+\qquad+N(N-1)\operatorname{Cov}_0(Y_1,Y_2) \\
+\operatorname{Cov}_0(Y_a,Y_b)=-\frac{s_r^2}{N} \\
+\qquad (a\ne b)
+\end{gathered}
+\]
+
+% 式（3b）
+\[
+\begin{gathered}
+\operatorname{Var}_0(\bar Y_i)=\frac{1}{n_i^2}\left[n_i\frac{N-1}{N}s_r^2\right. \\
+\qquad\left.-n_i(n_i-1)\frac{s_r^2}{N}\right] \\
+\quad=s_r^2\left(\frac{1}{n_i}-\frac{1}{N}\right) \\
+\operatorname{Cov}_0(\bar Y_i,\bar Y_\ell)=-\frac{s_r^2}{N} \\
+\qquad (i\ne\ell)
+\end{gathered}
+\]
+
+% 式（3c）
+\[
+\begin{gathered}
+\operatorname{E}_0(B)=\sum_i n_i\operatorname{Var}_0(\bar Y_i) \\
+\quad=s_r^2\sum_i\left(1-\frac{n_i}{N}\right) \\
+\quad=(k-1)s_r^2 \\
+H=\frac{B}{s_r^2},\qquad \operatorname{E}_0(H)=k-1
+\end{gathered}
+\]
+
+% 式（4）
+\[
+\begin{gathered}
+\sum_{j=1}^{N}(j-\bar r)^2=\frac{N(N^2-1)}{12} \\
+s_{\mathrm{base}}^2=\frac{N(N+1)}{12} \\
+H^*=\frac{B}{s_{\mathrm{base}}^2}=\frac{12B}{N(N+1)}
+\end{gathered}
+\]
+
+% 式（5）
+\[
+\begin{gathered}
+R_i=n_i\bar r_i,\qquad \sum_iR_i=N\bar r \\
+B=\sum_i\frac{R_i^2}{n_i}-N\bar r^2 \\
+H^*=\frac{12}{N(N+1)}\sum_i\frac{R_i^2}{n_i} \\
+\qquad -3(N+1)
+\end{gathered}
+\]
+
+% 式（6）
+\[
+\begin{gathered}
+2,3,4,5,6\ \longrightarrow\ 4,4,4,4,4 \\
+(2-4)^2+(3-4)^2+(4-4)^2 \\
+\quad+(5-4)^2+(6-4)^2=10 \\
+\text{loss for }t\text{ ties}=\frac{t^3-t}{12}
+\end{gathered}
+\]
+
+% 式（7）
+\[
+\begin{gathered}
+\mathrm{SS}_{\mathrm{base}}=\frac{24(24^2-1)}{12}=1150 \\
+\mathrm{loss}=0+10+10+5+60=85 \\
+\mathrm{SS}_{\mathrm{actual}}=1150-85=1065 \\
+s_r^2=\frac{1065}{23}=46.3043478\ldots \\
+C=\frac{s_r^2}{50}=0.9260869565\ldots
+\end{gathered}
+\]
+
+% 式（7a）
+\[
+\begin{gathered}
+C=1-\frac{\sum_\ell(t_\ell^3-t_\ell)}{N^3-N} \\
+s_r^2=\frac{N(N+1)}{12}C
+\end{gathered}
+\]
+
+% 式（8）
+\[
+\begin{gathered}
+H=\frac{B}{s_r^2}=\frac{H^*}{C} \\
+H=\frac{546.583333\ldots}{46.3043478\ldots} \\
+\quad=\frac{10.9316667\ldots}{0.9260869565\ldots} \\
+\quad=11.8041471\ldots
+\end{gathered}
+\]
+
+% 式（9）
+\[
+\begin{gathered}
+M=\frac{N!}{n_1!n_2!\cdots n_k!} \\
+P_{\rm exact}=\frac{\#\{H_{\rm perm}\geq H_{\rm obs}\}}{M}
+\end{gathered}
+\]
+
+% 式（10）
+\[
+\begin{gathered}
+\operatorname{Var}_0(d)=s_r^2\left(\frac{1}{m}+\frac{1}{n}\right) \\
+Z_1=\frac{\bar Y_1-\bar Y_2}{\sqrt{2s_r^2/n}} \\
+Z_2=\frac{(\bar Y_1+\bar Y_2)/2-\bar Y_3}{\sqrt{3s_r^2/(2n)}} \\
+Z_3=\frac{(\bar Y_1+\bar Y_2+\bar Y_3)/3-\bar Y_4}{\sqrt{4s_r^2/(3n)}} \\
+n=6
+\end{gathered}
+\]
+
+% 式（10a）
+\[
+\begin{gathered}
+Z_1^2+Z_2^2+Z_3^2 \\
+\quad=\frac{n}{s_r^2}\sum_{i=1}^{4}(\bar Y_i-\bar r)^2 \\
+\quad=\frac{B}{s_r^2}=H
+\end{gathered}
+\]
+
+% 式（10b）
+\[
+\begin{gathered}
+D_1=\bar Y_1-\bar Y_2 \\
+D_2=(\bar Y_1+\bar Y_2)/2-\bar Y_3 \\
+v=\operatorname{Var}_0(\bar Y_i),\ c=\operatorname{Cov}_0(\bar Y_i,\bar Y_\ell) \\
+\operatorname{Cov}_0(D_1,D_2) \\
+\quad=\frac{1}{2}(v-v)+\frac{1}{2}(c-c)-c+c=0
+\end{gathered}
+\]
+
+% 式（10c）
+\[
+\begin{gathered}
+\mathrm{SE}_0(d)=s_r\sqrt{\frac{1}{m}+\frac{1}{n}} \\
+\Delta B=\frac{mn}{m+n}d^2 \\
+\frac{\Delta B}{s_r^2}=\left[\frac{d}{\mathrm{SE}_0(d)}\right]^2
+\end{gathered}
+\]
+
+% 式（10d）
+\[
+\begin{gathered}
+H\ \longrightarrow\ \chi^2_{k-1} \\
+P_{\chi^2}=\Pr\{\chi^2_{k-1}\geq H_{\rm obs}\}
+\end{gathered}
+\]
+
+% 式（11）
+\[
+\begin{gathered}
+\bar r_A=1.5,\quad\bar r_B=3.5,\quad\bar r_C=5.5 \\
+B=2(-2)^2+2(0)^2+2(2)^2=16 \\
+H=\frac{12\times16}{6\times7}=\frac{32}{7}=4.5714286\ldots
+\end{gathered}
+\]
+
+% 式（12）
+\[
+\begin{gathered}
+\widehat P=\frac{b+1}{B_{\rm MC}+1} \\
+\operatorname{MCSE}\approx\sqrt{\frac{\widehat P(1-\widehat P)}{B_{\rm MC}}}
+\end{gathered}
+\]
