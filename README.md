@@ -35,6 +35,7 @@
 | 40 | 趋势检验为什么能写成Logistic回归？从一道例题认识模型与结果（R、Python、MATLAB配套） | [stats_classroom/article40_trend_logistic](stats_classroom/article40_trend_logistic/) |
 | 41 | 双向有序表怎样做条件模拟？从线性关联统计量到Monte Carlo P值（R、Python、MATLAB配套） | [stats_classroom/article41_ordinal_conditional_mc](stats_classroom/article41_ordinal_conditional_mc/) |
 | 42 | 为什么有些统计检验，我们反而希望P＞0.05？（诊断检验、残差图与三语配套） | [stats_classroom/article42_diagnostic_tests](stats_classroom/article42_diagnostic_tests/) |
+| 46 | 多组均数怎样比较？LSD、Tukey、Dunnett和SNK怎么选（R、Python、MATLAB配套） | [stats_classroom/article46_posthoc_selection](stats_classroom/article46_posthoc_selection/) |
 
 请进入对应文件夹，再按该文件夹的 README 运行。
 

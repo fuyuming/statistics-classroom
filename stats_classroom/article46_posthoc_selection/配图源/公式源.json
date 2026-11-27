@@ -1,0 +1,53 @@
+[
+  {
+    "number": "01",
+    "latex": [
+      "SE_{ij}=\\sqrt{MSE(1/n_i+1/n_j)}",
+      "t_{ij}=\\frac{\\bar y_i-\\bar y_j}{SE_{ij}},\\quad df=N-k"
+    ],
+    "alt": "均数差标准误与共同误差自由度",
+    "font_pt": 26,
+    "canvas_width_inches": 7
+  },
+  {
+    "number": "02",
+    "latex": [
+      "LSD=t_{0.975,16}\\,SE=0.8777\\ \\mathrm{MPa}",
+      "1.10\\pm0.8777=[0.2223,\\ 1.9777]"
+    ],
+    "alt": "LSD临界差与A1减A3的普通95%置信区间，单位MPa",
+    "font_pt": 26,
+    "canvas_width_inches": 7
+  },
+  {
+    "number": "03",
+    "latex": [
+      "q_{ij}=\\frac{|\\bar y_i-\\bar y_j|}{\\sqrt{MSE/n}}=\\sqrt{2}|t_{ij}|",
+      "HSD=q_{0.95;4,16}\\sqrt{MSE/5}",
+      "=4.0461\\times0.29275=1.1845\\ \\mathrm{MPa}"
+    ],
+    "alt": "等组量Tukey统计量与临界差",
+    "font_pt": 26,
+    "canvas_width_inches": 7
+  },
+  {
+    "number": "04",
+    "latex": [
+      "P\\!\\left(\\max_{i=2,3,4}|T_{i1}|\\leq d\\right)=0.95",
+      "(\\bar y_i-\\bar y_1)\\pm d\\,SE_{i1}"
+    ],
+    "alt": "Dunnett三项共同对照比较的联合临界值与同时区间",
+    "font_pt": 26,
+    "canvas_width_inches": 7
+  },
+  {
+    "number": "05",
+    "latex": [
+      "r=j-i+1,\\quad q_{ij}=\\frac{\\bar y_{(i)}-\\bar y_{(j)}}{\\sqrt{MSE/n}}",
+      "CR_r=q_{0.95;r,16}\\sqrt{MSE/5}"
+    ],
+    "alt": "SNK排序跨度含两个端点，按跨度使用临界极差",
+    "font_pt": 26,
+    "canvas_width_inches": 7
+  }
+]
