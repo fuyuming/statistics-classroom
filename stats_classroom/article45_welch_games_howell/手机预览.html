@@ -164,7 +164,7 @@ round(c(difference = difference, SE = se, df = nu,
 <h2>九、配套代码与动手练习</h2>
 <p>和前面的统计课堂一样，这次也准备了R、Python和MATLAB三套脚本。用自己熟悉的一种跑通即可。第一次先核对本题的Welch结果和全部三对GH结果；第二次可以把下降值统一从mmHg换成kPa，看看为什么均数差、标准误和区间端点一起缩放，而F、q和P值保持不变。练习沿用表1的全部数据、分组、检验水准和比较族，只改变单位；脚本中的<code>unit_scale</code>控制换算。</p>
 <p>本篇练习项目ZIP：<a href="https://github.com/fuyuming/statistics-classroom/raw/main/stats_classroom/article45_welch_games_howell/统计课堂45_练习项目.zip" rel="noopener" target="_blank">下载统计课堂45练习项目</a>。下载解压后先读<code>练习项目/README.md</code>：R用户打开<code>统计课堂45.Rproj</code>，再打开<code>R/welch_gh.R</code>；Python用户在Spyder以练习项目为工作目录，打开<code>Python/welch_gh.py</code>按单元运行；MATLAB用户将练习项目设为Current Folder，再打开<code>MATLAB/welch_gh.m</code>按节运行。</p>
-<p>R使用原生Welch检验及学生化极差函数；Python同时对照SciPy的Welch和GH接口；MATLAB按正文关系自编计算，学生化极差使用R2025a工具箱的内部接口，具体版本限制写在README中。SciPy的<code>tukey_hsd(..., equal_var=False)</code>在这个参数下执行Games–Howell，返回的矩阵差值需按组序选取<span class="cite-tail">方向<sup>[9]</sup>。</span></p>
+<p>R使用原生Welch检验及学生化极差函数；Python同时对照SciPy的Welch和GH接口；MATLAB按正文公式计算Welch与GH，所需的q概率和分位点由项目附带的自编函数求得。SciPy的<code>tukey_hsd(..., equal_var=False)</code>在这个参数下执行Games–Howell，返回的矩阵差值需按组序选取<span class="cite-tail">方向<sup>[9]</sup>。</span></p>
 <p>本篇完整项目目录：</p>
 <p><a href="https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article45_welch_games_howell" rel="noopener" target="_blank">https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article45_welch_games_howell</a></p>
 <p>系列仓库入口：</p>

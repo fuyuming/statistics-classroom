@@ -20,6 +20,17 @@ root = pwd;
 if ~isfolder(fullfile(root,'data'))
     root = fileparts(root); % 整文件run进入代码目录时，数据在上一层。
 end
+if ~isfolder(fullfile(root,'data'))
+    script_path = mfilename('fullpath');
+    if isempty(script_path)
+        error('找不到data目录；请将Current Folder设为项目根目录。');
+    end
+    root = fileparts(fileparts(script_path));
+end
+if ~isfolder(fullfile(root,'data'))
+    error('找不到data目录；请将Current Folder设为项目根目录。');
+end
+addpath(fullfile(root,'代码'));
 data = readtable(fullfile(root,'data','scaffold.csv'));
 data.modulus = data.modulus * UNIT_SCALE;
 data.group = categorical(data.group,{'A1','A2','A3','A4'});
@@ -61,6 +72,11 @@ lsd = array2table(rows,'VariableNames',{'group1','group2','difference',...
     'SE','t','df','p','CI_low','CI_high','reject'});
 disp(lsd)
 fprintf('普通P拒绝数：%d；差值与区间单位：%s\n',sum(lsd.reject),unit)
+% 同一共同MSE也交给公开multcompare的LSD分支，与上面的手算互相核对。
+c_lsd = multcompare(model_stats,'CType','lsd','Alpha',alpha,'Display','off');
+lsd_native = table(c_lsd(:,1),c_lsd(:,2),c_lsd(:,4),c_lsd(:,3),c_lsd(:,5),c_lsd(:,6), ...
+    'VariableNames',{'group1','group2','difference','CI_low','CI_high','p'});
+disp(lsd_native)
 
 %% 4. Tukey：全部六对同时推断
 % multcompare原矩阵列顺序固定：组1、组2、下限、差值、上限、P。
@@ -105,8 +121,8 @@ for i = 1:k-1
         q = (means(order(i))-means(order(j)))/sqrt(mse/n(1));
         % MATLAB R2025a内部学生化极差接口；顺序为概率/q、df、组数。
         % 不是公开稳定API；升级版本时需与R qtukey/ptukey复核。
-        qcrit = internal.stats.stdrinv(1-alpha,df_error,span);
-        raw_p = internal.stats.stdrcdf(q,df_error,span,'upper');
+        qcrit = studentized_range_inv(1-alpha,span,df_error);
+        raw_p = studentized_range_cdf(q,span,df_error,'upper');
         rows(end+1,:) = [order(i) order(j) i j span q qcrit raw_p];
     end
 end

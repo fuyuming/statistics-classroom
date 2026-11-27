@@ -18,7 +18,7 @@ R使用基础`stats`和`multcomp`包。在当前RStudio中执行`install.package
 
 Python需要NumPy、pandas、SciPy≥1.15（使用`dunnett`的`rng`参数）、Matplotlib。在Spyder实际使用的解释器环境安装`requirements.txt`；命令行可用`python -m pip install -r requirements.txt`。
 
-MATLAB需要Statistics and Machine Learning Toolbox。已在R2025a运行。SNK部分调用`internal.stats.stdrinv/stdrcdf`计算学生化极差概率与分位数，这是该版本内部接口；升级版本时须复核其参数顺序，不能当作公开稳定API。
+MATLAB需要Statistics and Machine Learning Toolbox。已在R2025a运行。SNK部分的学生化极差概率与分位数由项目代码目录中的studentized_range_cdf、studentized_range_inv自编数值函数计算；函数只调用公开MATLAB函数，不依赖R/Python后端。较长算法供核对使用，新手可先按主脚本分节运行。
 
 命令行备选入口，均从项目根运行：
 
@@ -52,7 +52,7 @@ Dunnett段还会打印共同参照的尺度关系：本例`MSE/n_A1=.0857 MPa²`
 
 ## 图与保存
 
-第7节绘制全部实际观测点和组均数。首次只显示图；代码顶部`SAVE_OUTPUTS`改为TRUE/True/true后，再从第1节运行，更新`运行结果/语言名/`中的5张CSV及图片。教学核验也支持环境变量`SAVE_OUTPUTS=1`。随包已保留三语实际输出，代码会从共享输入重新计算，不读取这些旧结果。
+第7节绘制全部实际观测点和组均数。首次只显示图；代码顶部SAVE_OUTPUTS改为TRUE/True/true后，再从第1节运行，更新运行结果/语言名/中的5张CSV及图片。教学核验也支持环境变量SAVE_OUTPUTS=1。MATLAB的LSD节同时保留手算t/SE表和公开multcompare(...,'CType','lsd')核对表。随包已保留三语实际输出，代码会从共享输入重新计算，不读取这些旧结果。
 
 RStudio的图出现在Plots窗；非交互式Rscript可能创建默认`Rplots.pdf`，这不是本篇必需材料。Python默认不强制Agg，方便Spyder查看；无图形界面自动运行可设置`MPLBACKEND=Agg`。
 

@@ -1,7 +1,7 @@
 # 统计课堂46｜四种均数比较方法，UTF-8
 # 数据：李春喜等《生物统计学》6版例7-1数字；改写支架情境，非真实工程实验。
 # 依赖 multcomp；在项目根打开Rproj，依次运行各节，或Source整文件。
-# %% 1. 设置与共享数据
+# 1. 设置与共享数据 ----
 options(stringsAsFactors = FALSE)
 library(multcomp)
 alpha <- .05
@@ -19,7 +19,7 @@ dat$group <- factor(dat$group, levels = c("A1", "A2", "A3", "A4"))
 print(head(dat))  # group为结构名；modulus为每个独立试件的一次测量。
 print(str(dat))
 
-# %% 2. 整体模型与共同MSE
+# 2. 整体模型与共同MSE ----
 fit <- aov(modulus ~ group, data = dat)
 anova_table <- summary(fit)[[1]]
 df_error <- df.residual(fit)
@@ -35,7 +35,7 @@ protected_gate <- summary_table$F_p < alpha
 cat("整体F通过保护性LSD的前置关：", protected_gate, "\n")
 cat("下列LSD表仍列普通P，不能称作全部组对的强FWER调整。\n")
 
-# %% 3. LSD计算形式：共同MSE的普通双侧t比较
+# 3. LSD计算形式：共同MSE的普通双侧t比较 ----
 # combn把四个组名组合成六个不同组对，方向为前组减后组。
 pairs <- combn(names(means), 2)
 lsd_rows <- list()
@@ -58,7 +58,7 @@ rownames(lsd) <- NULL
 print(lsd, digits = 7)
 cat("普通P小于alpha的组对数：", sum(lsd$reject), "；差值/区间单位：", unit, "\n")
 
-# %% 4. Tukey：所有六对的同时推断
+# 4. Tukey：所有六对的同时推断 ----
 # TukeyHSD返回diff/lwr/upr/p adj；R方向为后组减前组，保留原行名。
 tukey_result <- TukeyHSD(fit, "group", conf.level = 1 - alpha)$group
 tukey <- data.frame(comparison = rownames(tukey_result),
@@ -70,7 +70,7 @@ q_critical <- qtukey(1 - alpha, k, df_error)
 cat("Tukey q临界值：", q_critical, "；同时推断拒绝数：", sum(tukey$reject), "\n")
 print(tukey, digits = 7)
 
-# %% 5. Dunnett：只比较A2/A3/A4减A1
+# 5. Dunnett：只比较A2/A3/A4减A1 ----
 # factor第一个水平A1为共同参照。glht读取完整模型的共同MSE。
 set.seed(20261130)
 dun_model <- glht(fit, linfct = mcp(group = "Dunnett"))
@@ -98,7 +98,7 @@ dunnett_covariance <- data.frame(v_MSE_over_n_A1 = v_control,
 print(dunnett_covariance, digits = 7)
 cat("说明：共同参照联合t推断使用该相关结构；MSE/n仅演示共同尺度。\n")
 
-# %% 6. SNK：等组量的教学自编实现
+# 6. SNK：等组量的教学自编实现 ----
 stopifnot(length(unique(as.numeric(n))) == 1)
 # order得到样本均数降序对应的组名；i/j是排序位置，r包含两端。
 ordered_names <- names(sort(means, decreasing = TRUE))
@@ -134,7 +134,7 @@ snk <- snk[order(-snk$r, snk$i), ]
 print(snk, digits = 7)
 cat("SNK逐步拒绝数：", sum(snk$reject), "；step_P不是强FWER调整P。\n")
 
-# %% 7. 实际观测点与组均数；保存开关
+# 7. 实际观测点与组均数；保存开关 ----
 # stripchart画出每个观测点；固定偏移便于重现，钻石为组均数。
 plot_points <- function() {
   plot(NA, xlim = c(.5, k + .5), ylim = range(dat$modulus),

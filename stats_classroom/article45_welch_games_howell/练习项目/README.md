@@ -6,7 +6,7 @@
 
 1. **R/RStudio**：双击`统计课堂45.Rproj`，打开`R/welch_gh.R`。从“0.准备”开始，在同一新会话中选中一节并运行，依次到最后一节；先看Environment中的中间量、Console结果，再到Plots看图。整文件可点Source，或在Console输入`source("R/welch_gh.R")`。仅用R自带函数，无需安装扩展包。
 2. **Python/Spyder**：将工作目录设为解压后的`练习项目`，打开`Python/welch_gh.py`，按`# %%`单元从0节向下运行。在Variable Explorer查看`summary_tab`、`welch_tab`和`gh_tab`，在Plots查看两图；也可按F5执行整文件。新控制台逐节运行不依赖`__file__`。命令行备选为`python Python/welch_gh.py`。
-3. **MATLAB**：将Current Folder设为`练习项目`，打开`MATLAB/welch_gh.m`，从0节依次点击Run Section；整文件点Run。把目录加入搜索路径与设置Current Folder是不同操作。需要Statistics and Machine Learning Toolbox；当前验证版本为R2025a。
+3. **MATLAB**：将Current Folder设为`练习项目`，打开`MATLAB/welch_gh.m`，从0节依次点击Run Section；整文件点Run。把目录加入搜索路径与设置Current Folder是不同操作。需要Statistics and Machine Learning Toolbox；本项目实测版本为R2025a，不表示其他版本必然不可用。
 
 后面的节使用前面算出的变量。若刚启动新会话，要从第0节开始；若改了数据或`unit_scale`，也从第0节重新向下运行。
 
@@ -29,7 +29,7 @@ Python实际依赖是NumPy、pandas、SciPy≥1.16、matplotlib。请在Spyder�
 
 脚本中的结论由当前结果生成。P和区间均已纳入GH调整，不再追加Bonferroni。R原生`oneway.test`返回整体F/df/P；Python的`tukey_hsd(..., equal_var=False)`执行GH。
 
-**MATLAB实现限制**：Welch与GH按正文定义自编，学生化极差使用R2025a的`internal.stats.stdrinv/stdrcdf`。这是非公开工具箱接口，不是MATLAB公开原生GH函数；其他版本可能不可用，需复核接口和数值。项目不调用R/Python作为隐藏后端。
+**MATLAB实现说明**：Welch与GH按正文定义自编，q概率和分位点由项目MATLAB目录中的studentized_range_cdf、studentized_range_inv数值函数计算；函数只调用公开MATLAB函数，不调用R/Python后端。较长的q数值算法供核对使用，新手可先按主脚本分节运行。
 
 ## 第二次：只改变单位
 

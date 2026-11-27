@@ -11,12 +11,13 @@ if ~isfolder(fullfile(root,'数据'))
 end
 assert(isfolder(fullfile(root,'数据')), '请把Current Folder设为项目根。');
 save_figures = strcmp(getenv('SAVE_FIGURES'),'1');
+save_results = strcmp(getenv('SAVE_RESULTS'),'1');
 show_figures = ~strcmp(getenv('KW_HEADLESS'),'1');
 alpha = 0.05;
 mc_draws = 199999;
 seed = 20261130;
 out = fullfile(root,'运行结果','MATLAB');
-if ~isfolder(out)
+if save_results && ~isfolder(out)
     mkdir(out);
 end
 rabbit = readtable(fullfile(root,'数据','rabbit.csv'));
@@ -83,7 +84,10 @@ if numel(unique(sizes)) == 1 && k == 4
     contrast = ["m1-m2"; "(m1+m2)/2-m3"; "(m1+m2+m3)/3-m4"];
     contrast_components = table(contrast,differences,SE,Z,Z2, ...
         'VariableNames',{'contrast','difference','SE','Z','Z_squared_contribution'});
-    writetable(contrast_components,fullfile(out,'contrast_components.csv'));
+    if save_results
+        if ~isfolder(out), mkdir(out); end
+        writetable(contrast_components,fullfile(out,'contrast_components.csv'));
+    end
     disp(contrast_components);
     fprintf('contrast Z^2 sum=%.12f; H=%.12f\n',sum(Z2),H);
     contrast_sum_z2 = sum(Z2);
@@ -98,7 +102,10 @@ if p_chisq <= alpha
 else
     disp('χ²近似判断：不足以拒绝同分布H0。');
 end
-writetable(rank_table,fullfile(out,'rabbit_ranks.csv'));
+if save_results
+    if ~isfolder(out), mkdir(out); end
+    writetable(rank_table,fullfile(out,'rabbit_ranks.csv'));
+end
 
 %% 3 六瓶：观察H按当前组别算，枚举全部90个身份划分
 bottles = readtable(fullfile(root,'数据','six_bottles.csv'));
@@ -146,7 +153,10 @@ if exact_P <= alpha
 else
     disp('精确枚举判断：不足以拒绝同分布H0。');
 end
-writetable(distribution,fullfile(out,'aux_exact_distribution.csv'));
+if save_results
+    if ~isfolder(out), mkdir(out); end
+    writetable(distribution,fullfile(out,'aux_exact_distribution.csv'));
+end
 
 %% 4 兔例条件置换：均匀重排有身份的秩，保留组大小
 rng(seed);
@@ -177,7 +187,10 @@ result = table(H,C,p_chisq,mc_draws,exceedances,mc_P,mc_se,small_H,exact_P, ...
     Vbase,Tbase,Tactual,Vactual,contrast_sum_z2, ...
     'VariableNames',{'H','C','chi2_P','mc_draws','tail_count','mc_P','mc_se','small_H','small_exact_P', ...
     'Vbase','Tbase','Tactual','Vactual','contrast_Z2_sum'});
-writetable(result,fullfile(out,'summary.csv'));
+if save_results
+    if ~isfolder(out), mkdir(out); end
+    writetable(result,fullfile(out,'summary.csv'));
+end
 
 %% 5 绘图：默认显示，保存开关位于第1节
 visibility = 'off';

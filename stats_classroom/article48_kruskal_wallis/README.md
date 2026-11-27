@@ -36,9 +36,9 @@
 
 ## 图、保存与输出
 
-正文主图采用R＋ggplot2生成。三种语言默认显示平均秩图及六瓶精确CDF/χ² CDF对照，不自动保存图片。把第1节`save_figures`设为真可保存PNG；也可运行前设置环境变量`SAVE_FIGURES=1`。自动检查使用`KW_HEADLESS=1`关闭显示，Python另用`MPLBACKEND=Agg`；学生在IDE中无需设置这些变量。
+正文主图采用R＋ggplot2生成。三种语言默认显示平均秩图及六瓶精确CDF/χ² CDF对照，不自动保存图片或CSV。把第1节save_figures设为真可保存PNG，把save_results设为真可保存CSV；也可运行前设置环境变量SAVE_FIGURES=1、SAVE_RESULTS=1。自动检查使用KW_HEADLESS=1关闭显示，Python另用MPLBACKEND=Agg；学生在IDE中无需设置这些变量。
 
-数表自动写入`运行结果/语言/`，便于逐项核对；附带`console.txt`是本次实际整文件运行输出。`summary.csv`汇总H、C、近似P及MC结果，`rabbit_ranks.csv`为组秩汇总。图片的英文标签便于三环境移植，正文提供中文解释。CDF纵轴均为累计概率，精确分布用阶梯，观察H用竖线；不是把概率质量与密度直接比较。
+开启save_results后，数表写入运行结果/语言/，便于逐项核对；默认只打印，不创建结果目录。附带的console.txt是本次实际整文件运行输出。summary.csv汇总H、C、近似P及MC结果，rabbit_ranks.csv为组秩汇总。图片的英文标签便于三环境移植，正文提供中文解释。CDF纵轴均为累计概率，精确分布用阶梯，观察H用竖线；不是把概率质量与密度直接比较。
 
 ## 再改一次分组
 

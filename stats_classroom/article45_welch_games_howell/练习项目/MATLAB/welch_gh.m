@@ -1,5 +1,5 @@
 %% 0. 准备：Current Folder设为练习项目，在同一新会话按节运行。
-% UTF-8；教学模拟数据来源见README；需R2025a Statistics and Machine Learning Toolbox。
+% UTF-8；教学模拟数据来源见README；需Statistics and Machine Learning Toolbox；实测版本R2025a。
 alpha = 0.05;
 confidence = 1 - alpha;
 unit_scale = 1; % 第二遍改为0.133322，把mmHg换成kPa后完整重算。
@@ -20,6 +20,7 @@ else
 end
 output_dir = fullfile(project_dir, '运行结果', 'MATLAB');
 figure_dir = fullfile(project_dir, '图形', 'MATLAB');
+addpath(fullfile(project_dir, 'MATLAB'));
 
 %% 1. 数据：每行一名受试者，显示字段与各组摘要。
 h = readtable(fullfile(project_dir, 'data', 'hetero_normal.csv'));
@@ -70,11 +71,7 @@ else
 end
 fprintf('在α=%.2f下%s三组总体均数相等；整体检验不指出具体组对。\n', alpha, verdict);
 
-%% 3. GH：自编定义实现，学生化极差使用R2025a内部接口。
-% 这两个函数不是公开API，不能保证其他版本可用；升级后需复核。
-if isempty(which('internal.stats.stdrinv')) || isempty(which('internal.stats.stdrcdf'))
-    error('缺少R2025a学生化极差内部接口，请阅读README中的版本限制。')
-end
+%% 3. GH：自编定义实现，q概率/分位点由项目内数值函数计算。
 pair_count = k * (k - 1) / 2;
 group1 = strings(pair_count, 1);
 group2 = strings(pair_count, 1);
@@ -91,10 +88,9 @@ for i = 1:k-1
         q = sqrt(2) * abs(t_statistic);
         % k=2核对t/q尺度；正式GH的k仍是全部组数。
         p_single = 2 * tcdf(-abs(t_statistic), nu);
-        p_q_two = internal.stats.stdrcdf(q, nu, 2, 'upper');
-        % 注意内部函数的参数顺序为q、自由度、组数。
-        p_adj = internal.stats.stdrcdf(q, nu, k, 'upper');
-        q_critical = internal.stats.stdrinv(confidence, nu, k);
+        p_q_two = studentized_range_cdf(q, 2, nu, 'upper');
+        p_adj = studentized_range_cdf(q, k, nu, 'upper');
+        q_critical = studentized_range_inv(confidence, k, nu);
         half_width = q_critical * se / sqrt(2);
         group1(row_id) = names{i};
         group2(row_id) = names{j};

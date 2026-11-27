@@ -10,12 +10,13 @@ if (!dir.exists(file.path(root, "数据"))) {
   stop("请先打开项目根目录的Rproj，或将工作目录设为项目根。")
 }
 save_figures <- Sys.getenv("SAVE_FIGURES", "0") == "1"
+save_results <- Sys.getenv("SAVE_RESULTS", "0") == "1"
 show_figures <- Sys.getenv("KW_HEADLESS", "0") != "1"
 alpha <- 0.05
 mc_draws <- 199999L
 seed <- 20261130L
 out <- file.path(root, "运行结果", "R")
-dir.create(out, recursive = TRUE, showWarnings = FALSE)
+if (save_results) dir.create(out, recursive = TRUE, showWarnings = FALSE)
 rabbit <- read.csv(file.path(root, "数据", "rabbit.csv"))
 cat("每行一只兔，drug为药物，score为改善差（分）：\n")
 print(head(rabbit))
@@ -83,7 +84,10 @@ if (length(unique(sizes)) == 1 && k == 4) {
     contrast = c("m1-m2", "(m1+m2)/2-m3", "(m1+m2+m3)/3-m4"),
     difference = differences, SE = SE, Z = Z,
     Z_squared_contribution = Z2)
-  write.csv(contrast_components, file.path(out, "contrast_components.csv"), row.names = FALSE)
+  if (save_results) {
+    dir.create(out, recursive = TRUE, showWarnings = FALSE)
+    write.csv(contrast_components, file.path(out, "contrast_components.csv"), row.names = FALSE)
+  }
   print(contrast_components)
   cat(sprintf("contrast Z^2 sum=%.12f; H=%.12f\n", sum(Z2), H))
   contrast_sum_z2 <- sum(Z2)
@@ -93,7 +97,10 @@ if (length(unique(sizes)) == 1 && k == 4) {
 }
 print(native) # 返回校正后统计量、近似自由度与P值。
 cat("χ²近似判断：", if (p_chisq <= alpha) "拒绝同分布H0。\n" else "不足以拒绝同分布H0。\n")
-write.csv(rank_table, file.path(out, "rabbit_ranks.csv"), row.names = FALSE)
+if (save_results) {
+  dir.create(out, recursive = TRUE, showWarnings = FALSE)
+  write.csv(rank_table, file.path(out, "rabbit_ranks.csv"), row.names = FALSE)
+}
 
 # 3 六瓶：观察H来自当前组别，完整枚举全部身份划分 ----
 bottles <- read.csv(file.path(root, "数据", "six_bottles.csv"))
@@ -130,7 +137,10 @@ print(distribution)
 cat(sprintf("辅助 H=%.9f total=%d tail=%d exact_P=%.12f chi2_P=%.12f\n",
             small_H, length(all_H), tail_count, exact_P, small_chisq_P))
 cat("精确枚举判断：", if (exact_P <= alpha) "拒绝同分布H0。\n" else "不足以拒绝同分布H0。\n")
-write.csv(distribution, file.path(out, "aux_exact_distribution.csv"), row.names = FALSE)
+if (save_results) {
+  dir.create(out, recursive = TRUE, showWarnings = FALSE)
+  write.csv(distribution, file.path(out, "aux_exact_distribution.csv"), row.names = FALSE)
+}
 
 # 4 兔例：固定组大小，Monte Carlo抽取合法划分 ----
 set.seed(seed)
@@ -153,12 +163,15 @@ cat(sprintf("MC B=%d seed=%d exceedances=%d P_plus1=%.9f MCSE=%.9f\n",
             mc_draws, seed, exceedances, mc_P, mc_se))
 cat("条件置换判断：", if (mc_P <= alpha) "拒绝同分布H0。\n" else "不足以拒绝同分布H0。\n")
 cat("这是整体分布比较，具体药物组对需要另作多重比较。\n")
-write.csv(data.frame(H, C, chi2_P = p_chisq, mc_draws,
-                     tail_count = exceedances, mc_P, mc_se,
-                     small_H, small_exact_P = exact_P,
-                     Vbase, Tbase, Tactual, Vactual,
-                     contrast_Z2_sum = contrast_sum_z2),
-          file.path(out, "summary.csv"), row.names = FALSE)
+if (save_results) {
+  dir.create(out, recursive = TRUE, showWarnings = FALSE)
+  write.csv(data.frame(H, C, chi2_P = p_chisq, mc_draws,
+                       tail_count = exceedances, mc_P, mc_se,
+                       small_H, small_exact_P = exact_P,
+                       Vbase, Tbase, Tactual, Vactual,
+                       contrast_Z2_sum = contrast_sum_z2),
+            file.path(out, "summary.csv"), row.names = FALSE)
+}
 
 # 5 绘图：R + ggplot2，也是正文主图的来源 ----
 # ggplot建立图对象；geom_step(direction="hv")画右连续的精确CDF阶梯。

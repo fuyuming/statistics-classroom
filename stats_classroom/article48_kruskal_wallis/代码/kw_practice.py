@@ -20,12 +20,14 @@ if not (root / '数据').is_dir() and '__file__' in globals():
 if not (root / '数据').is_dir():
     raise FileNotFoundError('请把工作目录设为含“数据”文件夹的项目根目录。')
 save_figures = os.getenv('SAVE_FIGURES', '0') == '1'
+save_results = os.getenv('SAVE_RESULTS', '0') == '1'
 show_figures = os.getenv('KW_HEADLESS', '0') != '1'
 alpha = 0.05
 mc_draws = 199999
 seed = 20261130
 out = root / '运行结果' / 'Python'
-out.mkdir(parents=True, exist_ok=True)
+if save_results:
+    out.mkdir(parents=True, exist_ok=True)
 rabbit = pd.read_csv(root / '数据' / 'rabbit.csv')
 print('每行一只兔；drug为药物，score为改善差（分）：')
 print(rabbit.head())
@@ -92,7 +94,9 @@ if len(set(sizes)) == 1 and k == 4:
         'contrast': ['m1-m2', '(m1+m2)/2-m3', '(m1+m2+m3)/3-m4'],
         'difference': diffs, 'SE': ses, 'Z': zvals,
         'Z_squared_contribution': contributions})
-    contrast_components.to_csv(out / 'contrast_components.csv', index=False)
+    if save_results:
+        out.mkdir(parents=True, exist_ok=True)
+        contrast_components.to_csv(out / 'contrast_components.csv', index=False)
     print(contrast_components.to_string(index=False))
     print(f'contrast Z^2 sum={contributions.sum():.12f}; H={H:.12f}')
     contrast_sum_z2 = contributions.sum()
@@ -101,7 +105,9 @@ else:
     print('contrast components skipped: requires four equal-sized groups.')
 print('scipy.stats.kruskal:', native)
 print('χ²近似判断：', '拒绝同分布H0。' if p_chisq <= alpha else '不足以拒绝同分布H0。')
-summary.to_csv(out / 'rabbit_ranks.csv', index=False)
+if save_results:
+    out.mkdir(parents=True, exist_ok=True)
+    summary.to_csv(out / 'rabbit_ranks.csv', index=False)
 
 # %% 3 六瓶教学例：观察H来自当前分组，再枚举全部合法划分
 bottles = pd.read_csv(root / '数据' / 'six_bottles.csv')
@@ -139,7 +145,9 @@ print(distribution.to_string(index=False))
 print(f'辅助 H={small_H:.9f}, total={len(all_H)}, tail={tail_count}')
 print(f'exact_P={exact_P:.12f}, chi2_P={small_chisq_P:.12f}')
 print('精确枚举判断：', '拒绝同分布H0。' if exact_P <= alpha else '不足以拒绝同分布H0。')
-distribution.to_csv(out / 'aux_exact_distribution.csv', index=False)
+if save_results:
+    out.mkdir(parents=True, exist_ok=True)
+    distribution.to_csv(out / 'aux_exact_distribution.csv', index=False)
 
 # %% 4 兔例条件置换：固定每组大小，打乱有身份的单位
 # default_rng创建随机数生成器；permutation均匀重排24个秩。
@@ -162,12 +170,14 @@ print(f'MC B={mc_draws}, seed={seed}, exceedances={exceedances}')
 print(f'P_plus1={mc_P:.9f}, MCSE={mc_se:.9f}')
 print('条件置换判断：', '拒绝同分布H0。' if mc_P <= alpha else '不足以拒绝同分布H0。')
 print('这是整体分布比较；具体药物组对需要另作多重比较。')
-pd.DataFrame({'H':[H], 'C':[C], 'chi2_P':[p_chisq],
-              'mc_draws':[mc_draws], 'tail_count':[exceedances],
-              'mc_P':[mc_P], 'mc_se':[mc_se], 'small_H':[small_H],
-              'small_exact_P':[exact_P], 'Vbase':[vbase], 'Tbase':[tbase],
-              'Tactual':[tactual], 'Vactual':[vactual],
-              'contrast_Z2_sum':[contrast_sum_z2]}).to_csv(out / 'summary.csv', index=False)
+if save_results:
+    out.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame({'H':[H], 'C':[C], 'chi2_P':[p_chisq],
+                  'mc_draws':[mc_draws], 'tail_count':[exceedances],
+                  'mc_P':[mc_P], 'mc_se':[mc_se], 'small_H':[small_H],
+                  'small_exact_P':[exact_P], 'Vbase':[vbase], 'Tbase':[tbase],
+                  'Tactual':[tactual], 'Vactual':[vactual],
+                  'contrast_Z2_sum':[contrast_sum_z2]}).to_csv(out / 'summary.csv', index=False)
 
 # %% 5 绘图：直接显示；SAVE_FIGURES=1才另存图片
 fig1, ax1 = plt.subplots(figsize=(7, 4.5))
