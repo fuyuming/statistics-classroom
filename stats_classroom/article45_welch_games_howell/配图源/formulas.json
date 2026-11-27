@@ -1,0 +1,45 @@
+{
+  "01": [
+    "v_i=\\frac{s_i^2}{n_i},\\qquad \\mathrm{SE}(\\bar y_i)=\\sqrt{v_i}",
+    "w_i=\\frac{1}{v_i}=\\frac{n_i}{s_i^2}"
+  ],
+  "02": [
+    "W=\\sum_{i=1}^{k}w_i,\\qquad \\bar y_w=\\frac{\\sum_{i=1}^{k}w_i\\bar y_i}{W}"
+  ],
+  "03": [
+    "A=\\frac{\\sum_{i=1}^{k}w_i(\\bar y_i-\\bar y_w)^2}{k-1}"
+  ],
+  "04": [
+    "C=\\sum_{i=1}^{k}\\frac{(1-w_i/W)^2}{n_i-1}",
+    "F_W=\\frac{A}{1+2(k-2)C/(k^2-1)}",
+    "\\nu=\\frac{k^2-1}{3C}"
+  ],
+  "05": [
+    "F_W=\\frac{12.377002}{1+0.171352/4}=11.868577",
+    "\\nu=\\frac{8}{3\\times0.171352}=15.562533",
+    "H_0:\\quad F_W\\ \\overset{\\mathrm{approx}}{\\sim}\\ F(2,15.562533)"
+  ],
+  "06": [
+    "\\mathrm{SE}_{ij}=\\sqrt{v_i+v_j}",
+    "\\nu_{ij}=\\frac{(v_i+v_j)^2}{v_i^2/(n_i-1)+v_j^2/(n_j-1)}"
+  ],
+  "07": [
+    "t_{ij}=\\frac{d_{ij}}{\\mathrm{SE}_{ij}}",
+    "q_{ij}=\\sqrt{2}|t_{ij}|=\\frac{\\sqrt{2}|d_{ij}|}{\\mathrm{SE}_{ij}}",
+    "=\\frac{|d_{ij}|}{\\sqrt{(v_i+v_j)/2}}"
+  ],
+  "07a": [
+    "Z_1,\\ldots,Z_k\\ \\sim N(0,1)",
+    "U\\sim\\chi_\\nu^2,\\quad U\\perp(Z_1,\\ldots,Z_k)",
+    "Q_{k,\\nu}=\\frac{\\max_i Z_i-\\min_i Z_i}{\\sqrt{U/\\nu}}"
+  ],
+  "08": [
+    "P_{\\mathrm{adj},ij}=\\Pr(Q_{k,\\nu_{ij}}\\geq q_{ij})",
+    "\\mathrm{CI}_{ij}:\\quad d_{ij}\\ \\pm\\ q_{0.95;k,\\nu_{ij}}\\frac{\\mathrm{SE}_{ij}}{\\sqrt{2}}"
+  ],
+  "09": [
+    "8.156667\\ \\pm\\ 3.805083\\times\\frac{1.884437}{\\sqrt{2}}",
+    "=8.156667\\ \\pm\\ 5.070266",
+    "=[3.086400,\\ 13.226933]\\ \\mathrm{mmHg}"
+  ]
+}
