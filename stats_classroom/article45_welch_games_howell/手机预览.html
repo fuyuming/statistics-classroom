@@ -1,18 +1,19 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>方差不齐，三个组的均数怎样比较？——Welch与Games–Howell算同一道题</title><style>*{box-sizing:border-box}body{margin:0;background:#f1f4f3;color:#27343a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:720px;margin:24px auto;padding:32px 36px 56px;background:#fff;border-top:5px solid #258dcc}.brand{display:flex;align-items:center;gap:12px;color:#258dcc;font-size:14px;letter-spacing:.04em}.brand img{width:48px;height:48px;border-radius:50%}h1{font-size:30px;line-height:1.45;color:#0000F5;margin:26px 0 20px}h2{font-size:22px;line-height:1.5;color:#0000F5;border-left:4px solid #58b9ed;padding-left:13px;margin:42px 0 20px}h3{font-size:19px;line-height:1.55;color:#0000F5;margin:30px 0 14px}p{font-size:17px;line-height:1.95;margin:19px 0;text-align:justify}strong{color:#27343a;font-weight:700}blockquote{margin:20px 0 30px;padding:10px 18px;background:#f0f8ff;border-left:2px solid #58b9ed}blockquote p{font-size:14px;line-height:1.9;margin:8px 0;color:#53666c}a{color:#258dcc;text-decoration:none;border-bottom:1px solid #b9def5}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;background:#f0f8ff;color:#1769aa;padding:1px 5px;border-radius:4px}pre{background:#f7faf9;border:1px solid #e4ecea;border-radius:6px;padding:12px 14px;overflow-x:auto}pre code{background:none;padding:0;font-size:14px;line-height:1.7}div.formula{background:#f7faf9;border-left:3px solid #58b9ed;padding:12px 16px;margin:20px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:17px;color:#1769aa;text-align:center;line-height:1.9}ul,ol{font-size:17px;line-height:1.95;margin:18px 0;padding-left:26px}li{margin:8px 0}table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px}th,td{border-bottom:1px solid #e4ecea;padding:9px 10px;text-align:left;line-height:1.7}th{background:#f0f8ff;color:#1769aa;font-weight:650}footer{border-top:1px solid #dfe8e6;margin-top:36px;padding-top:16px;font-size:12px;color:#758787;line-height:1.8}@media(max-width:600px){body{background:#fff}main{margin:0;padding:24px 22px 40px;border-top-width:4px}h1{font-size:27px}h2{font-size:21px}h3{font-size:18px}p,ul,ol{font-size:16px;line-height:1.95}table{font-size:14px}}main > p img{display:block;width:100%;height:auto;margin:24px 0 8px;border:1px solid #e4ecea}main > p:has(img){margin:25px -12px 4px}main > p:has(img) a{border:0;display:block}main > p.caption > em{display:block;font-size:13px;line-height:1.8;font-style:normal;color:#657a7d;text-align:left;margin:0 0 28px}@media(max-width:600px){main > p:has(img){margin-left:-12px;margin-right:-12px}}a{overflow-wrap:anywhere}table{display:block;overflow-x:auto}blockquote p{font-size:16px}hr{border:0;border-top:1px solid #dfe8e6;margin:30px 0}</style><style>
-main{max-width:640px}table{display:table;width:100%;table-layout:auto;font-size:13px}th,td{padding:8px 4px;line-height:1.65;vertical-align:middle}td:not(:first-child),th:not(:first-child){text-align:right}td:first-child,th:first-child{text-align:left}pre{white-space:pre-wrap;overflow-wrap:anywhere}pre code{font-size:12px}img{max-width:100%}h2,h3{color:#0000F5}main>p img{border:0}main>p:has(img){margin:20px -10px 4px}sup{font-size:.7em}.cite-tail{white-space:nowrap}code{overflow-wrap:anywhere;word-break:break-word}p{word-break:normal}table+table{margin-top:14px}
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>方差不齐，三个组的均数怎样比较？——Welch与Games–Howell算同一道题</title><style>*{box-sizing:border-box}body{margin:0;background:#f1f4f3;color:#27343a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:720px;margin:24px auto;padding:32px 36px 56px;background:#fff;border-top:5px solid #258dcc}.brand{display:flex;align-items:center;gap:12px;color:#258dcc;font-size:14px;letter-spacing:.04em}.brand img{width:48px;height:48px;border-radius:50%}h1{font-size:30px;line-height:1.45;color:#0000F5;margin:26px 0 20px}h2{font-size:22px;line-height:1.5;color:#0000F5;border-left:4px solid #58b9ed;padding-left:13px;margin:42px 0 20px}h3{font-size:19px;line-height:1.55;color:#0000F5;margin:30px 0 14px}p{font-size:17px;line-height:1.95;margin:19px 0;text-align:justify}strong{color:#27343a;font-weight:700}blockquote{margin:20px 0 30px;padding:10px 18px;background:#f0f8ff;border-left:2px solid #58b9ed}blockquote p{font-size:14px;line-height:1.9;margin:8px 0;color:#53666c}a{color:#258dcc;text-decoration:none;border-bottom:1px solid #b9def5}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;background:#f0f8ff;color:#1769aa;padding:1px 5px;border-radius:4px}pre{background:#f7faf9;border:1px solid #e4ecea;border-radius:6px;padding:12px 14px;overflow-x:auto}pre code{background:none;padding:0;font-size:14px;line-height:1.7}div.formula{background:#f7faf9;border-left:3px solid #58b9ed;padding:12px 16px;margin:20px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:17px;color:#1769aa;text-align:center;line-height:1.9}ul,ol{font-size:17px;line-height:1.95;margin:18px 0;padding-left:26px}li{margin:8px 0}table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px}th,td{border-bottom:1px solid #e4ecea;padding:9px 10px;text-align:left;line-height:1.7}th{background:#f0f8ff;color:#1769aa;font-weight:650}footer{border-top:1px solid #dfe8e6;margin-top:36px;padding-top:16px;font-size:12px;color:#758787;line-height:1.8}@media(max-width:600px){body{background:#fff}main{margin:0;padding:24px 22px 40px;border-top-width:4px}h1{font-size:27px}h2{font-size:21px}h3{font-size:18px}p,ul,ol{font-size:16px;line-height:1.95}table{font-size:14px}}main > p img{display:block;width:100%;height:auto;margin:24px 0 8px;border:1px solid #e4ecea}main > p:has(img){margin:25px -12px 4px}main > p:has(img) a{border:0;display:block}main > p.caption > em{display:block;font-size:13px;line-height:1.8;font-style:normal;color:#657a7d;text-align:left;margin:0 0 28px}@media(max-width:600px){main > p:has(img){margin-left:-12px;margin-right:-12px}}a{overflow-wrap:anywhere}table{display:block;overflow-x:auto}blockquote p{font-size:16px}hr{border:0;border-top:1px solid #dfe8e6;margin:30px 0}</style><style>
+main{max-width:640px}table{display:table;width:100%;table-layout:auto;font-size:13px}th,td{padding:8px 4px;line-height:1.65;vertical-align:middle}td:not(:first-child),th:not(:first-child){text-align:right}td:first-child,th:first-child{text-align:left}.raw-data-table td,.raw-data-table th{text-align:left!important;line-height:1.8}.raw-data-table td:last-child{word-break:normal}pre{white-space:pre-wrap;overflow-wrap:anywhere}pre code{font-size:12px}img{max-width:100%}h2,h3{color:#0000F5}main>p img{border:0}main>p:has(img){margin:20px -10px 4px}sup{font-size:.7em}.cite-tail{white-space:nowrap}code{overflow-wrap:anywhere;word-break:break-word}p{word-break:normal}table+table{margin-top:14px}
 @media(max-width:600px){table{font-size:12px}th,td{padding:8px 3px}p{font-size:16px}main{padding-left:22px;padding-right:22px}}
 </style></head><body><main><div class="brand">明哥的微生物世界 · 统计课堂 45</div><h1>方差不齐，三个组的均数怎样比较？——Welch与Games–Howell算同一道题</h1>
 <blockquote><p>摘要　三组资料的波动相差很大，研究目标仍是平均下降多少，这时怎样比较均数？从一道三种降压方案的完整教学题出发，用各组均数的精度构造Welch整体检验，再逐对计算Games–Howell的标准误、近似自由度、调整P值和同时置信区间，看看同一份数据怎样得到带方向、单位与不确定性的结论。最后对照两项近期研究，看看这套方法怎样用于牙釉质硬度和嗅觉评分的比较。</p></blockquote>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/00_%E8%AF%BE%E5%A0%82%E5%B0%81%E9%9D%A2.png" alt="本科第十二次课：单因素方差分析与多组比较，无姓名版课堂封面"></p>
+<p><img alt="本科第十二次课：单因素方差分析与多组比较，无姓名版课堂封面" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/00_%E8%AF%BE%E5%A0%82%E5%B0%81%E9%9D%A2.png"/></p>
 <p>大家好，我是明哥。</p>
 <p>本科《概率与医学统计学》讲到多组均数比较时，会用到Welch和Games–Howell。课堂会讲选择理由和结果判读，课时有限，背后的统计量怎样构造，就放到公众号接着讲。</p>
 <p>第43篇整理了经典方差分析的正态性、方差齐性与残差诊断。接下来要解决的是：<strong>共同方差不合理，而我们仍想比较总体均数，分析该怎样继续？</strong></p>
 <p>Welch把两独立样本的不等方差均数比较推广到多个组；Games–Howell则进一步比较各组之间的两两差异。本篇沿同一道题，从各组均数的抽样波动算起，把统计量、参照分布和最后的研究解释连<span class="cite-tail">起来<sup>[1]</sup>。</span></p>
 <h2>一、先把完整题目摆出来</h2>
 <p>假设一个团队比较三种降压方案G1、G2、G3。36名不同受试者随机分入三个组，每组12人，随访8周。每人记录基线和8周收缩压，并计算<strong>基线收缩压减去8周收缩压</strong>，得到一个下降值，单位为mmHg；数值越大，表示下降越多。</p>
-<p>本题分析的是36名相互独立受试者各自的下降值。一个人的两次测量已经合成为一个差值；不同方案之间是独立组比较。表1给出按正态模型模拟生成的全部教学数据，同一行只是各组内的编号，跨组没有配对关系。</p>
+<p>本题分析的是36名相互独立受试者各自的下降值。一个人的两次测量已经合成为一个差值；不同方案之间是独立组比较。表1按方案分别列出每组12名受试者的全部教学数据，数据按正态模型模拟生成。</p>
 <p class="caption"><em>表1｜三种降压方案的收缩压下降值，单位mmHg</em></p>
-<table><thead><tr><th>组内编号</th><th>G1</th><th>G2</th><th>G3</th></tr></thead><tbody><tr><td>1</td><td>8.87</td><td>13.94</td><td>8.04</td></tr><tr><td>2</td><td>8.58</td><td>12.52</td><td>11.58</td></tr><tr><td>3</td><td>10.79</td><td>16.64</td><td>20.31</td></tr><tr><td>4</td><td>9.36</td><td>12.53</td><td>13.90</td></tr><tr><td>5</td><td>10.40</td><td>14.21</td><td>26.84</td></tr><tr><td>6</td><td>9.94</td><td>9.81</td><td>12.65</td></tr><tr><td>7</td><td>8.51</td><td>7.49</td><td>13.98</td></tr><tr><td>8</td><td>9.36</td><td>11.15</td><td>21.86</td></tr><tr><td>9</td><td>9.43</td><td>12.17</td><td>13.69</td></tr><tr><td>10</td><td>9.88</td><td>10.10</td><td>27.47</td></tr><tr><td>11</td><td>9.92</td><td>7.06</td><td>17.75</td></tr><tr><td>12</td><td>10.53</td><td>17.88</td><td>25.38</td></tr></tbody></table>
+<table class="raw-data-table" data-table-role="raw-data"><thead><tr><th>降压方案</th><th>12名受试者的下降值（mmHg）</th></tr></thead><tbody><tr><td>G1</td><td>8.87、8.58、10.79、9.36、10.40、9.94、8.51、9.36、9.43、9.88、9.92、10.53</td></tr><tr><td>G2</td><td>13.94、12.52、16.64、12.53、14.21、9.81、7.49、11.15、12.17、10.10、7.06、17.88</td></tr><tr><td>G3</td><td>8.04、11.58、20.31、13.90、26.84、12.65、13.98、21.86、13.69、27.47、17.75、25.38</td></tr></tbody></table>
 <p>设各组下降值的总体分布近似正态，允许各组总体方差不同。本题的总体均数μ₁、μ₂、μ₃分别表示三种方案下的平均下降值，这三个总体均数未知，需要用样本资料推断。检验水准取α＝0.05，要回答：</p>
 <ol><li>三种方案的总体平均下降值是否相等？整体H₀为μ₁＝μ₂＝μ₃，H₁为至少有两个总体均数不同。</li><li>如果比较全部三个组对，哪些方案之间的平均下降值有差异？逐对H₀为对应的总体均数差等于0，均作双侧比较，并为全部三对作多重比较调整，报告95%同时置信区间。</li></ol>
 <p>先明确方法适用的范围。Welch放宽的是<strong>共同方差</strong>要求，仍需要按研究设计判断独立性，并关注组内分布和极端值。每组只有12人时，严重偏态、重尾或强影响点仍可能使均数及其方差估计不稳定。Welch在这一模型下使用近似参照<span class="cite-tail">分布<sup>[2]</sup>。</span></p>
@@ -20,7 +21,7 @@ main{max-width:640px}table{display:table;width:100%;table-layout:auto;font-size:
 <h2>二、各组均数的精度为什么不同？</h2>
 <p>先从表1计算每组样本量、均数和样本标准差。下标i表示组，j表示组内受试者；yᵢⱼ是某人的下降值，ȳᵢ和sᵢ²分别为该组样本均数与样本方差，nᵢ为该组人数。本题i＝1、2、3，各组nᵢ＝12。</p>
 <p>在同组受试者独立、具有同一总体方差σᵢ²的模型下，样本均数的方差为σᵢ²/nᵢ。用sᵢ²代替未知的σᵢ²，就得到式（1）的均数方差估计vᵢ，以及相应的精度权重wᵢ。</p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F01.png" alt="式1：均数方差等于组内样本方差除以人数，标准误为其平方根，权重为均数方差倒数"></p>
+<p><img alt="式1：均数方差等于组内样本方差除以人数，标准误为其平方根，权重为均数方差倒数" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F01.png"/></p>
 <p class="caption"><em>式（1）｜vᵢ估计样本均数的抽样方差，单位为mmHg²；其平方根是均数标准误，单位为mmHg；wᵢ为方差倒数，单位为mmHg⁻²。</em></p>
 <p><strong>样本标准差描述组内个体的差异，均数标准误描述样本均数的抽样波动。</strong> 人数相同时，组内波动越大，均数估计通常越不精确；在总体方差相同的条件下，人数越多，均数估计通常越精确。wᵢ把这两方面合在一起。</p>
 <p>表2列出本题的实际结果；样本方差用nᵢ−1作分母，后面计算均使用未舍入值。</p>
@@ -28,37 +29,37 @@ main{max-width:640px}table{display:table;width:100%;table-layout:auto;font-size:
 <table><thead><tr><th>量</th><th>G1</th><th>G2</th><th>G3</th></tr></thead><tbody><tr><td>人数nᵢ</td><td>12</td><td>12</td><td>12</td></tr><tr><td>均数ȳᵢ/mmHg</td><td>9.6308</td><td>12.1250</td><td>17.7875</td></tr><tr><td>标准差sᵢ/mmHg</td><td>0.7454</td><td>3.2893</td><td>6.4852</td></tr><tr><td>方差sᵢ²/mmHg²</td><td>0.5556</td><td>10.8197</td><td>42.0577</td></tr><tr><td>均数方差vᵢ/mmHg²</td><td>0.0463</td><td>0.9016</td><td>3.5048</td></tr><tr><td>精度权重wᵢ/mmHg⁻²</td><td>21.5987</td><td>1.1091</td><td>0.2853</td></tr></tbody></table>
 <p>G3的平均下降值最大，个体差异也最大；G1的数据集中得多。因此，虽然三组人数相等，三个样本均数的精度却很不一样。</p>
 <p>图1把个体下降值与各组均数放在一起，帮助区分“均数位置”和“组内分散”。</p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%9B%BE01_%E5%8E%9F%E5%A7%8B%E6%95%B0%E6%8D%AE.png" alt="图1：三组原始下降值散点及组均数，纵轴为收缩压下降值mmHg"></p>
+<p><img alt="图1：三组原始下降值散点及组均数，纵轴为收缩压下降值mmHg" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%9B%BE01_%E5%8E%9F%E5%A7%8B%E6%95%B0%E6%8D%AE.png"/></p>
 <p class="caption"><em>图1｜点为36名受试者的模拟下降值，横线为各组样本均数；散点在横向稍作错开以便辨认。</em></p>
 <p>经典单因素ANOVA在共同方差模型下，把各组方差合并成误差均方MSE。这里允许三个总体方差不同，Welch便分别使用各组的方差估计，让每个均数的精度参与整体比较。</p>
 <h2>三、从精度权重构造Welch统计量</h2>
 <h3>（一）先找共同均数的加权估计</h3>
 <p>如果H₀成立，三个总体均数相同，就可以用三个样本均数共同估计这个未知的共同均数。精度高的估计贡献较多，精度低的估计贡献较少。式（2）给出权重总和W与加权均数ȳ<sub>w</sub>。</p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F02.png" alt="式2：权重相加得到W，用权重与组均数的乘积之和除以W得到加权均数"></p>
+<p><img alt="式2：权重相加得到W，用权重与组均数的乘积之和除以W得到加权均数" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F02.png"/></p>
 <p class="caption"><em>式（2）｜求和覆盖全部k个组，本题k＝3；ȳ<sub>w</sub>仍以mmHg计。</em></p>
 <p>代入表2，W＝22.9931，ȳ<sub>w</sub>＝9.8524 mmHg。G1占总权重约93.94%，所以ȳ<sub>w</sub>靠近G1均数9.6308 mmHg。</p>
 <p>Welch用这个加权均数作为共同中心，接着衡量三个组均数偏离它的程度。</p>
 <h3>（二）衡量三个均数偏离共同中心多少</h3>
 <p>有了共同中心，就可以计算每个组均数与ȳ<sub>w</sub>的偏离。式（3）将偏离平方，按精度加权，再除以k−1，得到A。</p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03.png" alt="式3：组均数相对加权中心的偏离平方按精度加权，除以k减1得到A"></p>
+<p><img alt="式3：组均数相对加权中心的偏离平方按精度加权，除以k减1得到A" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03.png"/></p>
 <p class="caption"><em>式（3）｜偏离平方的单位与权重相消，A无量纲；k−1对应k个均数围绕一个共同中心的偏离。</em></p>
 <p>同样大的均数偏离，如果发生在估计很精确的组，就更难用抽样波动解释，因此贡献更大。本题A＝12.377002。</p>
 <p>可以先看一个理想情形来理解它：假如各组总体方差已知，在独立正态模型下按真实精度加权，那么H₀下的加权离差平方和服从自由度k−1的χ²分布。若把式（3）的权重也换成这些真实精度，得到的量就是上述χ²变量除以k−1。实际资料中，权重来自样本方差，连加权中心也随它们波动。直接沿用“已知方差”的参照会忽略这部分不确定性，Welch因此作有限样本校正。</p>
 <h3>（三）把方差估计的不确定性纳入校正</h3>
 <p>式（4）先写出一般k组的关系：定义校正量C，再给出Welch统计量F<sub>W</sub>及其分母近似自由度ν。这个构造使用各组样本量和权重比例，R的<code>oneway.test()</code>也按这一形式<span class="cite-tail">实现<sup>[3]</sup>。</span></p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F04.png" alt="式4：由权重比例和各组样本量计算C，再校正A得到Welch统计量与近似自由度"></p>
+<p><img alt="式4：由权重比例和各组样本量计算C，再校正A得到Welch统计量与近似自由度" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F04.png"/></p>
 <p class="caption"><em>式（4）｜C、F<sub>W</sub>、ν均无量纲；nᵢ−1是各组样本方差的自由度。</em></p>
 <p>C中每项都包含nᵢ−1，因为每组方差估计的稳定程度与它的自由度有关；同时包含wᵢ/W，因为不同精度的组对共同中心的影响不同。这些因素汇总成C，用来校正A，并确定参照分布的分母自由度。</p>
 <p>本题C＝0.171352。式（5）用k＝3把校正和参照分布接起来。</p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F05.png" alt="式5：本题Welch统计量11.868577，近似参照F分布的自由度为2及15.562533"></p>
+<p><img alt="式5：本题Welch统计量11.868577，近似参照F分布的自由度为2及15.562533" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F05.png"/></p>
 <p class="caption"><em>式（5）｜显示值经过舍入；实际计算保留全部精度。F分布的分子自由度为k−1＝2，分母为近似自由度ν。</em></p>
 <p>式（5）已经用A和C算出了本题的<strong>F统计量11.868577</strong>。随后得到的ν＝15.562533，用于确定这个统计量的参照分布。</p>
 <p>F分布的自由度参数可以取正实数。这里直接使用分子自由度2、分母自由度15.562533的F分布，求临界值或尾部概率。<strong>样本算出的F统计量</strong>与<strong>由参照分布求出的临界F值</strong>，在分析中分别承担这两步的<span class="cite-tail">作用<sup>[3]</sup>。</span></p>
 <p>观察到的F<sub>W</sub>越大，说明组均数相对其抽样波动的偏离越大。用上述F分布计算11.868577及更大值的右尾概率，得到P＝0.0007405。这里虽然只取F的右尾，整体备择仍包含任意方向的均数差异，因为偏离在式（3）中已经平方。</p>
 <h2>四、用R核对整体检验，它回答到哪一步？</h2>
 <p>配套CSV有两列：<code>group</code>是方案，<code>value</code>是每人的下降值。打开本篇R项目后，从项目根目录读取它；<code>value ~ group</code>表示按方案比较下降值，<code>var.equal = FALSE</code>明确采用不假定共同方差的Welch<span class="cite-tail">方法<sup>[2]</sup>。</span></p>
-<pre><code>h &lt;- read.csv(&quot;data/hetero_normal.csv&quot;)
-h$group &lt;- factor(h$group, levels = c(&quot;G1&quot;, &quot;G2&quot;, &quot;G3&quot;))
+<pre><code>h &lt;- read.csv("data/hetero_normal.csv")
+h$group &lt;- factor(h$group, levels = c("G1", "G2", "G3"))
 fit_welch &lt;- oneway.test(
   value ~ group, data = h, var.equal = FALSE
 )
@@ -81,7 +82,7 @@ c(F_observed = F_observed, F_cutoff = F_cutoff, P = P_right)</code></pre>
 <h3>（一）沿用Welch t的标准误和自由度</h3>
 <p>每个组对先按两独立样本Welch t的方法处理：用这两个组各自的方差估计均数差的标准误，再计算Welch–Satterthwaite近似自由度。</p>
 <p>因为两个样本均数相互独立，差值的方差等于两个均数方差之和。式（6）给出SEᵢⱼ和νᵢⱼ，正是两独立样本Welch t使用的标准误和自由度。</p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F06.png" alt="式6：两个组的均数方差相加开根得到差值标准误，用各自样本量与方差计算近似自由度"></p>
+<p><img alt="式6：两个组的均数方差相加开根得到差值标准误，用各自样本量与方差计算近似自由度" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F06.png"/></p>
 <p class="caption"><em>式（6）｜SEᵢⱼ以mmHg计；νᵢⱼ无量纲，只用当前两个组的样本量和方差计算。</em></p>
 <p>自由度为什么也要逐对算？均数差的标准误使用了两个样本方差，两者估计得是否稳定、各占多少，都影响这个标准误的不确定性。如果其中一组的均数方差远大于另一组，差值的不确定性便主要来自这组，近似自由度也会靠近这组方差的自由度。</p>
 <p>例如G3−G1，v₃＝3.504805远大于v₁＝0.046299。按式（6），SE₁₃＝1.884437 mmHg，ν₁₃＝11.290574，接近G3的12−1＝11。其余组对也分别按自己的均数方差和样本量重算SE与ν。</p>
@@ -89,21 +90,21 @@ c(F_observed = F_observed, F_cutoff = F_cutoff, P = P_right)</code></pre>
 <p>如果只比较预先指定的一对，检验H₀：μⱼ−μᵢ＝0时，差值除以式（6）的标准误得到tᵢⱼ，参照该自由度的t分布作双侧检验。</p>
 <p>现在要同时看三对，Games–Howell沿用每对的标准误和自由度，把|tᵢⱼ|乘√2转到q尺度，再用全体组数k的学生化极差参照进行多重比较，控制三次比较中至少一次错误拒绝真实零假设的<span class="cite-tail">概率<sup>[4]</sup>。</span></p>
 <p>式（7）把同一个均数差分别写在t尺度和q尺度上。两种统计量使用的分母相差√2。</p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F07.png" alt="式7：均数差除以标准误得到Welch t，t的绝对值乘根号2得到q统计量"></p>
+<p><img alt="式7：均数差除以标准误得到Welch t，t的绝对值乘根号2得到q统计量" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F07.png"/></p>
 <p class="caption"><em>式（7）｜tᵢⱼ保留差值方向，qᵢⱼ使用其绝对值；两者均无量纲。</em></p>
 <p>这里为什么有√2？在等人数、共同方差的Tukey情形，q的分母是单个均数的标准误s/√n，而两个独立均数之差的标准误是√2倍的s/√n。因此，从“均数差标准误”的尺度换到q尺度，要乘√2。Games–Howell保留这个尺度关系，同时将分母换成当前两组各自方差构成的估计。</p>
 <p><strong>GH的方差尺度由当前两个组的均数方差相加得到。</strong> 三个组对分别计算这个尺度，再结合各自的近似自由度使用q分布。</p>
 <h3>（三）q分布为什么包含全体组数？</h3>
-<p>这里的q分布，就是Tukey方法采用的<strong>学生化极差分布</strong>。<a href="https://mp.weixin.qq.com/s/VE3pGhSa0J2n_NQna0fhqA" target="_blank" rel="noopener">统计课堂22《Tukey检验为什么用q分布？多重比较校正在哪里？》</a>已经从均数极差讲过它的来由；这里保留接到GH所需的关系。</p>
+<p>这里的q分布，就是Tukey方法采用的<strong>学生化极差分布</strong>。<a href="https://mp.weixin.qq.com/s/VE3pGhSa0J2n_NQna0fhqA" rel="noopener" target="_blank">统计课堂22《Tukey检验为什么用q分布？多重比较校正在哪里？》</a>已经从均数极差讲过它的来由；这里保留接到GH所需的关系。</p>
 <p>为定义这个理论参照分布，取k个相互独立的标准正态变量Z₁、…、Zₖ，再取一个与它们独立、服从自由度ν的χ²分布的变量U。Z的最大值减最小值是极差；把U除以ν再开平方，得到分母的波动尺度。极差除以这个尺度，就得到式（7a）的Q<sub>k,ν</sub><sup>[5]</sup>。</p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F07a.png" alt="式7a：k个独立标准正态量的极差，除以独立卡方变量除以其自由度的平方根，得到学生化极差Q"></p>
+<p><img alt="式7a：k个独立标准正态量的极差，除以独立卡方变量除以其自由度的平方根，得到学生化极差Q" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F07a.png"/></p>
 <p class="caption"><em>式（7a）｜Z₁、…、Zₖ相互独立；U与它们独立。k是参与取极差的正态量个数，ν描述分母波动尺度的估计精度。大写Q表示参照随机变量，小写qᵢⱼ表示本题组对的观察值；两者均无量纲。</em></p>
 <p>k个数里，最大的两两绝对差就是最大值减最小值。在<strong>总体均数相等、观测独立、正态、共同方差且各组样本量相同</strong>的Tukey模型中，各组均数共享同一个标准误。把全部组对放在这个共同尺度上比较，<strong>最大的标准化组对差异就对应Q的极差参照</strong>。</p>
 <p>组数k越多，抽样时出现相距较远的一对的机会越多，q参照因此随k改变。ν越大，分母波动尺度的估计通常越稳定。以Q的95%分位点作门槛，在这个参照分布下，超过门槛的概率为5%。</p>
 <p>回到本题，三个组对分别使用自己的Welch标准误和近似自由度，GH用Q<sub>k,νᵢⱼ</sub>逐对作近似校准。三对都保留全体组数k＝3，各自使用νᵢⱼ，所以分位点也逐对计算。<strong>√2完成t与q的尺度转换，全体组数k通过极差参照进入多重比较调整。</strong></p>
 <h3>（四）同一套q参照同时给出调整P与区间</h3>
 <p>将本题每对观察到的q放入相应的Q<sub>k,νᵢⱼ</sub>参照，便可按式（8）计算调整P值和近似95%同时置信区间。R的<code>ptukey()</code>在<code>lower.tail = FALSE</code>时给出右尾概率，<code>qtukey()</code>求分<span class="cite-tail">位点<sup>[6]</sup>。</span></p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F08.png" alt="式8：q分布右尾给出调整P，差值加减q临界值乘标准误除以根号2得到区间"></p>
+<p><img alt="式8：q分布右尾给出调整P，差值加减q临界值乘标准误除以根号2得到区间" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F08.png"/></p>
 <p class="caption"><em>式（8）｜q₀.₉₅是参照分布的95%分位点；本题所有组对都用k＝3，各自使用νᵢⱼ。区间端点以mmHg计。</em></p>
 <p>同一个规则可以从两边读：观察q大于95%分位点，对应调整P＜0.05，也对应区间不包含0。式（8）已经把多重比较调整纳入P值和区间，因此不再对这些P值追加一次Bonferroni校正。</p>
 <p>“95%同时”针对的是三条区间一起覆盖各自总体均数差的事件，整套覆盖率约为95%；对应检验的目标是把三次比较中至少一次错误拒绝真实零假设的概率控制在约0.05。GH使用近似自由度和q参照，<strong>这里的同时覆盖率与错误控制也都是近似的</strong>。</p>
@@ -113,8 +114,8 @@ c(F_observed = F_observed, F_cutoff = F_cutoff, P = P_right)</code></pre>
 <p>为具体看清t与q的关系，先把G3−G1作为预先指定的单对比较。沿用表1的数据与模型条件，作H₀：μ₃＝μ₁的双侧Welch t检验，α仍为0.05。再把相同t转为q，分别使用k＝2和本题全部三组的k＝3计算尾概率。</p>
 <p>R的<code>pt()</code>返回t分布累计概率，取负的绝对t值并乘2得到单对双侧P。<code>ptukey(q, nmeans, df, lower.tail = FALSE)</code>计算q参照的右尾概率；<code>nmeans = 3</code>是比较族的组数，<code>df</code>填当前组对的自由度。<code>qtukey(0.95, 3, df)</code>返回95%分位点；除以√2把q尺度还原到均数差标准误的<span class="cite-tail">尺度<sup>[5]</sup>。</span></p>
 <pre><code># 这两个v来自G1、G3各自的样本方差除以12。
-x1 &lt;- h$value[h$group == &quot;G1&quot;]
-x3 &lt;- h$value[h$group == &quot;G3&quot;]
+x1 &lt;- h$value[h$group == "G1"]
+x3 &lt;- h$value[h$group == "G3"]
 v1 &lt;- var(x1) / length(x1)
 v3 &lt;- var(x3) / length(x3)
 difference &lt;- mean(x3) - mean(x1)
@@ -137,7 +138,7 @@ round(c(difference = difference, SE = se, df = nu,
         P_adj = p_adjusted), 6)</code></pre>
 <p>实际得到单对Welch t的双侧P＝0.001128；同一组对转成q后，把<code>nmeans</code>设为2，即使用k＝2的q参照，仍得到0.001128。两组时只有一对比较，q参照与双侧t参照按√2对应。改为全部三组的k＝3，GH调整P为0.002974。参照中的组数由2改为3，调整后的尾概率随之改变。</p>
 <p>本题k＝3的q临界值为3.805083，区间半宽为5.070266 mmHg。将差值加减这个半宽，便得到式（9）的区间。</p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F09.png" alt="式9：G3减G1的区间为均数差8.156667加减半宽5.070266，端点为3.086400和13.226933毫米汞柱"></p>
+<p><img alt="式9：G3减G1的区间为均数差8.156667加减半宽5.070266，端点为3.086400和13.226933毫米汞柱" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F09.png"/></p>
 <p class="caption"><em>式（9）｜差值和两个端点均为G3减G1的方向。</em></p>
 <p>配套R脚本对三对分别计算，得到表3的标准化计算量，以及表4的均数差、同时区间和调整P值。</p>
 <p class="caption"><em>表3｜各组对自己的标准误、近似自由度和q</em></p>
@@ -145,10 +146,10 @@ round(c(difference = difference, SE = se, df = nu,
 <p class="caption"><em>表4｜全部三对Games–Howell结果，差值与区间单位均为mmHg</em></p>
 <table><thead><tr><th>比较</th><th>均数差</th><th>95%同时区间</th><th>调整P</th></tr></thead><tbody><tr><td>G2−G1</td><td>2.4942</td><td>[−0.0997, 5.0880]</td><td>0.059853</td></tr><tr><td>G3−G1</td><td>8.1567</td><td>[3.0864, 13.2269]</td><td>0.002974</td></tr><tr><td>G3−G2</td><td>5.6625</td><td>[0.2561, 11.0689]</td><td>0.039411</td></tr></tbody></table>
 <p>图2将表4的差值和区间画在同一个尺度上，竖直的0线表示两个方案总体平均下降值相等。</p>
-<p><img src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%9B%BE02_%E5%90%8C%E6%97%B6%E5%8C%BA%E9%97%B4.png" alt="图2：三对Games–Howell均数差与95%同时区间，横轴为后组减前组的下降值差mmHg，竖线为0"></p>
+<p><img alt="图2：三对Games–Howell均数差与95%同时区间，横轴为后组减前组的下降值差mmHg，竖线为0" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%9B%BE02_%E5%90%8C%E6%97%B6%E5%8C%BA%E9%97%B4.png"/></p>
 <p class="caption"><em>图2｜点为样本均数差，横线为GH近似95%同时区间；比较族为三组的全部三对。</em></p>
 <p>在本题模型条件下，G3比G1平均多下降8.16 mmHg，95%同时区间为[3.09, 13.23] mmHg；G3比G2平均多下降5.66 mmHg，区间为[0.26, 11.07] mmHg。两对调整P均小于0.05，支持相应总体平均下降值有差异。</p>
-<p>G2比G1的样本均数高2.49 mmHg，区间为[−0.10, 5.09] mmHg，调整P约0.0599。这份样本尚不足以在0.05水平下确认两方案的总体均数差异；区间同时包含轻微的反向差异和一定幅度的正向差异，仍有不确定性。是否足够精确，要结合事先确定的临床重要差异判断。这也延续了<a href="https://mp.weixin.qq.com/s/ZwcUQoyq5vk4dw5Nhv74Gw" target="_blank" rel="noopener">统计课堂11《P＝0.06，该怎样解释？把P值、效应量和置信区间放在一起看》</a>的读法。</p>
+<p>G2比G1的样本均数高2.49 mmHg，区间为[−0.10, 5.09] mmHg，调整P约0.0599。这份样本尚不足以在0.05水平下确认两方案的总体均数差异；区间同时包含轻微的反向差异和一定幅度的正向差异，仍有不确定性。是否足够精确，要结合事先确定的临床重要差异判断。这也延续了<a href="https://mp.weixin.qq.com/s/ZwcUQoyq5vk4dw5Nhv74Gw" rel="noopener" target="_blank">统计课堂11《P＝0.06，该怎样解释？把P值、效应量和置信区间放在一起看》</a>的读法。</p>
 <h2>七、近期研究怎样使用这两个检验？</h2>
 <p>下面两项2025—2026年的研究，也采用了Welch整体比较与Games–Howell两两比较：一项比较牛牙釉质的硬度，另一项检查同一种气味在不同受试组中的评分差异。</p>
 <h3>（一）牙釉质：四组的平均显微硬度有差异吗？</h3>
@@ -162,34 +163,34 @@ round(c(difference = difference, SE = se, df = nu,
 <ul><li><strong>均数方差越小，均数估计越精确。</strong> 组内观测独立、总体方差为σᵢ²时，均数方差为σᵢ²/nᵢ；以sᵢ²/nᵢ估计它，倒数就是Welch的精度权重。</li><li><strong>Welch按各组均数的精度作整体比较，使用近似F参照。</strong> 加权中心、均数偏离和有限样本校正共同构成统计量，用来检验多个总体均数是否全相等。</li><li><strong>Games–Howell沿用每对Welch t的标准误和自由度，以全组极差参照作近似调整。</strong> √2连接t与q的尺度；全体组数k和当前组对自由度共同确定q参照，给出调整P值与近似同时区间。</li><li><strong>均数差、同时区间和调整P共同描述差异及其不确定性。</strong> 差值保留方向和单位，区间反映估计精度，调整P对应预定比较族中的检验判断。</li></ul>
 <h2>九、配套代码与动手练习</h2>
 <p>和前面的统计课堂一样，这次也准备了R、Python和MATLAB三套脚本。用自己熟悉的一种跑通即可。第一次先核对本题的Welch结果和全部三对GH结果；第二次可以把下降值统一从mmHg换成kPa，看看为什么均数差、标准误和区间端点一起缩放，而F、q和P值保持不变。练习沿用表1的全部数据、分组、检验水准和比较族，只改变单位；脚本中的<code>unit_scale</code>控制换算。</p>
-<p>本篇练习项目ZIP：<a href="https://github.com/fuyuming/statistics-classroom/raw/main/stats_classroom/article45_welch_games_howell/统计课堂45_练习项目.zip" target="_blank" rel="noopener">下载统计课堂45练习项目</a>。下载解压后先读<code>练习项目/README.md</code>：R用户打开<code>统计课堂45.Rproj</code>，再打开<code>R/welch_gh.R</code>；Python用户在Spyder以练习项目为工作目录，打开<code>Python/welch_gh.py</code>按单元运行；MATLAB用户将练习项目设为Current Folder，再打开<code>MATLAB/welch_gh.m</code>按节运行。</p>
+<p>本篇练习项目ZIP：<a href="https://github.com/fuyuming/statistics-classroom/raw/main/stats_classroom/article45_welch_games_howell/统计课堂45_练习项目.zip" rel="noopener" target="_blank">下载统计课堂45练习项目</a>。下载解压后先读<code>练习项目/README.md</code>：R用户打开<code>统计课堂45.Rproj</code>，再打开<code>R/welch_gh.R</code>；Python用户在Spyder以练习项目为工作目录，打开<code>Python/welch_gh.py</code>按单元运行；MATLAB用户将练习项目设为Current Folder，再打开<code>MATLAB/welch_gh.m</code>按节运行。</p>
 <p>R使用原生Welch检验及学生化极差函数；Python同时对照SciPy的Welch和GH接口；MATLAB按正文关系自编计算，学生化极差使用R2025a工具箱的内部接口，具体版本限制写在README中。SciPy的<code>tukey_hsd(..., equal_var=False)</code>在这个参数下执行Games–Howell，返回的矩阵差值需按组序选取<span class="cite-tail">方向<sup>[9]</sup>。</span></p>
 <p>本篇完整项目目录：</p>
-<p><a href="https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article45_welch_games_howell" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article45_welch_games_howell</a></p>
+<p><a href="https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article45_welch_games_howell" rel="noopener" target="_blank">https://github.com/fuyuming/statistics-classroom/tree/main/stats_classroom/article45_welch_games_howell</a></p>
 <p>系列仓库入口：</p>
-<p><a href="https://github.com/fuyuming/statistics-classroom" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom</a></p>
+<p><a href="https://github.com/fuyuming/statistics-classroom" rel="noopener" target="_blank">https://github.com/fuyuming/statistics-classroom</a></p>
 <p>整个仓库ZIP下载：</p>
-<p><a href="https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip" target="_blank" rel="noopener">https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip</a></p>
+<p><a href="https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip" rel="noopener" target="_blank">https://github.com/fuyuming/statistics-classroom/archive/refs/heads/main.zip</a></p>
 <p>仓库ZIP解压后，进入<code>statistics-classroom-main/stats_classroom/article45_welch_games_howell/练习项目</code>，先读README。</p>
 <p>这里是“明哥的微生物世界”，一起把统计问题读清楚、算明白。</p>
 <h2>参考文献与资料</h2>
 <p>[1] Welch BL. On the Comparison of Several Mean Values: An Alternative Approach. <em>Biometrika</em>. 1951;38(3/4):330–336.</p>
-<p><a href="https://doi.org/10.1093/biomet/38.3-4.330" target="_blank" rel="noopener">https://doi.org/10.1093/biomet/38.3-4.330</a></p>
+<p><a href="https://doi.org/10.1093/biomet/38.3-4.330" rel="noopener" target="_blank">https://doi.org/10.1093/biomet/38.3-4.330</a></p>
 <p>[2] R官方文档：Test for Equal Means in a One-Way Layout，<code>oneway.test</code>。</p>
-<p><a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/oneway.test.html" target="_blank" rel="noopener">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/oneway.test.html</a></p>
+<p><a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/oneway.test.html" rel="noopener" target="_blank">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/oneway.test.html</a></p>
 <p>[3] R Core Team. <code>oneway.test</code>官方源代码与F分布函数文档；Welch统计量、近似自由度及<code>pf</code>/<code>qf</code>的实现与参数。</p>
-<p><a href="https://github.com/wch/r-source/blob/trunk/src/library/stats/R/oneway.test.R" target="_blank" rel="noopener">https://github.com/wch/r-source/blob/trunk/src/library/stats/R/oneway.test.R</a></p>
-<p><a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Fdist.html" target="_blank" rel="noopener">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Fdist.html</a></p>
+<p><a href="https://github.com/wch/r-source/blob/trunk/src/library/stats/R/oneway.test.R" rel="noopener" target="_blank">https://github.com/wch/r-source/blob/trunk/src/library/stats/R/oneway.test.R</a></p>
+<p><a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Fdist.html" rel="noopener" target="_blank">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Fdist.html</a></p>
 <p>[4] Games PA, Howell JF. Pairwise Multiple Comparison Procedures with Unequal N’s and/or Variances: A Monte Carlo Study. <em>Journal of Educational Statistics</em>. 1976;1(2):113–125.</p>
-<p><a href="https://doi.org/10.3102/10769986001002113" target="_blank" rel="noopener">https://doi.org/10.3102/10769986001002113</a></p>
+<p><a href="https://doi.org/10.3102/10769986001002113" rel="noopener" target="_blank">https://doi.org/10.3102/10769986001002113</a></p>
 <p>[5] R官方文档：The Studentized Range Distribution，<code>ptukey</code>与<code>qtukey</code>。</p>
-<p><a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Tukey.html" target="_blank" rel="noopener">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Tukey.html</a></p>
+<p><a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Tukey.html" rel="noopener" target="_blank">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Tukey.html</a></p>
 <p>[6] rstatix作者公开实现：<code>games_howell_test.R</code>，均数差标准误与q的√2换算、逐对自由度和区间实现。</p>
-<p><a href="https://github.com/kassambara/rstatix/blob/master/R/games_howell_test.R" target="_blank" rel="noopener">https://github.com/kassambara/rstatix/blob/master/R/games_howell_test.R</a></p>
+<p><a href="https://github.com/kassambara/rstatix/blob/master/R/games_howell_test.R" rel="noopener" target="_blank">https://github.com/kassambara/rstatix/blob/master/R/games_howell_test.R</a></p>
 <p>[7] Yerou A, Elmeguenni M, Bouiadjra BAB, Albedah A. Phosphate-treated siwak as a calcium phosphate–bearing bioactive material for fluoride-free oral care: physicochemical characterization and in vitro enamel microhardness recovery. <em>Scientific Reports</em>. 2026；11月10日在线早期发表。</p>
-<p><a href="https://doi.org/10.1038/s41598-026-80345-z" target="_blank" rel="noopener">https://doi.org/10.1038/s41598-026-80345-z</a></p>
+<p><a href="https://doi.org/10.1038/s41598-026-80345-z" rel="noopener" target="_blank">https://doi.org/10.1038/s41598-026-80345-z</a></p>
 <p>[8] Bierling AL, Croy A, Jesgarzewsky T, et al. A dataset of laymen olfactory perception for 74 mono-molecular odors. <em>Scientific Data</em>. 2025;12:347.</p>
-<p><a href="https://doi.org/10.1038/s41597-025-04644-2" target="_blank" rel="noopener">https://doi.org/10.1038/s41597-025-04644-2</a></p>
+<p><a href="https://doi.org/10.1038/s41597-025-04644-2" rel="noopener" target="_blank">https://doi.org/10.1038/s41597-025-04644-2</a></p>
 <p>[9] SciPy官方文档与实现：<code>tukey_hsd</code>的<code>equal_var=False</code>分支及置信区间。</p>
-<p><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.tukey_hsd.html" target="_blank" rel="noopener">https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.tukey_hsd.html</a></p>
-<p><a href="https://github.com/scipy/scipy/blob/v1.16.3/scipy/stats/_hypotests.py" target="_blank" rel="noopener">https://github.com/scipy/scipy/blob/v1.16.3/scipy/stats/_hypotests.py</a></p></main></body></html>
+<p><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.tukey_hsd.html" rel="noopener" target="_blank">https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.tukey_hsd.html</a></p>
+<p><a href="https://github.com/scipy/scipy/blob/v1.16.3/scipy/stats/_hypotests.py" rel="noopener" target="_blank">https://github.com/scipy/scipy/blob/v1.16.3/scipy/stats/_hypotests.py</a></p></main></body></html>
