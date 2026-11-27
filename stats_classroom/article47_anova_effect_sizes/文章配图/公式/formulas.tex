@@ -1,0 +1,78 @@
+% 式（01）
+\begin{aligned}
+SS_B=\sum_{i=1}^{k}n_i(\bar y_i-\bar y)^2 \\
+SS_W=\sum_{i=1}^{k}\sum_{j=1}^{n_i}(y_{ij}-\bar y_i)^2 \\
+SS_T=\sum_{i,j}(y_{ij}-\bar y)^2=SS_B+SS_W
+\end{aligned}
+
+% 式（02）
+\begin{aligned}
+\eta^2=\frac{SS_B}{SS_T} \\
+=\frac{15.4495}{22.3055}\approx0.692632
+\end{aligned}
+
+% 式（03）
+\begin{aligned}
+\mu=\frac{1}{4}\sum_{i=1}^{4}\mu_i,\quad V_\mu=\frac{1}{4}\sum_{i=1}^{4}(\mu_i-\mu)^2 \\
+\eta^2_{\mathrm{pop}}=\frac{V_\mu}{V_\mu+\sigma^2}
+\end{aligned}
+
+% 式（04）
+\begin{aligned}
+MSE=\frac{SS_W}{N-k}=\frac{6.8560}{16}=0.4285 \\
+\mathrm{E}(SS_B)=NV_\mu+(k-1)\sigma^2 \\
+\mathrm{E}(SS_T)=NV_\mu+(N-1)\sigma^2
+\end{aligned}
+
+% 式（04a）
+\begin{aligned}
+SS_B=\sum_i n_i(\bar y_i-\mu)^2-N(\bar y-\mu)^2 \\
+\mathrm{E}\!\left[\sum_i n_i(\bar Y_i-\mu)^2\right]=NV_\mu+k\sigma^2 \\
+\mathrm{E}\!\left[N(\bar Y-\mu)^2\right]=\sigma^2
+\end{aligned}
+
+% 式（05）
+\begin{aligned}
+\omega^2=\frac{SS_B-(k-1)MSE}{SS_T+MSE} \\
+=\frac{15.4495-3\times0.4285}{22.3055+0.4285} \\
+=\frac{14.1640}{22.7340}\approx0.623032
+\end{aligned}
+
+% 式（06）
+\begin{aligned}
+\eta_p^2=\frac{SS_{\mathrm{effect}}}{SS_{\mathrm{effect}}+SS_{\mathrm{error}}}
+\end{aligned}
+
+% 式（07a）
+\begin{aligned}
+SS_A=4[(12-13)^2+(14-13)^2]=8 \\
+SS_B=4[(11-13)^2+(15-13)^2]=32 \\
+SS_E=4(1^2+1^2)=8,\quad SS_T=48 \\
+SS_{AB}=48-8-32-8=0
+\end{aligned}
+
+% 式（07b）
+\begin{aligned}
+\eta_A^2=\frac{SS_A}{SS_T}=\frac{8}{48}\approx0.167 \\
+\eta_{p,A}^2=\frac{SS_A}{SS_A+SS_E}=\frac{8}{8+8}=0.500
+\end{aligned}
+
+% 式（08）
+\begin{aligned}
+R^2=1-\frac{SS_W}{SS_T} \\
+=\frac{SS_B}{SS_T}=\eta^2\approx0.692632
+\end{aligned}
+
+% 式（09）
+\begin{aligned}
+R^2_{\mathrm{adj}}=1-\frac{SS_W/(N-k)}{SS_T/(N-1)} \\
+=\frac{SS_B-(k-1)MSE}{SS_T}\approx0.635000
+\end{aligned}
+
+% 式（10）
+\begin{aligned}
+\eta^2_{\mathrm{pop}}=\frac{f^2}{1+f^2} \\
+f=0.10\quad\Rightarrow\quad\eta^2_{\mathrm{pop}}\approx0.009901 \\
+f=0.25\quad\Rightarrow\quad\eta^2_{\mathrm{pop}}\approx0.058824 \\
+f=0.40\quad\Rightarrow\quad\eta^2_{\mathrm{pop}}\approx0.137931
+\end{aligned}
