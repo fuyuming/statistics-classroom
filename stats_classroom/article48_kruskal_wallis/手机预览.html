@@ -24,7 +24,7 @@
 <table><thead><tr><th>指标/分</th><th>频数</th><th>占据序号</th><th>每个观测的秩</th></tr></thead><tbody><tr><td>−1</td><td>1</td><td>1</td><td>1</td></tr><tr><td>0</td><td>5</td><td>2—6</td><td>4</td></tr><tr><td>1</td><td>5</td><td>7—11</td><td>9</td></tr><tr><td>2</td><td>4</td><td>12—15</td><td>13.5</td></tr><tr><td>3</td><td>9</td><td>16—24</td><td>20</td></tr></tbody></table>
 <p>记总样本量为N、组数为k，第i组样本量为nᵢ；本例N＝24、k＝4，各nᵢ＝6。单只兔的合并秩记为rⱼ；第i组的秩和记为Rᵢ，平均秩记为r̄ᵢ＝Rᵢ/nᵢ。</p>
 <p>并列时用平均秩，保留了所有秩的总和。因此，合并秩的总平均仍由式（1）给出。</p>
-<p><img alt="式1：合并秩的平均为一至N的序号和除以N，即(N加1)/2；24只兔的总平均秩是12.5" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F01.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式1：合并秩的平均为一至N的序号和除以N，即(N加1)/2；24只兔的总平均秩是12.5" data-formula-font-css="22" data-formula-width="288.0" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F01.png" style="display:block;width:288.0px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（1）｜r̄表示所有观测的总平均秩，秩及H均无物理单位。</em></p>
 <p>按表2逐只替换评分再求和，就得到表3。例如Indomethacin组的秩和为13.5＋20＋20＋20＋20＋4＝97.5。四组秩和合计300，等于24×12.5。</p>
 <p class="caption"><em>表3｜各药物组在同一套合并秩中的位置</em></p>
@@ -34,50 +34,50 @@
 <h3>（一）先衡量各组分开了多少</h3>
 <p>每组平均秩减去总平均秩，表示这一组在共同排序中偏高还是偏低。直接相加会正负抵消，平方以后，两种方向都会增加统计量。</p>
 <p>为什么还要乘nᵢ？一组有nᵢ个观测，该组平均位置的偏离应按它代表的观测数计入。把该组每个观测都用组平均秩代表，nᵢ个相同的平方偏离相加，就得到式（2）的组间平方和B。这也正是方差分析中按组大小加权的组间变异构造。</p>
-<p><img alt="式2：B为各组样本量乘平均秩离总平均秩的平方之和；兔例B等于546.5833" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F02.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式2：B为各组样本量乘平均秩离总平均秩的平方之和；兔例B等于546.5833" data-formula-font-css="22" data-formula-width="285.0" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F02.png" style="display:block;width:285.0px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（2）｜B衡量组间平均秩的分开程度；数字演示省略的中间两项来自Aspirin和Piroxicam，实际计算包含四组全部贡献。</em></p>
 <p><strong>同样的平均秩偏离，出现在较大的组中，提供的证据通常更多</strong>：在相同的合并秩和总样本量下，大组平均秩的随机波动也更小。不过，B的大小还随总样本量和秩的取值范围改变，单看546.5833，仍无法判断异常程度。</p>
 <h3>（二）先看随机分组时，平均秩怎样波动</h3>
 <p>在H₀下，给定已经观察到的24个指标及四组大小，兔与组标签的对应可以交换。可以把24个合并秩写在24张有各自身份的签上，不放回地抽6张给第一组，再抽6张给第二组，直到分完。</p>
 <p>分组在变化，签上的数值没有变。式（3）先定义这套固定秩的方差sᵣ²。再把分配顺序中的第a个位置收到的秩记为Yₐ：每个位置都有同样的机会收到任意一张签，平均值是总平均秩r̄。</p>
-<p><img alt="式3：固定合并秩的样本方差以N减1为分母；随机位置收到的秩Y的均值为总平均秩，方差为(N减1)/N乘s_r平方" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式3：固定合并秩的样本方差以N减1为分母；随机位置收到的秩Y的均值为总平均秩，方差为(N减1)/N乘s_r平方" data-formula-font-css="22" data-formula-width="236.0" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03.png" style="display:block;width:236.0px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（3）｜rⱼ是固定的第j个观测的秩；Yₐ是随机分配到第a个位置的秩。下标0表示在H₀下、给定合并秩计算。</em></p>
 <p>这里有两个分母：sᵣ²按通常样本方差的定义除以N−1；一个随机位置的秩，则等概率取这N个数，计算方差时除以N，所以它的方差是(N−1)/N倍的sᵣ²。</p>
 <p><strong>两次不放回抽取并不独立。</strong> 一个位置拿走高秩，留给其他位置的平均秩就会降低。更准确地说，所有位置的秩之和固定，因此这个总和的方差为0。各位置地位相同，任意两个不同位置的协方差也相同。式（3a）把总和的方差展开，就能求出这项负协方差。</p>
-<p><img alt="式3a：全部位置秩的总和固定，因此总和方差为0；N个自身方差与N(N减1)个交叉协方差相加为0，得到不同位置协方差为负s_r平方除以N" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03a.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式3a：全部位置秩的总和固定，因此总和方差为0；N个自身方差与N(N减1)个交叉协方差相加为0，得到不同位置协方差为负s_r平方除以N" data-formula-font-css="22" data-formula-width="308.0" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03a.png" style="display:block;width:308.0px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（3a）｜a、b为两个不同的分配位置；Cov表示协方差，用来描述两个随机量如何一起变化。</em></p>
 <p>把重分组后第i组的随机平均秩记为Ȳᵢ，它是该组nᵢ个位置的Y求平均。表3中的r̄ᵢ则是实际分组得到的观察值。计算Ȳᵢ的方差时，要把nᵢ个自身方差和nᵢ(nᵢ−1)个交叉协方差一起计入，再除以nᵢ²。式（3b）代入刚求出的两种波动，得到组平均秩的方差；不同组之间的每一对位置也都贡献同样的负协方差。</p>
-<p><img alt="式3b：把组内各位置方差与协方差相加得到组平均秩方差s_r平方乘(1/n_i减1/N)；不同组平均秩协方差为负s_r平方除以N" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03b.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式3b：把组内各位置方差与协方差相加得到组平均秩方差s_r平方乘(1/n_i减1/N)；不同组平均秩协方差为负s_r平方除以N" data-formula-font-css="22" data-formula-width="269.0" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03b.png" style="display:block;width:269.0px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（3b）｜Ȳᵢ、Ȳℓ随重分组改变；i与ℓ表示不同组。本例nᵢ＝6、N＝24，所以每组平均秩方差为sᵣ²/8，不同组平均秩协方差为−sᵣ²/24。</em></p>
 <p>这就是“不放回”的修正从哪里来。研究设计中，不同兔之间独立；在这里，我们固定全部观测后重分组，各组统计量还受共同总秩和的约束。</p>
 <h3>（三）用同一套秩波动，给组间平方和定尺度</h3>
 <p>H₀下，随机平均秩Ȳᵢ都以r̄为中心，所以它离r̄的平方偏离，平均起来就是式（3b）的方差。式（3c）将每组的贡献乘nᵢ相加，得到B的平均水平。</p>
-<p><img alt="式3c：B的零假设期望等于各组样本量乘平均秩方差之和，等于(k减1)s_r平方；定义H为B除以s_r平方后，其期望为k减1" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03c.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式3c：B的零假设期望等于各组样本量乘平均秩方差之和，等于(k减1)s_r平方；定义H为B除以s_r平方后，其期望为k减1" data-formula-font-css="22" data-formula-width="280.67" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F03c.png" style="display:block;width:280.67px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（3c）｜期望对随机重分组取；B随分组改变，全部组的nᵢ/N相加为1。这一关系在有限样本下就成立。</em></p>
 <p>因此，H用<strong>组间的平方偏离B，除以这套合并秩的方差sᵣ²</strong>，将不同样本量和秩范围下的B放到共同尺度上。它与刚才的组平均秩方差、组间协方差使用同一套波动依据。</p>
 <p>算出H的平均水平是k−1，还不能据此认定它服从χ²。第六节会继续用式（3b）的方差和协方差，将本例H拆成三个标准化差的平方和，再说明大样本分布。</p>
 <p>先看没有并列的情况。秩就是1到N，利用连续整数及其平方的求和公式，式（4）得到围绕总平均秩的平方离差和及秩方差，也就得到未经并列校正的H∗。</p>
-<p><img alt="式4：无并列时总秩平方和为N(N平方减1)/12；秩样本方差为N(N加1)/12；H星为B除以该方差" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F04.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式4：无并列时总秩平方和为N(N平方减1)/12；秩样本方差为N(N加1)/12；H星为B除以该方差" data-formula-font-css="22" data-formula-width="252.0" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F04.png" style="display:block;width:252.0px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（4）｜base下标表示无并列时的基准秩方差；12来自连续整数的方差公式。没有并列时，H＝H∗。</em></p>
 <h3>（四）熟悉的秩和公式，只是把B展开</h3>
 <p>课堂常用的公式写成“秩和平方除以组大小，再求和”。式（5）用Rᵢ＝nᵢr̄ᵢ和固定的总秩和，把式（2）展开。</p>
-<p><img alt="式5：把平均秩换成秩和，B等于秩和平方除组大小的总和减N乘总平均秩平方；代入得到H星的课堂公式" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F05.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式5：把平均秩换成秩和，B等于秩和平方除组大小的总和减N乘总平均秩平方；代入得到H星的课堂公式" data-formula-font-css="22" data-formula-width="245.33" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F05.png" style="display:block;width:245.33px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（5）｜Rᵢ为第i组秩和，求和涵盖全部k组；末尾的−3(N＋1)来自减去共同中心。</em></p>
 <p>这样，12、N(N＋1)和−3(N＋1)都有了来处：前两者来自秩波动的尺度，最后一项来自围绕总平均秩计算偏离。H∗的核心始终是“各组平均秩分开了多少”。</p>
 <h2>四、有并列值，为什么要除以C？</h2>
 <p>本例并列很多，不能继续把1到24互不相同的秩方差直接用到底。</p>
 <p>平均秩保留总和，却压缩了波动。就看表2中本例的5个0分：它们原来占第2至6位，现在都取平均秩4。式（6）计算这一步消掉的平方偏离；连续t个序号的一般结果，可由式（4）将N换为t得到。</p>
-<p><img alt="式6：本例0分对应秩2到6，全部换成4后消掉平方偏离10；t个连续秩取平均会损失(t立方减t)/12" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F06.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式6：本例0分对应秩2到6，全部换成4后消掉平方偏离10；t个连续秩取平均会损失(t立方减t)/12" data-formula-font-css="22" data-formula-width="317.0" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F06.png" style="display:block;width:317.0px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（6）｜t是同一观测值的个数。连续序号整体平移不改变它们围绕自身平均数的平方和。</em></p>
 <p>虽然式（6）先围绕这一小段的平均秩4计算，但围绕总平均秩12.5计算时，损失仍是10：替换前后，这5个秩的总和相同，整段相对总中心的那部分偏离保留下来，只消掉段内的分散。</p>
 <p>对表2的五种取值分别计算，并列损失依次是0、10、10、5、60，合计85。若1到24互不并列，总秩平方和为1150、秩方差为50。式（7）从这里一步步得到本例的实际方差及其比例C。</p>
-<p><img alt="式7：兔例无并列总秩平方和1150减去并列损失85得到1065；实际秩方差1065/23约46.30435；除以无并列方差50得到C约0.926087" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F07.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式7：兔例无并列总秩平方和1150减去并列损失85得到1065；实际秩方差1065/23约46.30435；除以无并列方差50得到C约0.926087" data-formula-font-css="22" data-formula-width="318.33" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F07.png" style="display:block;width:318.33px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（7）｜平方和都围绕总平均秩12.5计算；sᵣ²使用N−1＝23的分母。C是实际秩方差与无并列基准方差的比。</em></p>
 <p>这样看，C记录的就是<strong>并列以后，还保留了原来多少比例的秩波动</strong>。对任意数据，把每个并列块的损失相加，再除以无并列总平方和，就得到式（7a）的通用校正公式。单个观测t＝1时，损失为0<sup>[2]</sup>。</p>
-<p><img alt="式7a：C等于1减各并列块(t立方减t)之和除以(N立方减N)，实际合并秩方差等于无并列基准方差乘C" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F07a.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式7a：C等于1减各并列块(t立方减t)之和除以(N立方减N)，实际合并秩方差等于无并列基准方差乘C" data-formula-font-css="22" data-formula-width="200.33" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F07a.png" style="display:block;width:200.33px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（7a）｜tℓ是第ℓ种取值的频数，本例为1、5、5、4、9；各块的tℓ³−tℓ合计1020，除以12就是总损失85。</em></p>
 <p><strong>H仍然等于B除以实际合并秩方差。</strong> 原来的H∗除以基准方差50；现在分母换成50C，便得到式（8）的H∗除以C。</p>
-<p><img alt="式8：校正H等于B除以实际秩方差，也等于H星除以C；兔例546.583333除以46.304348得到H约11.8041471" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F08.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式8：校正H等于B除以实际秩方差，也等于H星除以C；兔例546.583333除以46.304348得到H约11.8041471" data-formula-font-css="22" data-formula-width="248.0" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F08.png" style="display:block;width:248.0px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（8）｜程序使用未舍入的中间量；分母从无并列基准改为实际秩方差，说明了为什么是除以C。</em></p>
 <p>若所有观测都相同，实际秩方差为0，所有组平均秩也完全相同，H成为0/0，没有可供这种检验使用的秩变异。通常只要秩方差非零，便可按式（8）计算。</p>
 <p>把秩代入普通ANOVA，也能得到同一个组间平方和B和总平方和；但普通ANOVA构造的是组间与组内均方之比F，并使用F参照。<strong>变异分解相通，不等于可以把普通ANOVA的F检验P值直接当作KW的P值。</strong></p>
@@ -87,7 +87,7 @@
 <p>在独立、各组同分布的H₀下，给定这些观测和各组大小，组标签可交换。保留四组各6只，把24只<strong>有各自身份的兔</strong>重新分到四个有名称的组；每一个允许的身份划分等概率。每轮对新分组求秩和、B和H，就产生H的条件零分布。秩方法与置换推断正是在这里接起来的<sup>[2]</sup>。</p>
 <p>“固定观测”也意味着并列频数不变，因此总平均秩、秩方差及C每轮都相同，只有秩怎样分到各组发生变化。在这套固定观测上，H、H∗和B给出同一尾部排序，按大值选出的分组完全相同。</p>
 <p>如果逐一计算全部合法划分，式（9）就给出精确条件P值。M是合法划分的总数，#表示满足条件的划分个数。</p>
-<p><img alt="式9：合法分组总数M为N阶乘除以各组样本量阶乘之积；精确P是H达到或超过观察值的划分数除以M" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F09.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式9：合法分组总数M为N阶乘除以各组样本量阶乘之积；精确P是H达到或超过观察值的划分数除以M" data-formula-font-css="22" data-formula-width="275.67" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F09.png" style="display:block;width:275.67px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（9）｜固定各组大小、单位身份划分等概率；尾部包含H等于观察值的情况，也包括观察到的划分。</em></p>
 <p>这正是<strong>小样本精确检验</strong>的思路。它不靠原始评分正态，也不靠把H先近似成某条连续曲线。精确算法还可以用递推等办法汇总同样的概率，不一定要实际列出每个划分。</p>
 <p>并列值不会破坏这个思路，但会使多个身份划分产生同一套组内秩。如果为了加速把重复秩格局合并，就必须保留它们对应的<strong>组合数权重</strong>。等概率的是合法的身份划分，合并后的不同秩格局未必等概率。</p>
@@ -98,29 +98,29 @@
 <p>先比较第一组与第二组；再把前两组作为一个合并组，比较它们的平均秩与第三组；最后把前三组合并，与第四组比较。四组就这样经过三次合并，成为一个总体。</p>
 <p>每个差都需要除以它在H₀下的标准差。以第一步为例，差的方差是“两组各自的方差之和，减去两倍协方差”。代入式（3b），两项−sᵣ²/N会与协方差项抵消，得到2sᵣ²/n。</p>
 <p>这个抵消对任意两个互不重叠的合并块也成立：两块各有m、n个观测，差的方差便是sᵣ²(1/m＋1/n)。因此，三步所用的块大小分别为6与6、12与6、18与6。式（10）先写出通用的差方差，再列出对应的三个标准化差Z₁、Z₂、Z₃。</p>
-<p><img alt="式10：用零假设标准差缩放三步平均秩差，Z1比较第一与第二组，Z2比较前两组平均与第三组，Z3比较前三组平均与第四组" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F10.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式10：用零假设标准差缩放三步平均秩差，Z1比较第一与第二组，Z2比较前两组平均与第三组，Z3比较前三组平均与第四组" data-formula-font-css="22" data-formula-width="285.67" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F10.png" style="display:block;width:285.67px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（10）｜d表示两个互不重叠块的随机平均秩之差。三个Z的分母分别对应块大小6与6、12与6、18与6；这里n＝6。等组量的合并平均，就是各组平均秩的算术平均。</em></p>
 <p>代入本次观察值，第一步的差为2.083333，标准差约3.928713，Z₁约0.530284；第二步按式（10）代入m＝12、n＝6，标准差约3.402365。表4列出三个Z的观察值和各自平方贡献。</p>
 <p class="caption"><em>表4｜兔例H分解成三个标准化差的平方贡献</em></p>
 <table><thead><tr><th>合并步骤</th><th>观察Z值</th><th>Z²贡献</th></tr></thead><tbody><tr><td>第1组与第2组</td><td>0.530284</td><td>0.281201</td></tr><tr><td>前2组与第3组</td><td>−0.012246</td><td>0.000150</td></tr><tr><td>前3组与第4组</td><td>3.394524</td><td>11.522796</td></tr><tr><td>平方贡献合计</td><td>—</td><td>11.804147</td></tr></tbody></table>
 <p>前三药之间在前两步贡献很小，前三药与BW755C的分离贡献了大部分H。这里的三步是理解整体统计量的一种分解；整体检验的结论仍由一个H判断。</p>
 <p>为什么平方贡献相加，恰好等于H？四组等量，在任意一次重分组中，四个Ȳᵢ的平均都是固定的总平均秩r̄。把式（10）的三个平方展开，利用四个Ȳᵢ偏离r̄的和为0，就得到式（10a）的恒等式。</p>
-<p><img alt="式10a：三个标准化差的平方和恰为n除以s_r平方乘四组平均秩偏离总平均秩的平方和，即B除以s_r平方，也就是H" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F10a.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式10a：三个标准化差的平方和恰为n除以s_r平方乘四组平均秩偏离总平均秩的平方和，即B除以s_r平方，也就是H" data-formula-font-css="22" data-formula-width="204.67" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F10a.png" style="display:block;width:204.67px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（10a）｜这是本例四组等量时的代数恒等式，有限样本也成立；它本身还没有使用正态近似。</em></p>
 <h3>（二）为什么这三个差，在大样本下可以当作独立标准正态量？</h3>
 <p>式（3b）已经说明，四个组平均秩彼此相关。经过式（10）这种安排，三个差的系数却会让交叉协方差抵消。</p>
 <p>看前两步就能理解：第一步中，前两组一正一负；第二步中，前两组各占一半，权重相同。因为两组的方差相同、与其余组的协方差也相同，正负两部分的协方差贡献恰好抵消。第三步与前两步也有相同的抵消结构。式（10b）把前两步的未标准化差D₁、D₂实际展开一次：各组方差相同、不同组协方差相同，正负项便逐项抵消。除以固定标准差后，协方差仍为0。</p>
-<p><img alt="式10b：前两步未标准化差为Y1减Y2和前两组均值减Y3，协方差展开后自身方差相减、不同组协方差相减，得到0" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F10b.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式10b：前两步未标准化差为Y1减Y2和前两组均值减Y3，协方差展开后自身方差相减、不同组协方差相减，得到0" data-formula-font-css="22" data-formula-width="323.67" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F10b.png" style="display:block;width:323.67px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（10b）｜v是每组随机平均秩的方差，c是任意不同组平均秩的协方差；本例v＝5.7880435、c＝−1.9293478。D₁、D₂分别是式（10）Z₁、Z₂的分子。</em></p>
 <p>因此，三个Z的均值均为0、方差均为1，彼此协方差为0。</p>
 <p><strong>有限样本下，零协方差还不能推出独立或正态。</strong> 当组数固定、各组样本量增长、各组比例不趋于0，且秩的总变异非零、没有极少数观测支配它，满足秩和中心极限定理的常规条件时，这些组秩统计量才有联合正态极限。趋近正态的是H₀下重分组产生的统计量；原始评分不必正态<sup>[2]</sup>。</p>
 <p>在联合正态极限中，零协方差才进一步给出独立。于是Z₁、Z₂、Z₃趋近三个独立标准正态量，它们的平方和H就趋近χ²(3)。</p>
 <h3>（三）为什么一般是k−1个方向？</h3>
 <p>组大小不等时，每次合并要按人数加权。若前面的合并组有m个观测，新加入的组有n个观测，式（10c）给出两者平均秩差的标准差，以及这一步记录的组间平方和贡献。</p>
-<p><img alt="式10c：合并m个与n个观测的两部分时，平均秩差标准差为s_r乘根号(1/m加1/n)，新增组间平方和为mn除以m加n乘平均秩差平方；除以s_r平方就是本步Z平方" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F10c.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式10c：合并m个与n个观测的两部分时，平均秩差标准差为s_r乘根号(1/m加1/n)，新增组间平方和为mn除以m加n乘平均秩差平方；除以s_r平方就是本步Z平方" data-formula-font-css="22" data-formula-width="213.67" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F10c.png" style="display:block;width:213.67px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（10c）｜d为合并前两部分的平均秩之差；ΔB表示这一步记录的组间平方和贡献，sᵣ仍来自全部N个合并秩。</em></p>
 <p>每加入一组，就增加一个标准化差。k组需要k−1次合并；各次新增平方和加起来，就是总的B。因此，不等组量也能将H写成k−1个这类标准化差的平方和。按人数加权后，新一步对前面各组的同向权重，与先前差中的正负权重相抵消，仍得到零协方差。它们在上述渐近条件下具有独立标准正态极限，所以得到式（10d）的χ²(k−1)参照。</p>
-<p><img alt="式10d：在零假设与常规渐近条件下H趋近自由度k减1的卡方分布，近似P为该分布达到或超过观察H的右尾概率" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F10d.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式10d：在零假设与常规渐近条件下H趋近自由度k减1的卡方分布，近似P为该分布达到或超过观察H的右尾概率" data-formula-font-css="22" data-formula-width="248.67" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F10d.png" style="display:block;width:248.67px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（10d）｜箭头表示大样本分布趋近；近似的是前一节由标签重分配产生的条件零分布及其右尾概率。</em></p>
 <p>总秩和固定，使k组平均秩的偏离受一个约束；逐次合并只需k−1步，也从计算上看到了同一个自由度。小样本时，前面的代数分解仍成立，但正态极限未必足够接近，不能把它直接当作精确χ²分布。</p>
 <p>兔例k＝4，自由度为3。按式（10d）算得χ²近似P＝0.00808509。R的<code>kruskal.test()</code>接受“响应变量～分组变量”的公式；<code>data</code>指定数据表，返回的检验对象包含校正后统计量、近似自由度和P值。<strong>这个函数采用χ²近似，小样本也不会自动切换到精确枚举</strong><sup>[3]</sup>。</p>
@@ -137,7 +137,7 @@ c(H = unname(fit$statistic),
 <p>假设另有一个培养实验：6个相互独立的培养瓶随机分到A、B、C三种培养条件，每组2瓶。在相同培养时间结束时，每瓶测一次产物浓度，单位为mg/L。全部假设数据为：<strong>A组1、2；B组3、4；C组5、6</strong>。本例无缺失、无并列。</p>
 <p>本例检验H₀：三组浓度总体分布相同；在H₀下，给定这6个观测及每组2瓶，培养条件标签可交换。检验水准为0.05。我们要计算观察到的H、完整枚举的精确P，以及χ²近似P，比较两种推断方式。</p>
 <p>六个数的秩恰为1到6，总平均秩是3.5。式（11）先算这次实际分组的H。</p>
-<p><img alt="式11：三组平均秩1.5、3.5、5.5，以样本量2加权求偏离平方并标准化，H为32/7约4.5714286" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F11.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式11：三组平均秩1.5、3.5、5.5，以样本量2加权求偏离平方并标准化，H为32/7约4.5714286" data-formula-font-css="22" data-formula-width="329.0" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F11.png" style="display:block;width:329.0px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（11）｜本例N＝6、k＝3、各nᵢ＝2；无并列，无需并列校正。</em></p>
 <p>接下来，从6个有身份的瓶中选2个给A组，有15种选择；再从剩下4个中选2个给B组，有6种；最后2个自动归C组。于是，总共15×6＝90个等概率划分。</p>
 <p>比如原划分的三组秩和是3、7、11，H约4.5714；若A取1、6，B取2、5，C取3、4，三个秩和都为7，H就是0。逐个计算90次，再把相同H的划分数加起来，就得到表5的<strong>完整条件零分布</strong>。</p>
@@ -172,7 +172,7 @@ c(total = length(h_all),
 <p>这时合法身份划分有<strong>2,308,743,493,056</strong>个。完整逐一枚举已不适合课堂练习。每轮均匀打乱24只兔的标签对应，按6、6、6、6重新分组，就能从同一个条件零分布抽取一个H；多轮之间允许抽到重复划分。</p>
 <p>本篇进行<strong>199999次独立随机置换</strong>，记其中H达到或超过11.8041471的次数为b。式（12）用加1的Monte Carlo P值处理观察到的划分，同时给出近似Monte Carlo标准误，用来衡量有限模拟次数带来的计算波动<sup>[5]</sup>。</p>
 <p style="text-align:left">加1的计算依据：<a href="https://doi.org/10.2202/1544-6115.1585" rel="noopener" target="_blank">https://doi.org/10.2202/1544-6115.1585</a></p>
-<p><img alt="式12：蒙特卡洛P估计为(b加1)/(模拟次数加1)，标准误近似为根号下P估计乘1减P估计除以模拟次数" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F12.png"/></p>
+<p style="margin:22px 0 4px;text-align:center"><img alt="式12：蒙特卡洛P估计为(b加1)/(模拟次数加1)，标准误近似为根号下P估计乘1减P估计除以模拟次数" data-formula-font-css="22" data-formula-width="197.67" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F12.png" style="display:block;width:197.67px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（12）｜B_MC表示模拟次数，区别于前文组间平方和B；b只数随机置换中进入尾部的次数。</em></p>
 <p>Python本次实际有679次进入尾部，按式（12）得到P̂＝680/200000＝<strong>0.003400</strong>，Monte Carlo标准误约<strong>0.000130</strong>。以约两倍标准误描述计算波动，大致是0.00314至0.00366。</p>
 <p>R和MATLAB本次各有644次进入尾部，估计P均为0.003225，与Python结果的差异约为一个合并Monte Carlo标准误。不同语言即使用相同种子，也未必产生相同的随机序列。</p>

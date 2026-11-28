@@ -1,6 +1,6 @@
 {
   "1": [
-    "\\bar r=\\frac{1+2+\\cdots+N}{N}=\\frac{N+1}{2}",
+    "\\bar r=\\dfrac{1+2+\\cdots+N}{N}=\\dfrac{N+1}{2}",
     "N=24,\\qquad \\bar r=12.5"
   ],
   "2": [
@@ -10,91 +10,93 @@
     "B=546.5833\\ldots"
   ],
   "3": [
-    "s_r^2=\\frac{1}{N-1}\\sum_{j=1}^{N}(r_j-\\bar r)^2",
+    "s_r^2=\\dfrac{1}{N-1}\\sum_{j=1}^{N}(r_j-\\bar r)^2",
     "\\operatorname{E}_0(Y_a)=\\bar r",
-    "\\operatorname{Var}_0(Y_a)=\\frac{N-1}{N}s_r^2"
+    "\\operatorname{Var}_0(Y_a)=\\dfrac{N-1}{N}s_r^2"
   ],
   "3a": [
     "0=\\operatorname{Var}_0\\!\\left(\\sum_{a=1}^{N}Y_a\\right)",
     "\\quad=N\\operatorname{Var}_0(Y_1)",
     "\\qquad+N(N-1)\\operatorname{Cov}_0(Y_1,Y_2)",
-    "\\operatorname{Cov}_0(Y_a,Y_b)=-\\frac{s_r^2}{N}",
+    "\\operatorname{Cov}_0(Y_a,Y_b)=-\\dfrac{s_r^2}{N}",
     "\\qquad (a\\ne b)"
   ],
   "3b": [
-    "\\operatorname{Var}_0(\\bar Y_i)=\\frac{1}{n_i^2}\\left[n_i\\frac{N-1}{N}s_r^2\\right.",
-    "\\qquad\\left.-n_i(n_i-1)\\frac{s_r^2}{N}\\right]",
-    "\\quad=s_r^2\\left(\\frac{1}{n_i}-\\frac{1}{N}\\right)",
-    "\\operatorname{Cov}_0(\\bar Y_i,\\bar Y_\\ell)=-\\frac{s_r^2}{N}",
+    "\\operatorname{Var}_0(\\bar Y_i)=\\dfrac{1}{n_i^2}\\left[n_i\\dfrac{N-1}{N}s_r^2\\right.",
+    "\\qquad\\left.-n_i(n_i-1)\\dfrac{s_r^2}{N}\\right]",
+    "\\quad=s_r^2\\left(\\dfrac{1}{n_i}-\\dfrac{1}{N}\\right)",
+    "\\operatorname{Cov}_0(\\bar Y_i,\\bar Y_\\ell)=-\\dfrac{s_r^2}{N}",
     "\\qquad (i\\ne\\ell)"
   ],
   "3c": [
     "\\operatorname{E}_0(B)=\\sum_i n_i\\operatorname{Var}_0(\\bar Y_i)",
-    "\\quad=s_r^2\\sum_i\\left(1-\\frac{n_i}{N}\\right)",
+    "\\quad=s_r^2\\sum_i\\left(1-\\dfrac{n_i}{N}\\right)",
     "\\quad=(k-1)s_r^2",
-    "H=\\frac{B}{s_r^2},\\qquad \\operatorname{E}_0(H)=k-1"
+    "H=\\dfrac{B}{s_r^2},\\qquad \\operatorname{E}_0(H)=k-1"
   ],
   "4": [
-    "\\sum_{j=1}^{N}(j-\\bar r)^2=\\frac{N(N^2-1)}{12}",
-    "s_{\\mathrm{base}}^2=\\frac{N(N+1)}{12}",
-    "H^*=\\frac{B}{s_{\\mathrm{base}}^2}=\\frac{12B}{N(N+1)}"
+    "\\sum_{j=1}^{N}(j-\\bar r)^2=\\dfrac{N(N^2-1)}{12}",
+    "s_{\\mathrm{base}}^2=\\dfrac{N(N+1)}{12}",
+    "H^*=\\dfrac{B}{s_{\\mathrm{base}}^2}=\\dfrac{12B}{N(N+1)}"
   ],
   "5": [
     "R_i=n_i\\bar r_i,\\qquad \\sum_iR_i=N\\bar r",
-    "B=\\sum_i\\frac{R_i^2}{n_i}-N\\bar r^2",
-    "H^*=\\frac{12}{N(N+1)}\\sum_i\\frac{R_i^2}{n_i}",
+    "B=\\sum_i\\dfrac{R_i^2}{n_i}-N\\bar r^2",
+    "H^*=\\dfrac{12}{N(N+1)}\\sum_i\\dfrac{R_i^2}{n_i}",
     "\\qquad -3(N+1)"
   ],
   "6": [
     "2,3,4,5,6\\ \\longrightarrow\\ 4,4,4,4,4",
     "(2-4)^2+(3-4)^2+(4-4)^2",
     "\\quad+(5-4)^2+(6-4)^2=10",
-    "\\text{loss for }t\\text{ ties}=\\frac{t^3-t}{12}"
+    "\\text{loss for }t\\text{ ties}=\\dfrac{t^3-t}{12}"
   ],
   "7": [
-    "\\mathrm{SS}_{\\mathrm{base}}=\\frac{24(24^2-1)}{12}=1150",
-    "\\mathrm{loss}=0+10+10+5+60=85",
+    "\\mathrm{SS}_{\\mathrm{base}}=\\dfrac{24(24^2-1)}{12}=1150",
+    "\\mathrm{loss}=0+10+10+5+60",
+    "\\quad=85",
     "\\mathrm{SS}_{\\mathrm{actual}}=1150-85=1065",
-    "s_r^2=\\frac{1065}{23}=46.3043478\\ldots",
-    "C=\\frac{s_r^2}{50}=0.9260869565\\ldots"
+    "s_r^2=\\dfrac{1065}{23}=46.3043478\\ldots",
+    "C=\\dfrac{s_r^2}{50}=0.9260869565\\ldots"
   ],
   "7a": [
-    "C=1-\\frac{\\sum_\\ell(t_\\ell^3-t_\\ell)}{N^3-N}",
-    "s_r^2=\\frac{N(N+1)}{12}C"
+    "C=1-\\dfrac{\\sum_\\ell(t_\\ell^3-t_\\ell)}{N^3-N}",
+    "s_r^2=\\dfrac{N(N+1)}{12}C"
   ],
   "8": [
-    "H=\\frac{B}{s_r^2}=\\frac{H^*}{C}",
-    "H=\\frac{546.583333\\ldots}{46.3043478\\ldots}",
-    "\\quad=\\frac{10.9316667\\ldots}{0.9260869565\\ldots}",
+    "H=\\dfrac{B}{s_r^2}=\\dfrac{H^*}{C}",
+    "H=\\dfrac{546.583333\\ldots}{46.3043478\\ldots}",
+    "\\quad=\\dfrac{10.9316667\\ldots}{0.9260869565\\ldots}",
     "\\quad=11.8041471\\ldots"
   ],
   "9": [
-    "M=\\frac{N!}{n_1!n_2!\\cdots n_k!}",
-    "P_{\\rm exact}=\\frac{\\#\\{H_{\\rm perm}\\geq H_{\\rm obs}\\}}{M}"
+    "M=\\dfrac{N!}{n_1!n_2!\\cdots n_k!}",
+    "P_{\\rm exact}=\\dfrac{\\#\\{H_{\\rm perm}\\geq H_{\\rm obs}\\}}{M}"
   ],
   "10": [
-    "\\operatorname{Var}_0(d)=s_r^2\\left(\\frac{1}{m}+\\frac{1}{n}\\right)",
-    "Z_1=\\frac{\\bar Y_1-\\bar Y_2}{\\sqrt{2s_r^2/n}}",
-    "Z_2=\\frac{(\\bar Y_1+\\bar Y_2)/2-\\bar Y_3}{\\sqrt{3s_r^2/(2n)}}",
-    "Z_3=\\frac{(\\bar Y_1+\\bar Y_2+\\bar Y_3)/3-\\bar Y_4}{\\sqrt{4s_r^2/(3n)}}",
+    "\\operatorname{Var}_0(d)=s_r^2\\left(\\dfrac{1}{m}+\\dfrac{1}{n}\\right)",
+    "Z_1=\\dfrac{\\bar Y_1-\\bar Y_2}{\\sqrt{2s_r^2/n}}",
+    "Z_2=\\dfrac{(\\bar Y_1+\\bar Y_2)/2-\\bar Y_3}{\\sqrt{3s_r^2/(2n)}}",
+    "Z_3=\\dfrac{(\\bar Y_1+\\bar Y_2+\\bar Y_3)/3-\\bar Y_4}{\\sqrt{4s_r^2/(3n)}}",
     "n=6"
   ],
   "10a": [
     "Z_1^2+Z_2^2+Z_3^2",
-    "\\quad=\\frac{n}{s_r^2}\\sum_{i=1}^{4}(\\bar Y_i-\\bar r)^2",
-    "\\quad=\\frac{B}{s_r^2}=H"
+    "\\quad=\\dfrac{n}{s_r^2}\\sum_{i=1}^{4}(\\bar Y_i-\\bar r)^2",
+    "\\quad=\\dfrac{B}{s_r^2}=H"
   ],
   "10b": [
     "D_1=\\bar Y_1-\\bar Y_2",
     "D_2=(\\bar Y_1+\\bar Y_2)/2-\\bar Y_3",
     "v=\\operatorname{Var}_0(\\bar Y_i),\\ c=\\operatorname{Cov}_0(\\bar Y_i,\\bar Y_\\ell)",
     "\\operatorname{Cov}_0(D_1,D_2)",
-    "\\quad=\\frac{1}{2}(v-v)+\\frac{1}{2}(c-c)-c+c=0"
+    "\\quad=\\dfrac{1}{2}(v-v)+\\dfrac{1}{2}(c-c)",
+    "\\qquad-c+c=0"
   ],
   "10c": [
     "\\mathrm{SE}_0(d)=s_r\\sqrt{\\frac{1}{m}+\\frac{1}{n}}",
-    "\\Delta B=\\frac{mn}{m+n}d^2",
-    "\\frac{\\Delta B}{s_r^2}=\\left[\\frac{d}{\\mathrm{SE}_0(d)}\\right]^2"
+    "\\Delta B=\\dfrac{mn}{m+n}d^2",
+    "\\dfrac{\\Delta B}{s_r^2}=\\left[\\dfrac{d}{\\mathrm{SE}_0(d)}\\right]^2"
   ],
   "10d": [
     "H\\ \\longrightarrow\\ \\chi^2_{k-1}",
@@ -102,11 +104,13 @@
   ],
   "11": [
     "\\bar r_A=1.5,\\quad\\bar r_B=3.5,\\quad\\bar r_C=5.5",
-    "B=2(-2)^2+2(0)^2+2(2)^2=16",
-    "H=\\frac{12\\times16}{6\\times7}=\\frac{32}{7}=4.5714286\\ldots"
+    "B=2(-2)^2+2(0)^2+2(2)^2",
+    "\\quad=16",
+    "H=\\dfrac{12\\times16}{6\\times7}=\\dfrac{32}{7}",
+    "\\quad=4.5714286\\ldots"
   ],
   "12": [
-    "\\widehat P=\\frac{b+1}{B_{\\rm MC}+1}",
+    "\\widehat P=\\dfrac{b+1}{B_{\\rm MC}+1}",
     "\\operatorname{MCSE}\\approx\\sqrt{\\frac{\\widehat P(1-\\widehat P)}{B_{\\rm MC}}}"
   ]
 }

@@ -1,0 +1,188 @@
+{
+  "font_css_px": 22,
+  "pixel_density": 3,
+  "render_dpi": 216,
+  "maximum_display_width_css_px": 346,
+  "formulas": {
+    "公式01.png": {
+      "label": "1",
+      "width_px": 864,
+      "height_px": 277,
+      "display_width_css_px": 288.0,
+      "display_height_css_px": 92.33,
+      "font_css_px": 22,
+      "lines": 2
+    },
+    "公式02.png": {
+      "label": "2",
+      "width_px": 855,
+      "height_px": 567,
+      "display_width_css_px": 285.0,
+      "display_height_css_px": 189.0,
+      "font_css_px": 22,
+      "lines": 4
+    },
+    "公式03.png": {
+      "label": "3",
+      "width_px": 708,
+      "height_px": 513,
+      "display_width_css_px": 236.0,
+      "display_height_css_px": 171.0,
+      "font_css_px": 22,
+      "lines": 3
+    },
+    "公式03a.png": {
+      "label": "3a",
+      "width_px": 924,
+      "height_px": 743,
+      "display_width_css_px": 308.0,
+      "display_height_css_px": 247.67,
+      "font_css_px": 22,
+      "lines": 5
+    },
+    "公式03b.png": {
+      "label": "3b",
+      "width_px": 807,
+      "height_px": 854,
+      "display_width_css_px": 269.0,
+      "display_height_css_px": 284.67,
+      "font_css_px": 22,
+      "lines": 5
+    },
+    "公式03c.png": {
+      "label": "3c",
+      "width_px": 842,
+      "height_px": 689,
+      "display_width_css_px": 280.67,
+      "display_height_css_px": 229.67,
+      "font_css_px": 22,
+      "lines": 4
+    },
+    "公式04.png": {
+      "label": "4",
+      "width_px": 756,
+      "height_px": 610,
+      "display_width_css_px": 252.0,
+      "display_height_css_px": 203.33,
+      "font_css_px": 22,
+      "lines": 3
+    },
+    "公式05.png": {
+      "label": "5",
+      "width_px": 736,
+      "height_px": 725,
+      "display_width_css_px": 245.33,
+      "display_height_css_px": 241.67,
+      "font_css_px": 22,
+      "lines": 4
+    },
+    "公式06.png": {
+      "label": "6",
+      "width_px": 951,
+      "height_px": 518,
+      "display_width_css_px": 317.0,
+      "display_height_css_px": 172.67,
+      "font_css_px": 22,
+      "lines": 4
+    },
+    "公式07.png": {
+      "label": "7",
+      "width_px": 955,
+      "height_px": 870,
+      "display_width_css_px": 318.33,
+      "display_height_css_px": 290.0,
+      "font_css_px": 22,
+      "lines": 6
+    },
+    "公式07a.png": {
+      "label": "7a",
+      "width_px": 601,
+      "height_px": 440,
+      "display_width_css_px": 200.33,
+      "display_height_css_px": 146.67,
+      "font_css_px": 22,
+      "lines": 2
+    },
+    "公式08.png": {
+      "label": "8",
+      "width_px": 744,
+      "height_px": 649,
+      "display_width_css_px": 248.0,
+      "display_height_css_px": 216.33,
+      "font_css_px": 22,
+      "lines": 4
+    },
+    "公式09.png": {
+      "label": "9",
+      "width_px": 827,
+      "height_px": 365,
+      "display_width_css_px": 275.67,
+      "display_height_css_px": 121.67,
+      "font_css_px": 22,
+      "lines": 2
+    },
+    "公式10.png": {
+      "label": "10",
+      "width_px": 857,
+      "height_px": 989,
+      "display_width_css_px": 285.67,
+      "display_height_css_px": 329.67,
+      "font_css_px": 22,
+      "lines": 5
+    },
+    "公式10a.png": {
+      "label": "10a",
+      "width_px": 614,
+      "height_px": 553,
+      "display_width_css_px": 204.67,
+      "display_height_css_px": 184.33,
+      "font_css_px": 22,
+      "lines": 3
+    },
+    "公式10b.png": {
+      "label": "10b",
+      "width_px": 971,
+      "height_px": 739,
+      "display_width_css_px": 323.67,
+      "display_height_css_px": 246.33,
+      "font_css_px": 22,
+      "lines": 6
+    },
+    "公式10c.png": {
+      "label": "10c",
+      "width_px": 641,
+      "height_px": 500,
+      "display_width_css_px": 213.67,
+      "display_height_css_px": 166.67,
+      "font_css_px": 22,
+      "lines": 3
+    },
+    "公式10d.png": {
+      "label": "10d",
+      "width_px": 746,
+      "height_px": 257,
+      "display_width_css_px": 248.67,
+      "display_height_css_px": 85.67,
+      "font_css_px": 22,
+      "lines": 2
+    },
+    "公式11.png": {
+      "label": "11",
+      "width_px": 987,
+      "height_px": 608,
+      "display_width_css_px": 329.0,
+      "display_height_css_px": 202.67,
+      "font_css_px": 22,
+      "lines": 5
+    },
+    "公式12.png": {
+      "label": "12",
+      "width_px": 593,
+      "height_px": 368,
+      "display_width_css_px": 197.67,
+      "display_height_css_px": 122.67,
+      "font_css_px": 22,
+      "lines": 2
+    }
+  }
+}
