@@ -186,22 +186,32 @@ c(total = length(h_all),
 rabbit$drug &lt;- factor(rabbit$drug)
 mc_fit &lt;- coin::kruskal_test(
   score ~ drug, data = rabbit,
-  distribution = coin::approximate(nresample = 199999)
+  distribution = coin::approximate(
+    nresample = 199999
+  )
 )
 coin::statistic(mc_fit)
 coin::pvalue(mc_fit)</code></pre>
 <p>配套的一次实际运行得到H＝11.8041471、Monte Carlo P约0.00307502，MC标准误约0.00012381。函数本次打印的99%置信区间也描述Monte Carlo计算误差。coin本次返回的是模拟中进入右尾的比例b/B_MC；前面手写脚本采用加1规则。同一批模拟加1后约为0.00308000，两种估计的差别约0.000005，远小于本次模拟误差。不同抽样实现的结果也会有正常的Monte Carlo波动。</p>
 <p>coin的<code>exact</code>计算目前限定于单变量两样本问题，三组及以上KW的完整精确计算可以另用<code>kSamples::qn.test(test = "KW")</code>。继续用第七节的六瓶资料，输入三个组的数据向量，<code>method = "exact"</code>选择完整枚举。此函数还要求<code>Nsim</code>覆盖全部划分数；这里共有90种，设为90，再检查返回的<code>method</code>确为<code>exact</code><sup>[7]</sup>。</p>
 <pre><code>exact_fit &lt;- kSamples::qn.test(
-  list(A = c(1, 2), B = c(3, 4), C = c(5, 6)),
-  test = "KW", method = "exact", Nsim = 90
+  list(
+    A = c(1, 2),
+    B = c(3, 4),
+    C = c(5, 6)
+  ),
+  test = "KW",
+  method = "exact",
+  Nsim = 90
 )
 exact_fit$method
 exact_fit$qn</code></pre>
 <p>实际返回<code>method = "exact"</code>；<code>qn</code>依次给出H＝4.5714286、χ²近似P＝0.1017014及精确P＝0.0666667，与前面的90次完整枚举一致。若<code>Nsim</code>不足，该函数会改用模拟，因此要读取实际返回的方法，不能仅凭调用时写了<code>exact</code>就判定精确计算已经完成。它也支持<code>method = "simulated"</code>作Monte Carlo；配套脚本另用兔例核对了这一入口。</p>
 <p><code>rstatix::kruskal_test()</code>提供整洁的数据框输出，底层仍调用<code>stats::kruskal.test()</code>，P值采用χ²近似。它不会自动切换到上述完整精确或Monte Carlo计算。由于它与coin的函数同名，这里保留<code>coin::</code>、<code>rstatix::</code>等包名前缀，明确实际调用的是哪个函数<sup>[8]</sup>。</p>
 <p>对同一份兔数据，rstatix的调用如下；它返回的结果表仍给出H约11.8041、自由度3、近似P约0.00808509。</p>
-<pre><code>rstatix::kruskal_test(rabbit, score ~ drug)</code></pre>
+<pre><code>rstatix::kruskal_test(
+  rabbit, score ~ drug
+)</code></pre>
 <p style="text-align:left">软件说明：<a href="https://search.r-project.org/CRAN/refmans/coin/html/NullDistribution.html" rel="noopener" target="_blank">https://search.r-project.org/CRAN/refmans/coin/html/NullDistribution.html</a> ；<a href="https://search.r-project.org/CRAN/refmans/kSamples/html/qn.test.html" rel="noopener" target="_blank">https://search.r-project.org/CRAN/refmans/kSamples/html/qn.test.html</a> ；<a href="https://rpkgs.datanovia.com/rstatix/reference/kruskal_test.html" rel="noopener" target="_blank">https://rpkgs.datanovia.com/rstatix/reference/kruskal_test.html</a></p>
 <h2>九、回到兔实验，怎样解释结果？</h2>
 <p>兔例BW755C组平均秩为4.3333，前三组约14.17至16.25，样本中确实呈现明显的秩位置分离。H将这种分离汇总为11.8041。报告时要同时写明独立单位、整体检验及P值的计算方式。</p>
