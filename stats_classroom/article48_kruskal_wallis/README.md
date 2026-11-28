@@ -47,3 +47,16 @@
 ## 实际环境与验证
 
 本次使用Python 3.12.12、NumPy 2.4.3、SciPy 1.17.1、pandas 3.0.1、Matplotlib 3.10.8；R 4.6.1、ggplot2 4.0.3；MATLAB R2025a及Statistics and Machine Learning Toolbox。具体数字证据见附带实际结果，核验范围见随稿核对记录。较旧环境的输出排版可能不同，先核对数值与统计定义。
+
+
+## 可选：直接调用R包核对
+
+原`代码/kw_practice.R`的统计计算仍只需基础R。若要对照现成函数，先在自己的R环境运行`install.packages(c("coin", "kSamples", "rstatix"))`，再从项目根目录打开`代码/kw_R包核对.R`，按第1—4节顺序运行，或`source("代码/kw_R包核对.R")`。默认打印结果，不保存CSV；运行前设`SAVE_RESULTS=1`可保存比较表。
+
+`stats::kruskal.test()`和`rstatix::kruskal_test()`采用χ²近似，不会像`wilcox.test(exact=NULL)`那样自动切换精确/渐近方法。当前核对环境为R4.6.1，wilcox.test的新版本已支持并列秩的条件精确推断；不要将旧版本的并列限制直接套用到新版本。
+
+`kSamples::qn.test(test="KW", method="exact", Nsim=90)`完整枚举六瓶90种划分，返回H=32/7、χ²近似P=0.101701392304及精确P=1/15；必须检查返回的method实际为exact。Nsim不足合法划分数时，它会改用模拟。
+
+兔例用coin的approximate(nresample=199999)和kSamples的simulated/Nsim=199999，分别从seed=20261130开始。本次coin尾部615次、P=615/199999=0.003075015375、MCSE约0.000123806；kSamples尾部649次、P=649/199999=0.003245016225、MCSE约0.000127171。当前包返回b/B；同一批抽样按正文加1规则换算，分别为0.003080和0.003250。包的Monte Carlo区间衡量计算波动；不是药物效应的置信区间。
+
+本次包版本coin1.4.5、kSamples1.2.12、rstatix1.1.0；kSamples依赖SuppDists1.1.9.9。其他版本先核对算法、实际method与MC次数，再按计算误差比较结果。包函数使用同一份输入，既有三语教学入口及其结果保留。

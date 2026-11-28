@@ -130,6 +130,7 @@
 fit &lt;- kruskal.test(score ~ drug, data = rabbit)
 c(H = unname(fit$statistic),
   df = unname(fit$parameter), P = fit$p.value)</code></pre>
+<p><code>wilcox.test()</code>默认可以按其规则选择精确推断或正态近似，<code>kruskal.test()</code>则没有这样的自动切换，也没有精确或Monte Carlo的计算开关；这是函数支持范围的区别<sup>[3]</sup>。</p>
 <p>实际输出舍入为：H＝11.8041471，df＝3，P＝0.00808509。按预先规定的0.05水准，χ²近似结果支持四组改善指标分布存在差异。</p>
 <p>教材与NIST资料常用“每组至少5个”提示χ²近似的适用范围<sup>[1,4]</sup>。这是一条经验建议，不能保证任意不平衡、强并列或很小的尾部概率都足够准确。总样本量大，也不能补足某一组始终极小的问题。本例虽各组6只，并列明显，值得再用条件置换核对。</p>
 <p style="text-align:left">NIST说明：<a href="https://itl.nist.gov/div898/software/dataplot/refman1/auxillar/kruskwal.htm" rel="noopener" target="_blank">https://itl.nist.gov/div898/software/dataplot/refman1/auxillar/kruskwal.htm</a></p>
@@ -175,12 +176,33 @@ c(total = length(h_all),
 <p style="margin:22px 0 4px;text-align:center"><img alt="式12：蒙特卡洛P估计为(b加1)/(模拟次数加1)，标准误近似为根号下P估计乘1减P估计除以模拟次数" data-formula-font-css="17" data-formula-width="156.67" src="%E6%96%87%E7%AB%A0%E9%85%8D%E5%9B%BE/%E5%85%AC%E5%BC%8F12.png" style="display:block;width:156.67px;max-width:100%;height:auto;margin:18px auto 8px;border:0;"/></p>
 <p class="caption"><em>式（12）｜B_MC表示模拟次数，区别于前文组间平方和B；b只数随机置换中进入尾部的次数。</em></p>
 <p>Python本次实际有679次进入尾部，按式（12）得到P̂＝680/200000＝<strong>0.003400</strong>，Monte Carlo标准误约<strong>0.000130</strong>。以约两倍标准误描述计算波动，大致是0.00314至0.00366。</p>
-<p>R和MATLAB本次各有644次进入尾部，估计P均为0.003225，与Python结果的差异约为一个合并Monte Carlo标准误。不同语言即使用相同种子，也未必产生相同的随机序列。</p>
+<p>主练习脚本中的R和MATLAB手写循环，本次各有644次进入尾部，估计P均为0.003225，与Python结果的差异约为一个合并Monte Carlo标准误。不同语言即使用相同种子，也未必产生相同的随机序列。</p>
 <p>本例的χ²近似P＝0.008085，比置换估计明显偏大，这个差距远大于本次Monte Carlo标准误。因此，两者的差别主要反映参照分布近似的差异，而不只是模拟次数有限。四组各6只、并列较多，正好提醒我们：每组达到经验门槛，也不能据此断言近似尾部足够精确。这里两种方法仍给出相同的0.05水准判断。</p>
 <p>这个标准误描述的是<strong>在同一份数据上重新运行模拟，P值估计会抖动多少</strong>。它不衡量药物效应的生物学不确定性，也不是对H₀成立概率的估计。增加模拟次数可以减小计算波动；无法把χ²近似误差或实验设计问题一并消除。</p>
-<p>R的coin包提供条件推断框架，可用<code>asymptotic</code>作渐近推断，或用<code>approximate</code>作Monte Carlo重抽样。其文档中的<code>exact</code>计算限定于单变量两样本问题，不能给三组以上KW随意设置这个选项就宣称算出了精确P。本篇三组精确结果来自透明的完整枚举，兔例则是有限次数的Monte Carlo估计<sup>[6]</sup>。</p>
-<p style="text-align:left">coin官方说明：<a href="https://search.r-project.org/CRAN/refmans/coin/html/LocationTests.html" rel="noopener" target="_blank">https://search.r-project.org/CRAN/refmans/coin/html/LocationTests.html</a></p>
-<p>因此，“小样本应考虑精确检验”说的是应根据实际条件零分布计算概率；<strong>枚举规模</strong>决定能否直接完整算出。精确条件分布对大样本同样有定义，小样本也可能因组数较多而产生很大的组合空间。</p>
+<p>因此，“小样本应考虑精确检验”说的是应根据实际条件零分布计算概率；<strong>枚举规模</strong>决定能否直接逐一列出。精确条件分布对大样本同样有定义，小样本也可能因组数较多而产生很大的组合空间。</p>
+<h3>R里可以直接调用哪些函数？</h3>
+<p>前面的手写循环用于看清零分布的构造。实际计算可以调用R包。对表1的兔例，<code>coin::kruskal_test()</code>输入评分与分组，在<code>distribution</code>中选择<code>coin::approximate()</code>，将<code>nresample</code>设为199999，指定条件Monte Carlo抽样次数。它返回检验对象，<code>statistic()</code>读取H，<code>pvalue()</code>读取P。这里把<code>drug</code>明确设为因子，表示四个组；数据路径仍从配套项目根目录开始<sup>[6]</sup>。</p>
+<pre><code>rabbit &lt;- read.csv("数据/rabbit.csv")
+rabbit$drug &lt;- factor(rabbit$drug)
+mc_fit &lt;- coin::kruskal_test(
+  score ~ drug, data = rabbit,
+  distribution = coin::approximate(nresample = 199999)
+)
+coin::statistic(mc_fit)
+coin::pvalue(mc_fit)</code></pre>
+<p>配套的一次实际运行得到H＝11.8041471、Monte Carlo P约0.00307502，MC标准误约0.00012381。函数本次打印的99%置信区间也描述Monte Carlo计算误差。coin本次返回的是模拟中进入右尾的比例b/B_MC；前面手写脚本采用加1规则。同一批模拟加1后约为0.00308000，两种估计的差别约0.000005，远小于本次模拟误差。不同抽样实现的结果也会有正常的Monte Carlo波动。</p>
+<p>coin的<code>exact</code>计算目前限定于单变量两样本问题，三组及以上KW的完整精确计算可以另用<code>kSamples::qn.test(test = "KW")</code>。继续用第七节的六瓶资料，输入三个组的数据向量，<code>method = "exact"</code>选择完整枚举。此函数还要求<code>Nsim</code>覆盖全部划分数；这里共有90种，设为90，再检查返回的<code>method</code>确为<code>exact</code><sup>[7]</sup>。</p>
+<pre><code>exact_fit &lt;- kSamples::qn.test(
+  list(A = c(1, 2), B = c(3, 4), C = c(5, 6)),
+  test = "KW", method = "exact", Nsim = 90
+)
+exact_fit$method
+exact_fit$qn</code></pre>
+<p>实际返回<code>method = "exact"</code>；<code>qn</code>依次给出H＝4.5714286、χ²近似P＝0.1017014及精确P＝0.0666667，与前面的90次完整枚举一致。若<code>Nsim</code>不足，该函数会改用模拟，因此要读取实际返回的方法，不能仅凭调用时写了<code>exact</code>就判定精确计算已经完成。它也支持<code>method = "simulated"</code>作Monte Carlo；配套脚本另用兔例核对了这一入口。</p>
+<p><code>rstatix::kruskal_test()</code>提供整洁的数据框输出，底层仍调用<code>stats::kruskal.test()</code>，P值采用χ²近似。它不会自动切换到上述完整精确或Monte Carlo计算。由于它与coin的函数同名，这里保留<code>coin::</code>、<code>rstatix::</code>等包名前缀，明确实际调用的是哪个函数<sup>[8]</sup>。</p>
+<p>对同一份兔数据，rstatix的调用如下；它返回的结果表仍给出H约11.8041、自由度3、近似P约0.00808509。</p>
+<pre><code>rstatix::kruskal_test(rabbit, score ~ drug)</code></pre>
+<p style="text-align:left">软件说明：<a href="https://search.r-project.org/CRAN/refmans/coin/html/NullDistribution.html" rel="noopener" target="_blank">https://search.r-project.org/CRAN/refmans/coin/html/NullDistribution.html</a> ；<a href="https://search.r-project.org/CRAN/refmans/kSamples/html/qn.test.html" rel="noopener" target="_blank">https://search.r-project.org/CRAN/refmans/kSamples/html/qn.test.html</a> ；<a href="https://rpkgs.datanovia.com/rstatix/reference/kruskal_test.html" rel="noopener" target="_blank">https://rpkgs.datanovia.com/rstatix/reference/kruskal_test.html</a></p>
 <h2>九、回到兔实验，怎样解释结果？</h2>
 <p>兔例BW755C组平均秩为4.3333，前三组约14.17至16.25，样本中确实呈现明显的秩位置分离。H将这种分离汇总为11.8041。报告时要同时写明独立单位、整体检验及P值的计算方式。</p>
 <p>可以写成：“以每只兔的药物眼相对盐水眼改善指标为分析对象，四独立组的Kruskal–Wallis统计量H＝11.8041；χ²近似P＝0.00809，199999次条件置换的Monte Carlo P＝0.00340（MC标准误约0.00013）。结果支持四药组改善指标的总体分布存在差异。”</p>
@@ -188,10 +210,10 @@ c(total = length(h_all),
 <h2>十、近期研究怎样使用Kruskal–Wallis？</h2>
 <p>课堂上的药物组可以换成疾病阶段，也可以换成术前风险分层。下面两项2026年的研究，都按临床分组比较每位参与者的一个指标。</p>
 <h3>（一）肠道微生物组：不同肾病阶段的多样性是否不同？</h3>
-<p>Krukowski等2026年发表于《Nature Microbiology》的研究，纳入130人：非慢性肾病对照11人，慢性肾病1/2期36人、3期44人、4/5期29人，以及接受腹膜透析的5期患者10人。论文图2a比较这五组的物种丰富度、Shannon多样性和Pielou均匀度。方法部分说明采用非参数检验处理非正态的微生物指标，图注明确使用Kruskal–Wallis整体检验，再用Dunn检验作组对比较并进行BH调整。腹膜透析组的物种丰富度低于4/5期组，而Shannon多样性和均匀度未检出组间差异<sup>[7]</sup>。</p>
+<p>Krukowski等2026年发表于《Nature Microbiology》的研究，纳入130人：非慢性肾病对照11人，慢性肾病1/2期36人、3期44人、4/5期29人，以及接受腹膜透析的5期患者10人。论文图2a比较这五组的物种丰富度、Shannon多样性和Pielou均匀度。方法部分说明采用非参数检验处理非正态的微生物指标，图注明确使用Kruskal–Wallis整体检验，再用Dunn检验作组对比较并进行BH调整。腹膜透析组的物种丰富度低于4/5期组，而Shannon多样性和均匀度未检出组间差异<sup>[9]</sup>。</p>
 <p>对应本文，就是每位参与者提供一个多样性指标，比较不同临床组在该指标上的秩位置。这里的组间比较本身不能证明肾功能变化导致了菌群改变；论文进一步用含协变量的模型分析宿主因素与肾功能的关联。</p>
 <h3>（二）口腔外科：术前难度分组能否区分手术时长？</h3>
-<p>Önder等2026年发表于《BMC Oral Health》的前瞻性研究，纳入215名接受下颌阻生第三磨牙拔除的患者，按术前评分分为容易、中等困难和非常困难三组，分别为166、37、12例。作者用Kruskal–Wallis比较三组手术时长，报告H＝14.29、自由度2、P＜0.001；三组时长中位数分别为11、15、17分钟。这个整体结果支持难度分组与手术时长的分布差异有关，具体组对的差异仍由后续多重比较判断<sup>[8]</sup>。</p>
+<p>Önder等2026年发表于《BMC Oral Health》的前瞻性研究，纳入215名接受下颌阻生第三磨牙拔除的患者，按术前评分分为容易、中等困难和非常困难三组，分别为166、37、12例。作者用Kruskal–Wallis比较三组手术时长，报告H＝14.29、自由度2、P＜0.001；三组时长中位数分别为11、15、17分钟。这个整体结果支持难度分组与手术时长的分布差异有关，具体组对的差异仍由后续多重比较判断<sup>[10]</sup>。</p>
 <h2>本篇讲了哪些知识？</h2>
 <ul><li><strong>H是组间平均秩的加权平方偏离，除以合并秩的实际方差。</strong> nᵢ体现每组代表的观测数；共同中心为(N＋1)/2；12来自无并列整数秩的方差公式。</li><li><strong>并列校正来自平均秩压缩了秩波动。</strong> t个并列观测使总秩平方和减少(t³−t)/12，C记录实际方差相对无并列基准的比例，所以H＝H∗/C。</li><li><strong>精确P值由H₀下允许的标签重分配产生。</strong> 固定组大小、保持单位身份划分等概率，按H达到或超过观察值求右尾；合并并列秩格局时保留组合权重。</li><li><strong>χ²(k−1)是大样本参照。</strong> k组逐次合并产生k−1个标准化差，平方和就是H；它们在适当联合正态极限下独立，才使H趋近χ²。小样本的离散零分布可与它明显不同。</li><li><strong>有限次数Monte Carlo给出带计算误差的条件尾概率估计。</strong> 它可应对庞大的枚举空间，需同时说明轮数、估计规则与误差；原始评分不必正态，标签可交换仍有赖于研究设计和同分布H₀。</li></ul>
 <h2>配套资料：用自己熟悉的一种语言跑通</h2>
@@ -205,9 +227,11 @@ c(total = length(h_all),
 <h2>参考文献</h2>
 <p>[1] Rosner B. <em>Fundamentals of Biostatistics</em>. 8th ed. Cengage Learning, 2016. §12.7，p596—600；表12.17，p597；表12.18，p599。</p>
 <p style="text-align:left">[2] Kruskal WH, Wallis WA. Use of ranks in one-criterion variance analysis. <em>Journal of the American Statistical Association</em>. 1952;47(260):583—621. <a href="https://doi.org/10.1080/01621459.1952.10483441" rel="noopener" target="_blank">https://doi.org/10.1080/01621459.1952.10483441</a></p>
-<p style="text-align:left">[3] R Core Team. stats::kruskal.test：Kruskal–Wallis Rank Sum Test；stats::oneway.test：Test for Equal Means in a One-Way Layout. <a href="https://www.stat.ethz.ch/R-manual/R-devel/library/stats/html/kruskal.test.html" rel="noopener" target="_blank">https://www.stat.ethz.ch/R-manual/R-devel/library/stats/html/kruskal.test.html</a> ；<a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/oneway.test.html" rel="noopener" target="_blank">https://stat.ethz.ch/R-manual/R-patched/library/stats/html/oneway.test.html</a></p>
+<p style="text-align:left">[3] R Core Team. stats::kruskal.test：Kruskal–Wallis Rank Sum Test；stats::oneway.test：Test for Equal Means in a One-Way Layout；stats::wilcox.test：Wilcoxon Rank Sum and Signed Rank Tests. <a href="https://www.stat.ethz.ch/R-manual/R-devel/library/stats/html/kruskal.test.html" rel="noopener" target="_blank">https://www.stat.ethz.ch/R-manual/R-devel/library/stats/html/kruskal.test.html</a> ；<a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/oneway.test.html" rel="noopener" target="_blank">https://stat.ethz.ch/R-manual/R-patched/library/stats/html/oneway.test.html</a> ；<a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/wilcox.test.html" rel="noopener" target="_blank">https://stat.ethz.ch/R-manual/R-devel/library/stats/html/wilcox.test.html</a></p>
 <p style="text-align:left">[4] NIST. Dataplot Reference Manual：Kruskal Wallis. <a href="https://itl.nist.gov/div898/software/dataplot/refman1/auxillar/kruskwal.htm" rel="noopener" target="_blank">https://itl.nist.gov/div898/software/dataplot/refman1/auxillar/kruskwal.htm</a></p>
 <p style="text-align:left">[5] Phipson B, Smyth GK. Permutation P-values should never be zero: calculating exact P-values when permutations are randomly drawn. <em>Statistical Applications in Genetics and Molecular Biology</em>. 2010;9:Article39. <a href="https://doi.org/10.2202/1544-6115.1585" rel="noopener" target="_blank">https://doi.org/10.2202/1544-6115.1585</a></p>
 <p style="text-align:left">[6] Hothorn T, Hornik K, van de Wiel MA, Zeileis A. Implementing a class of permutation tests: the coin package. <em>Journal of Statistical Software</em>. 2008;28(8):1—23. <a href="https://doi.org/10.18637/jss.v028.i08" rel="noopener" target="_blank">https://doi.org/10.18637/jss.v028.i08</a> 。接口范围见官方文档：<a href="https://search.r-project.org/CRAN/refmans/coin/html/LocationTests.html" rel="noopener" target="_blank">https://search.r-project.org/CRAN/refmans/coin/html/LocationTests.html</a> ；<a href="https://search.r-project.org/CRAN/refmans/coin/html/IndependenceTest.html" rel="noopener" target="_blank">https://search.r-project.org/CRAN/refmans/coin/html/IndependenceTest.html</a></p>
-<p style="text-align:left">[7] Krukowski H, Valkenburg S, Vich Vila A, et al. Host factors dictate gut microbiome alterations in chronic kidney disease more strongly than kidney function. <em>Nature Microbiology</em>. 2026;11:664—677. 2026年2月5日在线发表；图2a及Statistical analysis。<a href="https://doi.org/10.1038/s41564-026-02259-w" rel="noopener" target="_blank">https://doi.org/10.1038/s41564-026-02259-w</a></p>
-<p style="text-align:left">[8] Önder H, Önder ME, Atıl F, Tekin U. Development and validation of a comprehensive clinical–radiographic difficulty scale for impacted mandibular third molar extractions: a prospective study. <em>BMC Oral Health</em>. 2026;26:568. 2026年2月26日发表；表3、表4及Statistical analysis。<a href="https://doi.org/10.1186/s12903-026-07970-y" rel="noopener" target="_blank">https://doi.org/10.1186/s12903-026-07970-y</a></p></main></body></html>
+<p style="text-align:left">[7] Scholz F, Zhu A. kSamples：Rank Score k-Sample Tests，qn.test函数及包说明。<a href="https://search.r-project.org/CRAN/refmans/kSamples/html/qn.test.html" rel="noopener" target="_blank">https://search.r-project.org/CRAN/refmans/kSamples/html/qn.test.html</a> ；<a href="https://search.r-project.org/CRAN/refmans/kSamples/html/kSamples-package.html" rel="noopener" target="_blank">https://search.r-project.org/CRAN/refmans/kSamples/html/kSamples-package.html</a></p>
+<p style="text-align:left">[8] Kassambara A. rstatix：kruskal_test函数说明。<a href="https://rpkgs.datanovia.com/rstatix/reference/kruskal_test.html" rel="noopener" target="_blank">https://rpkgs.datanovia.com/rstatix/reference/kruskal_test.html</a></p>
+<p style="text-align:left">[9] Krukowski H, Valkenburg S, Vich Vila A, et al. Host factors dictate gut microbiome alterations in chronic kidney disease more strongly than kidney function. <em>Nature Microbiology</em>. 2026;11:664—677. 2026年2月5日在线发表；图2a及Statistical analysis。<a href="https://doi.org/10.1038/s41564-026-02259-w" rel="noopener" target="_blank">https://doi.org/10.1038/s41564-026-02259-w</a></p>
+<p style="text-align:left">[10] Önder H, Önder ME, Atıl F, Tekin U. Development and validation of a comprehensive clinical–radiographic difficulty scale for impacted mandibular third molar extractions: a prospective study. <em>BMC Oral Health</em>. 2026;26:568. 2026年2月26日发表；表3、表4及Statistical analysis。<a href="https://doi.org/10.1186/s12903-026-07970-y" rel="noopener" target="_blank">https://doi.org/10.1186/s12903-026-07970-y</a></p></main></body></html>

@@ -1,0 +1,69 @@
+每行一只兔：四独立组，每组6只；每兔药物眼相对盐水眼改善指标，单位分。
+六瓶教学资料：A={1,2}，B={3,4}，C={5,6} mg/L，每组2瓶，互相独立。
+所有R包函数均写包名前缀；coin与rstatix有同名kruskal_test。
+
+	Kruskal-Wallis rank sum test
+
+data:  score by drug
+Kruskal-Wallis chi-squared = 11.804, df = 3, p-value = 0.008085
+
+# A tibble: 1 × 6
+  .y.       n statistic    df       p method        
+* <chr> <int>     <dbl> <int>   <dbl> <chr>         
+1 score    24      11.8     3 0.00809 Kruskal-Wallis
+
+
+ Kruskal-Wallis k-sample test.
+
+Number of samples:  3
+Sample sizes:  2, 2, 2
+Number of ties: 0
+
+Null Hypothesis: All samples come from a common population.
+
+  test statistic  asympt. P-value    exact P-Value 
+        4.571400         0.101700         0.066667 
+
+
+Warning: At least one sample size is less than 5,
+  asymptotic p-values may not be very accurate.
+实际使用方法： exact ；枚举数： 90 
+qn依次为：H、卡方近似P、精确P
+  test statistic  asympt. P-value    exact P-Value 
+ 4.5714285714286  0.1017013923042  0.0666666666667 
+
+	Approximative Kruskal-Wallis Test
+
+data:  score by
+	 drug (Aspirin, BW755C, Indomethacin, Piroxicam)
+chi-squared = 11.804, p-value = 0.003075
+
+[1] 0.003075015
+99 percent confidence interval:
+ 0.002765439 0.003408484 
+
+
+
+ Kruskal-Wallis k-sample test.
+
+Number of samples:  4
+Sample sizes:  6, 6, 6, 6
+Number of ties: 19
+
+Null Hypothesis: All samples come from a common population.
+
+Based on Nsim = 199999 simulations
+
+  test statistic  asympt. P-value     sim. P-Value 
+      11.8040000        0.0080851        0.0032450 
+   package             H simulations exceedances        package_P
+1     coin 11.8041471049      199999         615 0.00307501537508
+2 kSamples 11.8041471048      199999         649 0.00324501622508
+               MCSE P_plus1_same_draws
+1 0.000123805795167            0.00308
+2 0.000127171189097            0.00325
+包版本：
+coin 1.4.5 
+kSamples 1.2.12 
+rstatix 1.1.0 
+随机序列依具体函数与版本；比较模拟P需结合MC误差，不要求逐值相同。
